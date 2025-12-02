@@ -7,7 +7,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# ------------- CONSTANTS -------------
+# ------------------ CONSTANTS ------------------ #
 
 DIMENSIONS = [
     "Vision & Problem Clarity",
@@ -35,8 +35,67 @@ WEIGHTS = {
     "Momentum Signals": 5,
 }
 
+# Multiple-choice answer → score mappings (1–5)
+ANSWER_SCORES = {
+    "q_stage": {
+        "I just have a vague idea and haven't written anything down.": 1,
+        "I have a clear concept but haven't done anything with it yet.": 2,
+        "I've done some basic thinking and notes, but no real testing.": 3,
+        "I've talked to a few people and/or made a rough mockup.": 4,
+        "I've run tests, pilots, or early sales conversations.": 5,
+    },
+    "q_clarity": {
+        "I'm not really sure what problem I'm solving.": 1,
+        "I know the problem, but I'm fuzzy on who it's really for.": 2,
+        "I can describe the problem and a general target group.": 3,
+        "I can describe a specific customer and their situation.": 4,
+        "I have a very specific customer, context, and clear pain point.": 5,
+    },
+    "q_market_validation": {
+        "I've never spoken to anyone who has this problem.": 1,
+        "I've talked informally to 1–2 people.": 2,
+        "I've had several casual conversations with people who seem to have this problem.": 3,
+        "I've run a few structured interviews or small tests.": 4,
+        "I've run structured interviews/tests and seen clear demand signals.": 5,
+    },
+    "q_overwhelm": {
+        "I tend to freeze and avoid the work.": 1,
+        "I bounce between tasks without much progress.": 2,
+        "I push through but feel scattered and drained.": 3,
+        "I pause, regroup, and then choose 1–2 priorities.": 4,
+        "I calmly reset, choose the highest-leverage actions, and move.": 5,
+    },
+    "q_priorities": {
+        "I mostly research and gather more information.": 2,
+        "I mostly work on branding, visuals, or website.": 2,
+        "I mostly refine the idea in documents or slides.": 3,
+        "I mostly talk to potential customers or users.": 4,
+        "I mostly talk to customers and build simple things they can react to.": 5,
+    },
+    "q_rejection": {
+        "I feel discouraged and avoid bringing it up again.": 1,
+        "I argue for why they're wrong.": 2,
+        "I shrug and move on to something else.": 2,
+        "I ask a few questions but mostly defend my idea.": 3,
+        "I get curious, ask specific questions, and look for patterns in the feedback.": 5,
+    },
+    "q_uncertainty": {
+        "I delay decisions until I feel sure.": 1,
+        "I delay big decisions but make small ones.": 2,
+        "I can decide with partial info but it stresses me.": 3,
+        "I usually decide with partial info and adjust quickly if needed.": 4,
+        "I prefer to move with partial info and learn as I go.": 5,
+    },
+    "q_week_pattern": {
+        "I think about it a lot but rarely take concrete action.": 1,
+        "I work in bursts and then stop for long stretches.": 2,
+        "I move something forward most weeks, but inconsistently.": 3,
+        "I move something forward most weeks in a focused way.": 4,
+        "I reliably move concrete tasks forward every week.": 5,
+    },
+}
 
-# ------------- SESSION STATE SETUP -------------
+# ------------------ SESSION STATE ------------------ #
 
 if "step" not in st.session_state:
     st.session_state.step = 1
@@ -45,166 +104,89 @@ if "scores" not in st.session_state:
     st.session_state.scores = {dim: 0.0 for dim in DIMENSIONS}
 
 
-# ------------- HELPER FUNCTIONS -------------
-
 def next_step():
-    st.session_state.step += 1
+    st.session_state.step = min(3, st.session_state.step + 1)
 
 
 def prev_step():
-    st.session_state.step -= 1
+    st.session_state.step = max(1, st.session_state.step - 1)
 
 
-def text_score_length_based(text: str, min_words: int, max_words: int) -> float:
-    """Simple heuristic: 0–5 score based on being within a target word range."""
-    words = len(text.strip().split())
-    if words == 0:
-        return 0.0
-    if words < min_words:
-        return 2.0
-    if min_words <= words <= max_words:
-        return 5.0
-    if words <= max_words * 2:
-        return 4.0
-    return 3.0
+def get_answer_score(key: str):
+    """Return score for multiple-choice answer; None if placeholder or unanswered."""
+    mapping = ANSWER_SCORES.get(key, {})
+    ans = st.session_state.get(key)
+    if not ans or ans not in mapping:
+        return None
+    return mapping[ans]
 
 
-def calc_intake_scores():
-    """Score from venture intake (Step 1)."""
-    s = st.session_state
+# ------------------ SCORING ------------------ #
 
-    # Vision & Problem Clarity: based on problem, audience, solution descriptions
-    prob_score = text_score_length_based(s.problem_description, 20, 80)
-    audience_score = text_score_length_based(s.audience_description, 15, 50)
-    solution_score = text_score_length_based(s.solution_description, 20, 80)
-    clarity = (prob_score + audience_score + solution_score) / 3.0
+def compute_dimension_scores():
+    sums = {d: 0.0 for d in DIMENSIONS}
+    counts = {d: 0 for d in DIMENSIONS}
 
-    # Motivation: based on why they care
-    motivation = text_score_length_based(s.why_care, 20, 80)
+    def add(dim, value):
+        if value is None:
+            return
+        sums[dim] += float(value)
+        counts[dim] += 1
 
-    # Identity alignment: how strongly they feel this fits them (slider)
-    identity = s.identity_fit
+    # --- Step 1: sliders (self-ratings) ---
 
-    # Market understanding: self-rated + some credit for defining audience
-    market_understanding = (s.market_understanding_self + audience_score / 5.0) / 2.0
+    add("Internal Motivation", st.session_state.get("s_motivation"))
+    add("Identity Alignment", st.session_state.get("s_identity"))
+    add("Resource Access", st.session_state.get("s_resources"))
+    add("Skill Alignment", st.session_state.get("s_skills"))
+    add("Risk Tolerance", st.session_state.get("s_risk_base"))
+    add("Emotional Resilience", st.session_state.get("s_resilience_base"))
+    add("Execution Capacity", st.session_state.get("s_execution_self"))
+    add("Market Understanding", st.session_state.get("s_market_self"))
 
-    # Resource access: directly from slider
-    resource_access = s.resource_access
+    # Multiple choice – foundation
+    add("Momentum Signals", get_answer_score("q_stage"))
+    add("Execution Capacity", get_answer_score("q_stage"))
 
-    # Skill alignment: self-rated
-    skill_alignment = s.skill_alignment
+    clarity_score = get_answer_score("q_clarity")
+    add("Vision & Problem Clarity", clarity_score)
+    add("Market Understanding", clarity_score)
 
-    return {
-        "Vision & Problem Clarity": clarity,
-        "Internal Motivation": motivation,
-        "Identity Alignment": identity,
-        "Market Understanding": market_understanding,
-        "Resource Access": resource_access,
-        "Skill Alignment": skill_alignment,
-    }
+    market_val_score = get_answer_score("q_market_validation")
+    add("Market Understanding", market_val_score)
+    add("Vision & Problem Clarity", market_val_score)
 
+    # --- Step 2: scenarios ---
 
-def calc_challenge_scores():
-    """Score from behavior in challenges (Step 2)."""
-    s = st.session_state
+    overwhelm = get_answer_score("q_overwhelm")
+    add("Emotional Resilience", overwhelm)
+    add("Execution Capacity", overwhelm)
 
-    # --- Clarity Compression Challenge ---
-    pain_score = text_score_length_based(s.cc_pain, 10, 40)
-    why_now_score = text_score_length_based(s.cc_why_now, 10, 40)
-    proof_score = text_score_length_based(s.cc_proof, 10, 40)
-    clarity_from_cc = (pain_score + why_now_score + proof_score) / 3.0
+    priorities = get_answer_score("q_priorities")
+    add("Execution Capacity", priorities)
+    add("Market Understanding", priorities)
+    add("Momentum Signals", priorities)
 
-    # --- Prioritization Tradeoff ---
-    total_tokens = (
-        s.tokens_interviews
-        + s.tokens_prototype
-        + s.tokens_pitch
-        + s.tokens_finance
-        + s.tokens_brand
-    )
-    # Just in case user doesn't perfectly hit 10:
-    if total_tokens == 0:
-        total_tokens = 1
+    rejection = get_answer_score("q_rejection")
+    add("Emotional Resilience", rejection)
+    add("Risk Tolerance", rejection)
 
-    share_interviews = s.tokens_interviews / total_tokens
-    share_prototype = s.tokens_prototype / total_tokens
-    share_pitch = s.tokens_pitch / total_tokens
-    share_finance = s.tokens_finance / total_tokens
-    share_brand = s.tokens_brand / total_tokens
+    uncertainty = get_answer_score("q_uncertainty")
+    add("Risk Tolerance", uncertainty)
+    add("Emotional Resilience", uncertainty)
 
-    # Heuristic: good execution = interviews + prototype (learning + doing)
-    execution_from_tokens = 5.0 * (0.6 * (share_interviews + share_prototype) + 0.4 * share_prototype)
-    execution_from_tokens = max(0.0, min(5.0, execution_from_tokens))
+    week_pattern = get_answer_score("q_week_pattern")
+    add("Momentum Signals", week_pattern)
+    add("Execution Capacity", week_pattern)
 
-    # Market understanding benefits from interviews & finance modeling
-    market_from_tokens = 5.0 * (0.7 * share_interviews + 0.3 * share_finance)
-    market_from_tokens = max(0.0, min(5.0, market_from_tokens))
-
-    # Momentum gets boost from prototype + any distribution (pitch/brand)
-    momentum_from_tokens = 5.0 * (0.5 * share_prototype + 0.5 * (share_pitch + share_brand) / 2.0)
-    momentum_from_tokens = max(0.0, min(5.0, momentum_from_tokens))
-
-    # --- Rejection Simulation ---
-    rej_map = {
-        "Explore what's behind the feedback": 5.0,
-        "Reframe and ask for specifics": 4.5,
-        "Defend your idea strongly": 3.0,
-        "Shut down and move on": 1.0,
-    }
-    rejection_score = rej_map.get(s.rejection_response, 3.0)
-
-    # --- Uncertainty Dilemma ---
-    if s.uncertainty_choice == "Launch now with ~60% confidence (learn from market)":
-        risk_tolerance = 4.5
-        emotional_resilience = 4.0
-    elif s.uncertainty_choice == "Wait 4 weeks for more data before launching":
-        risk_tolerance = 3.0
-        emotional_resilience = 3.5
-    elif s.uncertainty_choice == "Pause indefinitely until things feel 'safe'":
-        risk_tolerance = 1.5
-        emotional_resilience = 2.0
-    else:
-        risk_tolerance = 3.0
-        emotional_resilience = 3.0
-
-    # Emotional resilience also influenced by rejection response
-    emotional_resilience = (emotional_resilience + rejection_score) / 2.0
-
-    # --- Momentum Challenge ---
-    mc_scores = []
-    for t in [s.momentum_step1, s.momentum_step2, s.momentum_step3]:
-        mc_scores.append(text_score_length_based(t, 6, 25))
-    momentum_from_mc = sum(mc_scores) / 3.0 if mc_scores else 0.0
-
-    # Combine momentum from tokens + micro-steps
-    momentum_total = (momentum_from_tokens + momentum_from_mc) / 2.0
-
-    # Execution gets help from micro-steps
-    execution_total = (execution_from_tokens + momentum_from_mc) / 2.0
-
-    return {
-        "Vision & Problem Clarity": clarity_from_cc,
-        "Market Understanding": market_from_tokens,
-        "Momentum Signals": momentum_total,
-        "Execution Capacity": execution_total,
-        "Emotional Resilience": emotional_resilience,
-        "Risk Tolerance": risk_tolerance,
-    }
-
-
-def combine_scores(intake_scores, challenge_scores):
-    combined = {}
+    # Final averages
+    scores = {}
     for dim in DIMENSIONS:
-        vals = []
-        if dim in intake_scores:
-            vals.append(intake_scores[dim])
-        if dim in challenge_scores:
-            vals.append(challenge_scores[dim])
-        if vals:
-            combined[dim] = sum(vals) / len(vals)
+        if counts[dim] > 0:
+            scores[dim] = round(sums[dim] / counts[dim], 2)
         else:
-            combined[dim] = 0.0
-    return combined
+            scores[dim] = 0.0
+    return scores
 
 
 def compute_total_score(dimension_scores):
@@ -251,224 +233,211 @@ def readiness_archetype(scores):
     return "🔍 The Thoughtful Explorer"
 
 
-# ------------- UI -------------
+# ------------------ UI LAYOUT ------------------ #
 
 st.title("Entrepreneurial Readiness Simulation")
-st.caption("Bring your own venture, make decisions under pressure, and see your readiness profile.")
+st.caption("Self-assessment and scenario simulation across 10 readiness dimensions.")
 
 with st.sidebar:
     st.header("Navigation")
     step = st.session_state.step
-    st.write(f"Current step: **{step}** / 3")
+    st.write(f"Current step: **{step} / 3**")
     if step > 1:
         st.button("⬅️ Back", on_click=prev_step)
     if step < 3:
         st.button("➡️ Next", on_click=next_step)
 
-
-# ------------- STEP 1: VENTURE INTAKE -------------
+# ------------------ STEP 1 ------------------ #
 
 if st.session_state.step == 1:
-    st.subheader("Step 1: Describe Your Venture")
+    st.subheader("Step 1: Foundation – Where Are You Now?")
 
-    st.markdown(
-        "This simulation works on *your* real or intended business. "
-        "Give enough detail that the later challenges feel real."
-    )
+    st.markdown("#### Venture Stage & Clarity")
 
-    st.text_input(
-        "Venture Name (working title is fine):",
-        key="venture_name",
-        placeholder="e.g., 'Clarity Coaching for Founders'",
-    )
-
-    st.text_area(
-        "1. What problem are you trying to solve?",
-        key="problem_description",
-        height=130,
-        placeholder="Describe the pain in concrete terms. What is broken, frustrating, or inefficient?",
-    )
-
-    st.text_area(
-        "2. Who specifically experiences this problem?",
-        key="audience_description",
-        height=130,
-        placeholder="Be as specific as possible (segment, role, context, etc.).",
-    )
-
-    st.text_area(
-        "3. What do you think your solution looks like?",
-        key="solution_description",
-        height=130,
-        placeholder="What are people actually doing, using, or buying from you?",
-    )
-
-    st.text_area(
-        "4. Why do *you* care deeply about this problem?",
-        key="why_care",
-        height=130,
-        placeholder="Connect to your personal story, values, or long-term interests.",
-    )
-
+    opt_stage = [
+        "(select one)",
+        "I just have a vague idea and haven't written anything down.",
+        "I have a clear concept but haven't done anything with it yet.",
+        "I've done some basic thinking and notes, but no real testing.",
+        "I've talked to a few people and/or made a rough mockup.",
+        "I've run tests, pilots, or early sales conversations.",
+    ]
     st.selectbox(
-        "Current stage of your venture:",
-        options=["Idea only", "Some validation", "MVP built", "Early traction", "Scaling"],
-        key="venture_stage",
+        "Which best describes your current stage with this venture?",
+        options=opt_stage,
+        key="q_stage",
     )
 
-    st.markdown("### Quick Self-Checks")
+    opt_clarity = [
+        "(select one)",
+        "I'm not really sure what problem I'm solving.",
+        "I know the problem, but I'm fuzzy on who it's really for.",
+        "I can describe the problem and a general target group.",
+        "I can describe a specific customer and their situation.",
+        "I have a very specific customer, context, and clear pain point.",
+    ]
+    st.selectbox(
+        "How clear is the problem and who it's for?",
+        options=opt_clarity,
+        key="q_clarity",
+    )
+
+    opt_market = [
+        "(select one)",
+        "I've never spoken to anyone who has this problem.",
+        "I've talked informally to 1–2 people.",
+        "I've had several casual conversations with people who seem to have this problem.",
+        "I've run a few structured interviews or small tests.",
+        "I've run structured interviews/tests and seen clear demand signals.",
+    ]
+    st.selectbox(
+        "How much direct validation have you done with real people?",
+        options=opt_market,
+        key="q_market_validation",
+    )
+
+    st.markdown("#### Self-Ratings (Sliders)")
 
     col1, col2 = st.columns(2)
 
     with col1:
         st.slider(
-            "How strongly does this venture feel like a natural fit with who you are?",
-            min_value=1,
-            max_value=5,
-            value=4,
-            key="identity_fit",
+            "Internal motivation to work on this specific problem",
+            1, 5, 3, key="s_motivation",
         )
-
         st.slider(
-            "How would you rate your current understanding of your target market?",
-            min_value=1,
-            max_value=5,
-            value=3,
-            key="market_understanding_self",
+            "How much this venture feels like a natural expression of who you are (identity fit)",
+            1, 5, 3, key="s_identity",
+        )
+        st.slider(
+            "Time / financial runway / support you realistically have",
+            1, 5, 3, key="s_resources",
+        )
+        st.slider(
+            "Comfort making decisions without having all the data (baseline risk tolerance)",
+            1, 5, 3, key="s_risk_base",
         )
 
     with col2:
         st.slider(
-            "How much time / financial runway / support do you realistically have?",
-            min_value=1,
-            max_value=5,
-            value=3,
-            key="resource_access",
+            "How well your current skills match what this venture needs",
+            1, 5, 3, key="s_skills",
         )
-
         st.slider(
-            "How well do your skills match what this venture needs (today, not ideally)?",
-            min_value=1,
-            max_value=5,
-            value=3,
-            key="skill_alignment",
+            "Your ability to stay steady and recover when things are stressful",
+            1, 5, 3, key="s_resilience_base",
+        )
+        st.slider(
+            "Your ability to consistently move ideas into concrete action",
+            1, 5, 3, key="s_execution_self",
+        )
+        st.slider(
+            "Your understanding of your target market today",
+            1, 5, 3, key="s_market_self",
         )
 
-    st.info(
-        "When you're ready, move to Step 2 using the sidebar. "
-        "You can come back and edit this anytime."
-    )
+    st.info("Use the sidebar to go to Step 2 when you’re ready.")
 
 
-# ------------- STEP 2: CHALLENGES -------------
+# ------------------ STEP 2 ------------------ #
 
 elif st.session_state.step == 2:
-    st.subheader("Step 2: Behavioral Challenges")
+    st.subheader("Step 2: Scenarios – How Do You Tend to Act?")
 
-    st.markdown("These scenarios stress-test how you **think and act** as a founder.")
+    st.markdown("#### When You Feel Overwhelmed By Everything You *Could* Do")
 
-    st.markdown("### A. Clarity Compression Challenge")
-    st.write("Imagine you have 90 seconds to explain your venture to a busy investor.")
-
-    st.text_area("The Pain (what hurts for your customer?):", key="cc_pain", height=90)
-    st.text_area("Why Now (why is this timely / urgent?):", key="cc_why_now", height=90)
-    st.text_area("The Proof (any evidence, traction, or credibility?):", key="cc_proof", height=90)
-
-    st.markdown("---")
-    st.markdown("### B. Prioritization Tradeoff")
-
-    st.write(
-        "You have **10 Action Tokens** to spend this week. Distribute them across activities. "
-        "Then reality hits and you lose 4 tokens (we'll see how you allocated anyway)."
-    )
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.number_input("Customer interviews", min_value=0, max_value=10, value=3, key="tokens_interviews")
-        st.number_input("Prototype / MVP build", min_value=0, max_value=10, value=3, key="tokens_prototype")
-
-    with col2:
-        st.number_input("Pitch / narrative refinement", min_value=0, max_value=10, value=2, key="tokens_pitch")
-
-    with col3:
-        st.number_input("Financial modeling / runway", min_value=0, max_value=10, value=1, key="tokens_finance")
-        st.number_input("Brand / website / visuals", min_value=0, max_value=10, value=1, key="tokens_brand")
-
-    tokens_total = (
-        st.session_state.tokens_interviews
-        + st.session_state.tokens_prototype
-        + st.session_state.tokens_pitch
-        + st.session_state.tokens_finance
-        + st.session_state.tokens_brand
-    )
-    st.caption(f"Current total tokens allocated: **{tokens_total}** (target: 10)")
-
-    st.markdown("---")
-    st.markdown("### C. Rejection Simulation")
-
-    st.write(
-        "You pitch your idea to 5 potential customers and 4 say some version of:\n"
-        "_'This is interesting, but I don't think it's a priority for me right now.'_"
-    )
-
+    opt_overwhelm = [
+        "(select one)",
+        "I tend to freeze and avoid the work.",
+        "I bounce between tasks without much progress.",
+        "I push through but feel scattered and drained.",
+        "I pause, regroup, and then choose 1–2 priorities.",
+        "I calmly reset, choose the highest-leverage actions, and move.",
+    ]
     st.radio(
-        "How do you most likely respond?",
-        options=[
-            "Explore what's behind the feedback",
-            "Reframe and ask for specifics",
-            "Defend your idea strongly",
-            "Shut down and move on",
-        ],
-        key="rejection_response",
+        "What most closely matches your typical pattern?",
+        options=opt_overwhelm,
+        key="q_overwhelm",
     )
 
-    st.markdown("---")
-    st.markdown("### D. Uncertainty Dilemma")
+    st.markdown("#### What You Usually Prioritize")
 
-    st.write(
-        "You are at a decision point:\n"
-        "- You have **60% confidence** in your current direction.\n"
-        "- You could launch now and learn from the market.\n"
-        "- Or you could wait 4 weeks to gather more data.\n"
-        "- Or pause until you feel 'truly ready'."
-    )
-
+    opt_priorities = [
+        "(select one)",
+        "I mostly research and gather more information.",
+        "I mostly work on branding, visuals, or website.",
+        "I mostly refine the idea in documents or slides.",
+        "I mostly talk to potential customers or users.",
+        "I mostly talk to customers and build simple things they can react to.",
+    ]
     st.radio(
-        "What do you actually choose?",
-        options=[
-            "Launch now with ~60% confidence (learn from market)",
-            "Wait 4 weeks for more data before launching",
-            "Pause indefinitely until things feel 'safe'",
-        ],
-        key="uncertainty_choice",
+        "Where do you usually spend your limited time first?",
+        options=opt_priorities,
+        key="q_priorities",
     )
 
-    st.markdown("---")
-    st.markdown("### E. Momentum Challenge")
+    st.markdown("#### Handling Rejection or Lukewarm Feedback")
 
-    st.write("List the **first three concrete steps** you would take in the next 7 days:")
+    opt_rejection = [
+        "(select one)",
+        "I feel discouraged and avoid bringing it up again.",
+        "I argue for why they're wrong.",
+        "I shrug and move on to something else.",
+        "I ask a few questions but mostly defend my idea.",
+        "I get curious, ask specific questions, and look for patterns in the feedback.",
+    ]
+    st.radio(
+        "If you get several lukewarm responses in a row, how do you tend to react?",
+        options=opt_rejection,
+        key="q_rejection",
+    )
 
-    st.text_input("Step 1:", key="momentum_step1", placeholder="e.g., Schedule 5 customer interviews for next week")
-    st.text_input("Step 2:", key="momentum_step2", placeholder="e.g., Build click-through prototype of landing page")
-    st.text_input("Step 3:", key="momentum_step3", placeholder="e.g., Set up simple waitlist form and share with X group")
+    st.markdown("#### Decisions Under Uncertainty")
 
-    st.info("When you're satisfied with your answers, move to Step 3 in the sidebar to see your readiness profile.")
+    opt_uncertainty = [
+        "(select one)",
+        "I delay decisions until I feel sure.",
+        "I delay big decisions but make small ones.",
+        "I can decide with partial info but it stresses me.",
+        "I usually decide with partial info and adjust quickly if needed.",
+        "I prefer to move with partial info and learn as I go.",
+    ]
+    st.radio(
+        "Which best describes how you approach important decisions when information is incomplete?",
+        options=opt_uncertainty,
+        key="q_uncertainty",
+    )
+
+    st.markdown("#### Weekly Momentum Pattern")
+
+    opt_week = [
+        "(select one)",
+        "I think about it a lot but rarely take concrete action.",
+        "I work in bursts and then stop for long stretches.",
+        "I move something forward most weeks, but inconsistently.",
+        "I move something forward most weeks in a focused way.",
+        "I reliably move concrete tasks forward every week.",
+    ]
+    st.radio(
+        "Over the past couple of months, which pattern best fits you?",
+        options=opt_week,
+        key="q_week_pattern",
+    )
+
+    st.info("Use the sidebar to go to Step 3 to view your readiness profile.")
 
 
-# ------------- STEP 3: RESULTS -------------
+# ------------------ STEP 3 ------------------ #
 
 elif st.session_state.step == 3:
     st.subheader("Step 3: Your Readiness Profile")
 
-    intake_scores = calc_intake_scores()
-    challenge_scores = calc_challenge_scores()
-    combined = combine_scores(intake_scores, challenge_scores)
-    total_score = compute_total_score(combined)
-    gates_ok = critical_gates_ok(combined)
-    archetype = readiness_archetype(combined)
+    scores = compute_dimension_scores()
+    st.session_state.scores = scores
 
-    st.session_state.scores = combined
+    total_score = compute_total_score(scores)
+    gates_ok = critical_gates_ok(scores)
+    archetype = readiness_archetype(scores)
 
     col_top_left, col_top_right = st.columns([2, 1])
 
@@ -479,8 +448,8 @@ elif st.session_state.step == 3:
 
         if not gates_ok:
             st.warning(
-                "⚠️ One or more critical gates (Emotional Resilience, Execution Capacity, Internal Motivation) "
-                "are below 3/5. This suggests focusing on strengthening your personal foundation "
+                "One or more critical gates (Emotional Resilience, Execution Capacity, "
+                "Internal Motivation) are below 3/5. Focus on strengthening your foundation "
                 "before fully committing."
             )
 
@@ -494,11 +463,10 @@ elif st.session_state.step == 3:
     df = pd.DataFrame(
         {
             "Dimension": DIMENSIONS,
-            "Score (1–5)": [round(combined[d], 2) for d in DIMENSIONS],
+            "Score (1–5)": [scores[d] for d in DIMENSIONS],
             "Weight": [WEIGHTS[d] for d in DIMENSIONS],
         }
     )
-
     st.dataframe(df, use_container_width=True)
 
     st.markdown("### Readiness Bar Chart")
@@ -513,25 +481,23 @@ elif st.session_state.step == 3:
         )
         .properties(height=400)
     )
-
     st.altair_chart(chart, use_container_width=True)
 
-    st.markdown("---")
     st.markdown("### Suggestions for Focus")
 
-    sorted_dims = sorted(DIMENSIONS, key=lambda d: combined[d], reverse=True)
+    sorted_dims = sorted(DIMENSIONS, key=lambda d: scores[d], reverse=True)
     strengths = sorted_dims[:2]
     growth = sorted_dims[-2:]
 
     st.write("**Top strengths:**")
     for d in strengths:
-        st.write(f"- **{d}** – {combined[d]:.2f}/5")
+        st.write(f"- **{d}** – {scores[d]:.2f}/5")
 
     st.write("**Most important growth areas:**")
     for d in growth:
-        st.write(f"- **{d}** – {combined[d]:.2f}/5")
+        st.write(f"- **{d}** – {scores[d]:.2f}/5")
 
     st.info(
         "You can go back to Steps 1 and 2 in the sidebar, adjust your answers, "
-        "and see how your readiness profile changes. This is a simulation, not a judgment."
+        "and see how your readiness profile changes."
     )
