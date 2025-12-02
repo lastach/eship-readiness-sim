@@ -48,6 +48,50 @@ DIM_DESCRIPTIONS = {
     ),
 }
 
+# ---------- ARCHETYPES ---------- #
+
+ARCHETYPE_LABELS = [
+    "🧠 The Insightful Planner",
+    "⚡ The Driven Sprinter",
+    "🎲 The Bold Gambler",
+    "🔧 The Emerging Builder",
+    "🔍 The Thoughtful Explorer",
+]
+
+ARCHETYPE_DESCRIPTIONS = {
+    "🧠 The Insightful Planner": (
+        "You see the opportunity clearly and think deeply about your venture. You likely have strong "
+        "insight into the problem and care about solving it, but translating that clarity into consistent "
+        "action is where things can get stuck. Your next level of growth comes from building simple, "
+        "repeatable habits that force movement — even when you don’t feel fully ready. You don’t need more "
+        "thinking; you need more small tests with real people."
+    ),
+    "⚡ The Driven Sprinter": (
+        "You bring energy, initiative, and a bias toward building and testing — huge strengths. At the same "
+        "time, your momentum may fluctuate when stress or doubt hits. Strengthening your emotional recovery "
+        "systems and pacing will help you sustain the drive you already have. You don’t need to go slower — "
+        "you need steadier patterns that protect your energy as you move fast."
+    ),
+    "🎲 The Bold Gambler": (
+        "You move fast, experiment, and don’t shy away from uncertainty. That willingness to act is powerful, "
+        "but if your support systems and runway aren’t strong enough, it can put you under avoidable pressure. "
+        "Your growth edge is designing guardrails — financial, emotional, and practical — so you can keep taking "
+        "bold swings without burning yourself or your life supports."
+    ),
+    "🔧 The Emerging Builder": (
+        "You show a balanced foundation across clarity, drive, resilience, momentum, and risk. Things may not "
+        "feel perfect in any single area, but they’re strong enough overall that you can keep building and "
+        "learning in motion. Your focus now is on consistency: continuing to ship, get feedback, and make "
+        "deliberate improvements rather than waiting for ideal conditions."
+    ),
+    "🔍 The Thoughtful Explorer": (
+        "You’re in an active exploration phase. No single dimension is wildly strong yet, but you’re also not "
+        "catastrophically low anywhere. This is a great place to be early on: curious, reflective, and tuning "
+        "yourself through reps. Your next step is to pick 1–2 dimensions to deliberately strengthen so your "
+        "readiness profile develops sharper edges over time."
+    ),
+}
+
 # ---------- MULTIPLE-CHOICE CONFIG ---------- #
 # Each question: id -> {dim, prompt, options(list), scores(list aligned with options)}
 
@@ -224,6 +268,7 @@ def get_mc_score(qid: str):
     """Return score for a multiple-choice question; None if placeholder / unanswered."""
     qconf = MC_QUESTIONS[qid]
     ans = st.session_state.get(qid)
+    # We present options as ["(select one)", ...qconf["options"]]
     if not ans or ans not in qconf["options"]:
         return None
     idx = qconf["options"].index(ans)
@@ -305,6 +350,46 @@ def readiness_archetype(scores):
     return "🔍 The Thoughtful Explorer"
 
 
+def suggestion_for_user(total_score, dim_scores):
+    # Identify weakest dimension(s)
+    sorted_dims = sorted(DIMENSIONS, key=lambda d: dim_scores[d])
+    weakest = sorted_dims[0]
+    second_weakest = sorted_dims[1] if len(sorted_dims) > 1 else None
+
+    if total_score < 50:
+        return (
+            f"Right now your overall readiness looks more like a **foundation-building phase**. "
+            f"A good next step is to focus on strengthening **{weakest}**"
+            + (f" and **{second_weakest}**" if second_weakest else "")
+            + ". Think in terms of simple, concrete experiments or habits that build those muscles, "
+              "rather than forcing yourself to 'launch' before you’re ready."
+        )
+    elif total_score < 70:
+        return (
+            "You’re in an **early-stage readiness zone**: enough here to take real steps, but with some "
+            f"clear growth edges, especially around **{weakest}**"
+            + (f" and **{second_weakest}**" if second_weakest else "")
+            + ". Consider designing a 4–6 week sprint to intentionally work on those areas while doing "
+              "lightweight tests with your venture."
+        )
+    elif total_score < 85:
+        return (
+            "You show **strong potential** with a reasonably solid base. You can likely move forward while "
+            f"keeping an eye on **{weakest}**"
+            + (f" and **{second_weakest}**" if second_weakest else "")
+            + ". Think about experiments that put you in real contact with customers or consequences while "
+              "gently stretching these weaker dimensions."
+        )
+    else:
+        return (
+            "You’re showing a **high level of entrepreneurial readiness**. At this stage, the focus is less on "
+            f"fixing weaknesses and more on building robust systems around your strengths. Still, watching "
+            f"**{weakest}**"
+            + (f" and **{second_weakest}**" if second_weakest else "")
+            + " will help you avoid blind spots as you scale your efforts."
+        )
+
+
 # ---------- UI SHELL ---------- #
 
 st.title("Entrepreneurial Readiness Simulation")
@@ -383,6 +468,8 @@ elif st.session_state.step == 3:
     total_score = compute_total_score(dim_scores)
     gates_ok = critical_gates_ok(dim_scores)
     archetype = readiness_archetype(dim_scores)
+    archetype_desc = ARCHETYPE_DESCRIPTIONS.get(archetype, "")
+    summary_suggestion = suggestion_for_user(total_score, dim_scores)
 
     col_left, col_right = st.columns([2, 1])
 
@@ -393,16 +480,21 @@ elif st.session_state.step == 3:
         if not gates_ok:
             st.warning(
                 "One or more foundational dimensions (Drive & Identity Fit, Resilience, "
-                "Bias to Action) is below 3/5. That doesn't mean 'don't do it', but it "
+                "Bias to Action & Momentum) is below 3/5. That doesn't mean 'don't do it', but it "
                 "does mean your personal foundation deserves attention in parallel."
             )
 
     with col_right:
         st.markdown("### Archetype")
         st.write(f"**{archetype}**")
+        if archetype_desc:
+            st.write(archetype_desc)
 
     st.markdown("---")
-    st.markdown("### Dimension Breakdown")
+    st.markdown("### What to Explore Next")
+    st.write(summary_suggestion)
+
+    st.markdown("### Readiness Chart")
 
     df = pd.DataFrame(
         {
@@ -411,9 +503,6 @@ elif st.session_state.step == 3:
             "Weight": [WEIGHTS[d] for d in DIMENSIONS],
         }
     )
-    st.dataframe(df, use_container_width=True)
-
-    st.markdown("### Readiness Chart")
 
     chart = (
         alt.Chart(df)
@@ -427,7 +516,7 @@ elif st.session_state.step == 3:
     )
     st.altair_chart(chart, use_container_width=True)
 
-    st.markdown("### What Each Dimension Is Looking At")
+    st.markdown("### How to Read Each Dimension")
 
     for dim in DIMENSIONS:
         st.markdown(f"**{dim} – {dim_scores[dim]:.2f}/5**")
