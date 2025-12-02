@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import altair as alt
 
 st.set_page_config(
     page_title="Entrepreneurial Readiness Simulation",
@@ -145,7 +145,6 @@ def calc_challenge_scores():
     momentum_from_tokens = max(0.0, min(5.0, momentum_from_tokens))
 
     # --- Rejection Simulation ---
-    # Best response: "Explore" or "Reframe", ok: "Defend thoughtfully", worst: "Shut down"
     rej_map = {
         "Explore what's behind the feedback": 5.0,
         "Reframe and ask for specifics": 4.5,
@@ -155,7 +154,6 @@ def calc_challenge_scores():
     rejection_score = rej_map.get(s.rejection_response, 3.0)
 
     # --- Uncertainty Dilemma ---
-    # Options encoded from radios
     if s.uncertainty_choice == "Launch now with ~60% confidence (learn from market)":
         risk_tolerance = 4.5
         emotional_resilience = 4.0
@@ -170,7 +168,7 @@ def calc_challenge_scores():
         emotional_resilience = 3.0
 
     # Emotional resilience also influenced by rejection response
-    emotional_resilience = (emotional_resilience + rejection_score / 5.0 * 5.0) / 2.0
+    emotional_resilience = (emotional_resilience + rejection_score) / 2.0
 
     # --- Momentum Challenge ---
     mc_scores = []
@@ -195,7 +193,6 @@ def calc_challenge_scores():
 
 
 def combine_scores(intake_scores, challenge_scores):
-    # Simple average of the sources for each dimension where applicable
     combined = {}
     for dim in DIMENSIONS:
         vals = []
@@ -214,7 +211,6 @@ def compute_total_score(dimension_scores):
     total = 0.0
     for dim, score in dimension_scores.items():
         weight = WEIGHTS.get(dim, 0)
-        # scale 1–5 to 0–100 via weight (score/5 * weight)
         total += (score / 5.0) * weight
     return round(total, 1)
 
@@ -239,7 +235,6 @@ def critical_gates_ok(scores):
 
 
 def readiness_archetype(scores):
-    # crude but fun classification
     ex = scores["Execution Capacity"]
     vi = scores["Vision & Problem Clarity"]
     em = scores["Emotional Resilience"]
@@ -466,7 +461,6 @@ elif st.session_state.step == 2:
 elif st.session_state.step == 3:
     st.subheader("Step 3: Your Readiness Profile")
 
-    # Calculate scores
     intake_scores = calc_intake_scores()
     challenge_scores = calc_challenge_scores()
     combined = combine_scores(intake_scores, challenge_scores)
@@ -507,32 +501,24 @@ elif st.session_state.step == 3:
 
     st.dataframe(df, use_container_width=True)
 
-    # Radar chart
-    st.markdown("### Readiness Radar")
+    st.markdown("### Readiness Bar Chart")
 
-    radar_df = pd.DataFrame(
-        {
-            "Dimension": DIMENSIONS,
-            "Score": [combined[d] for d in DIMENSIONS],
-        }
+    chart = (
+        alt.Chart(df)
+        .mark_bar()
+        .encode(
+            x=alt.X("Score (1–5):Q", scale=alt.Scale(domain=[0, 5])),
+            y=alt.Y("Dimension:N", sort="-x"),
+            tooltip=["Dimension", "Score (1–5)", "Weight"],
+        )
+        .properties(height=400)
     )
-    # close the radar loop
-    radar_df = pd.concat([radar_df, radar_df.iloc[[0]]], ignore_index=True)
 
-    fig = px.line_polar(
-        radar_df,
-        r="Score",
-        theta="Dimension",
-        line_close=True,
-        range_r=[0, 5],
-    )
-    fig.update_traces(fill="toself")
-    st.plotly_chart(fig, use_container_width=True)
+    st.altair_chart(chart, use_container_width=True)
 
     st.markdown("---")
     st.markdown("### Suggestions for Focus")
 
-    # Identify top 2 strengths and bottom 2 growth areas
     sorted_dims = sorted(DIMENSIONS, key=lambda d: combined[d], reverse=True)
     strengths = sorted_dims[:2]
     growth = sorted_dims[-2:]
