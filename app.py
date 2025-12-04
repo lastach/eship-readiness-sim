@@ -7,7 +7,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# ================= TOP-LEVEL COMPONENTS & DIMENSIONS =================
+# ================= GLOBAL CONSTANTS =================
 
 COMPONENTS = [
     "Entrepreneurial Mindset",
@@ -108,7 +108,7 @@ def compute_opportunity_score():
     norm = max(0.0, min(1.0, raw / max_raw))
     return round(1 + 4 * norm, 2)
 
-# ================= GAME 5: FEATURE PRIORITY BOARD =================
+# ================= GAME 5: FEATURE PRIORITY (BUDGET) =================
 
 VALUE_FEATURES = [
     {
@@ -147,36 +147,47 @@ VALUE_FEATURES = [
         "ideal_points": 2,
     },
 ]
+FEATURE_BUDGET = 20  # you can use as much or as little as you like
 
 
 def compute_value_creation_score():
-    diffs = []
+    allocations = []
     for f in VALUE_FEATURES:
-        val = st.session_state.get(f["key"], 3)
+        val = st.session_state.get(f["key"], 0)
         try:
             val = float(val)
         except Exception:
-            val = 3.0
-        diffs.append(abs(val - f["ideal_points"]))
-    if not diffs:
+            val = 0.0
+        allocations.append(val)
+    if not allocations:
         return 1.0
+    max_alloc = max(allocations)
+    if max_alloc <= 0:
+        # no allocation at all – treat as lowest score
+        return 1.0
+    diffs = []
+    for f, alloc in zip(VALUE_FEATURES, allocations):
+        normalized = 5.0 * alloc / max_alloc  # best allocation -> 5
+        diffs.append(abs(normalized - f["ideal_points"]))
     avg_diff = sum(diffs) / len(diffs)
-    norm = max(0.0, min(1.0, (4.0 - avg_diff) / 4.0))
+    norm = max(0.0, min(1.0, (5.0 - avg_diff) / 5.0))
     return round(1 + 4 * norm, 2)
 
-# ================= GAMES 2–4: MINDSET SCENARIOS =================
+# ================= MINDSET GAMES 2–4 =================
 
 MINDSET_QUESTIONS = {
-    # Resourcefulness (constraint cards – 7)
+    # Resourcefulness – more options, including soft ones
     "ms_res_1": {
         "subdim": "Resourcefulness",
-        "prompt": "You need to understand why users churn, but have zero budget. What do you do first?",
+        "prompt": "You need to understand why users churn, but have zero budget. What do you actually do first?",
         "options": [
-            "Pause until you have budget for a proper study.",
-            "Use existing signals (public reviews, support tickets) and talk directly to a few users.",
+            "Wait until you have budget for a proper study.",
+            "Use existing signals (reviews, support tickets) and talk directly to a few churned users.",
             "Ask friends what they think about churn in general.",
+            "Search Google/ChatGPT for 'why users churn' and read generic advice.",
+            "Ask a mentor what they would do in theory.",
         ],
-        "scores": [1, 5, 2],
+        "scores": [1, 5, 2, 2, 3],
     },
     "ms_res_2": {
         "subdim": "Resourcefulness",
@@ -185,8 +196,10 @@ MINDSET_QUESTIONS = {
             "Use a no-code template tool and ship something basic.",
             "Wait for a designer so it looks polished.",
             "Write copy now and hope design time appears later.",
+            "Mock it up in a slide deck and send screenshots only.",
+            "Ask a friend to design it 'sometime this week'.",
         ],
-        "scores": [5, 1, 2],
+        "scores": [5, 1, 2, 3, 2],
     },
     "ms_res_3": {
         "subdim": "Resourcefulness",
@@ -195,8 +208,10 @@ MINDSET_QUESTIONS = {
             "Create a simple clickable mockup or fake-door test.",
             "Wait until engineers have time to build it properly.",
             "Write a long spec and share internally for feedback.",
+            "Ask your mentor if they like the idea.",
+            "Search for similar products and assume the idea is validated if they exist.",
         ],
-        "scores": [5, 1, 2],
+        "scores": [5, 1, 2, 2, 3],
     },
     "ms_res_4": {
         "subdim": "Resourcefulness",
@@ -205,8 +220,10 @@ MINDSET_QUESTIONS = {
             "Run deep interviews and observe their workflows.",
             "Run a big quantitative survey with them.",
             "Don’t test until you have a bigger audience.",
+            "Ask them to fill out a long form and call it 'research'.",
+            "Read industry reports instead of talking to them.",
         ],
-        "scores": [5, 3, 1],
+        "scores": [5, 3, 1, 2, 2],
     },
     "ms_res_5": {
         "subdim": "Resourcefulness",
@@ -215,8 +232,10 @@ MINDSET_QUESTIONS = {
             "Do manual spot-checks and reconstruct the funnel from raw logs.",
             "Rebuild the full analytics stack before doing anything else.",
             "Ignore the gap for now.",
+            "Ask an engineer to look into it 'when they have time'.",
+            "Guess what’s happening based on your intuition alone.",
         ],
-        "scores": [5, 3, 1],
+        "scores": [5, 3, 1, 2, 1],
     },
     "ms_res_6": {
         "subdim": "Resourcefulness",
@@ -225,8 +244,10 @@ MINDSET_QUESTIONS = {
             "Talk to front-line staff or assistants who see the real workflow.",
             "Send a very long email and wait.",
             "Pause until a formal meeting is offered.",
+            "Google typical problems in that role and assume they apply.",
+            "Ask your mentor how they think that org probably behaves.",
         ],
-        "scores": [5, 3, 1],
+        "scores": [5, 3, 1, 2, 2],
     },
     "ms_res_7": {
         "subdim": "Resourcefulness",
@@ -235,10 +256,12 @@ MINDSET_QUESTIONS = {
             "Switch channels or use a scrappier workaround.",
             "Spend days trying to fix the tool first.",
             "Stop the campaign until it’s resolved.",
+            "Ask a friend what tool they use and consider trying it.",
+            "Search 'best outreach tools' and get lost researching.",
         ],
-        "scores": [5, 3, 1],
+        "scores": [5, 3, 1, 3, 2],
     },
-    # Execution bias (5 rounds)
+    # Execution bias – more options, includes vague / impossible moves
     "ms_exec_1": {
         "subdim": "Execution Bias",
         "prompt": "You have one afternoon to de-risk a new idea. What do you actually do?",
@@ -246,8 +269,10 @@ MINDSET_QUESTIONS = {
             "Write a 20-page strategy doc mapping the next 2 years.",
             "Run 5 quick user calls or a simple landing test.",
             "Brainstorm names and design a logo.",
+            "Search Google/ChatGPT for generic advice and read for hours.",
+            "Ask a mentor what they think, then schedule follow-ups later.",
         ],
-        "scores": [1, 5, 2],
+        "scores": [1, 5, 2, 2, 3],
     },
     "ms_exec_2": {
         "subdim": "Execution Bias",
@@ -256,8 +281,10 @@ MINDSET_QUESTIONS = {
             "Build the full feature and launch quietly.",
             "Add a 'coming soon' button and track clicks + follow-up.",
             "Survey friends who are not in your target segment.",
+            "Search similar tools online and assume that counts as validation.",
+            "Ask a mentor to decide which feature to try.",
         ],
-        "scores": [2, 5, 1],
+        "scores": [2, 5, 1, 2, 3],
     },
     "ms_exec_3": {
         "subdim": "Execution Bias",
@@ -266,8 +293,10 @@ MINDSET_QUESTIONS = {
             "Pick one based purely on your intuition.",
             "Run two tiny tests in parallel and compare response.",
             "Wait until you can do a full market study.",
+            "Ask a mentor which segment sounds cooler.",
+            "Search for reports and never actually talk to customers.",
         ],
-        "scores": [2, 5, 1],
+        "scores": [2, 5, 1, 3, 1],
     },
     "ms_exec_4": {
         "subdim": "Execution Bias",
@@ -276,8 +305,10 @@ MINDSET_QUESTIONS = {
             "Ignore it and wait for perfect signal.",
             "Make a small decision in the direction of the signal and keep testing.",
             "Restart from scratch with a totally different idea.",
+            "Ask ChatGPT what it thinks of your experiment instead of running another.",
+            "Ask a mentor if they think you should trust the data.",
         ],
-        "scores": [1, 5, 2],
+        "scores": [1, 5, 2, 2, 3],
     },
     "ms_exec_5": {
         "subdim": "Execution Bias",
@@ -286,10 +317,12 @@ MINDSET_QUESTIONS = {
             "Avoid the test; you don’t want to lose the idea.",
             "Run the test and be ready to pivot if it fails.",
             "Delay the test until after other work is finished.",
+            "Ask a mentor whether it’s worth testing at all.",
+            "Search online for opinions rather than running the test.",
         ],
-        "scores": [1, 5, 2],
+        "scores": [1, 5, 2, 3, 2],
     },
-    # Resilience & adaptability (4 rounds)
+    # Resilience & adaptability – same questions, card UI
     "ms_resil_1": {
         "subdim": "Resilience & Adaptability",
         "prompt": "Shock: A contractor delays a deliverable by 3 days. What do you do?",
@@ -297,8 +330,9 @@ MINDSET_QUESTIONS = {
             "Do nothing and hope it’s fine.",
             "Replace the contractor entirely.",
             "Re-scope the sprint and adjust dependent work.",
+            "Complain about it to a mentor but keep the plan unchanged.",
         ],
-        "scores": [1, 2, 5],
+        "scores": [1, 2, 5, 2],
     },
     "ms_resil_2": {
         "subdim": "Resilience & Adaptability",
@@ -307,8 +341,9 @@ MINDSET_QUESTIONS = {
             "Keep campaigns running and see what happens.",
             "Kill all paid channels immediately.",
             "Shift spend, test new creatives, and review funnel quality.",
+            "Google for 'best acquisition channels' and stall while reading.",
         ],
-        "scores": [1, 2, 5],
+        "scores": [1, 2, 5, 2],
     },
     "ms_resil_3": {
         "subdim": "Resilience & Adaptability",
@@ -317,8 +352,9 @@ MINDSET_QUESTIONS = {
             "Keep your current pricing and ignore it.",
             "Lower price slightly and hope to keep up.",
             "Refocus on a segment or offer where you compete on value, not price.",
+            "Ask a mentor what they would do and wait.",
         ],
-        "scores": [1, 2, 5],
+        "scores": [1, 2, 5, 2],
     },
     "ms_resil_4": {
         "subdim": "Resilience & Adaptability",
@@ -327,8 +363,9 @@ MINDSET_QUESTIONS = {
             "Stick with the plan; changing now would be painful.",
             "Pause everything while you rethink the entire business.",
             "Update the plan, keep what still works, and run new tests.",
+            "Vent to a friend and wait until things feel clearer.",
         ],
-        "scores": [1, 2, 5],
+        "scores": [1, 2, 5, 2],
     },
 }
 
@@ -352,7 +389,7 @@ SKILL_DESCRIPTIONS = {
 }
 
 SKILL_QUESTIONS = {
-    # Market research & marketing (2 rounds)
+    # Market research & marketing (2)
     "sk_mkt_1": {
         "skill": "Market Research & Marketing",
         "prompt": "Trial users aren’t converting. What do you do first?",
@@ -360,8 +397,9 @@ SKILL_QUESTIONS = {
             "Run a broad online survey with anyone you can find.",
             "Interview 5–10 recent trial users about their decision.",
             "Change the homepage headline based on your intuition.",
+            "Read general marketing blogs instead of talking to users.",
         ],
-        "scores": [2, 5, 1],
+        "scores": [2, 5, 1, 2],
     },
     "sk_mkt_2": {
         "skill": "Market Research & Marketing",
@@ -370,10 +408,11 @@ SKILL_QUESTIONS = {
             "Target everyone with the same generic message.",
             "Find a niche where the pain is sharp and design messaging just for them.",
             "Copy a competitor’s positioning.",
+            "Ask a mentor who they think sounds more interesting.",
         ],
-        "scores": [2, 5, 1],
+        "scores": [1, 5, 2, 3],
     },
-    # Product & technical (2 rounds)
+    # Product & technical (2)
     "sk_prod_1": {
         "skill": "Product & Technical",
         "prompt": "You can only ship one change this sprint. Which do you choose?",
@@ -381,8 +420,9 @@ SKILL_QUESTIONS = {
             "A 'nice to have' that a few users casually mentioned.",
             "A fix for a bug that blocks a key workflow.",
             "A flashy new thing that will look good in demos.",
+            "Ask ChatGPT for product ideas instead of shipping anything.",
         ],
-        "scores": [2, 5, 3],
+        "scores": [2, 5, 3, 1],
     },
     "sk_prod_2": {
         "skill": "Product & Technical",
@@ -391,10 +431,11 @@ SKILL_QUESTIONS = {
             "Ship it now; you’ll hear complaints if it’s bad.",
             "Do 5 quick usability tests with target users.",
             "Ask your team what they think.",
+            "Search for 'top UX patterns' and copy a random one.",
         ],
-        "scores": [2, 5, 3],
+        "scores": [1, 5, 3, 2],
     },
-    # Sales & networking (2 rounds)
+    # Sales & networking (2)
     "sk_sales_1": {
         "skill": "Sales & Networking",
         "prompt": "You have 10 warm leads and limited time. What’s your approach?",
@@ -402,8 +443,9 @@ SKILL_QUESTIONS = {
             "Send a generic email blast and hope some respond.",
             "Send tailored messages and schedule 1:1 conversations.",
             "Post about your product on social media instead.",
+            "Ask a mentor which lead to start with but take no action yet.",
         ],
-        "scores": [2, 5, 1],
+        "scores": [2, 5, 1, 2],
     },
     "sk_sales_2": {
         "skill": "Sales & Networking",
@@ -412,10 +454,11 @@ SKILL_QUESTIONS = {
             "Ask for a big commitment immediately.",
             "Suggest a small, concrete next step (intro, pilot, shared experiment).",
             "Wait to see if they reach out to you.",
+            "Send them generic material without a clear ask.",
         ],
-        "scores": [1, 5, 2],
+        "scores": [1, 5, 2, 2],
     },
-    # Financial management (2 rounds)
+    # Financial management (2)
     "sk_fin_1": {
         "skill": "Financial Management",
         "prompt": "You have 3 months of runway left. What do you prioritize?",
@@ -423,8 +466,9 @@ SKILL_QUESTIONS = {
             "Cut all spending, including things that fuel growth.",
             "Identify and cut low-ROI spend while doubling down on proven channels.",
             "Ignore runway and focus purely on product polish.",
+            "Ask a mentor if they think you should be worried.",
         ],
-        "scores": [2, 5, 1],
+        "scores": [2, 5, 1, 2],
     },
     "sk_fin_2": {
         "skill": "Financial Management",
@@ -433,10 +477,11 @@ SKILL_QUESTIONS = {
             "Shut off acquisition until CAC is lower.",
             "Check payback period and LTV, then decide how much you can afford to spend.",
             "Ignore the numbers and focus on top-line growth.",
+            "Search for benchmarks and assume they apply exactly.",
         ],
-        "scores": [2, 5, 1],
+        "scores": [2, 5, 1, 2],
     },
-    # Operations (2 rounds)
+    # Operations (2)
     "sk_ops_1": {
         "skill": "Operations",
         "prompt": "Support tickets are piling up. What’s your first move?",
@@ -444,8 +489,9 @@ SKILL_QUESTIONS = {
             "Hire more people immediately.",
             "Look for patterns and fix the top root causes.",
             "Tell the team to 'work harder' this week.",
+            "Ask a mentor if they think you need more staff.",
         ],
-        "scores": [2, 5, 1],
+        "scores": [2, 5, 1, 2],
     },
     "sk_ops_2": {
         "skill": "Operations",
@@ -454,10 +500,11 @@ SKILL_QUESTIONS = {
             "Keep doing it yourself to save time.",
             "Document it and train someone else so it’s repeatable.",
             "Pause the process entirely.",
+            "Record a quick video and hope people figure it out.",
         ],
-        "scores": [1, 5, 2],
+        "scores": [1, 5, 2, 3],
     },
-    # Team & strategy (2 rounds)
+    # Team & strategy (2)
     "sk_team_1": {
         "skill": "Team & Strategy",
         "prompt": "Traction is flat but a subset of users loves one use-case. What now?",
@@ -465,8 +512,9 @@ SKILL_QUESTIONS = {
             "Keep trying to serve everyone with the same product.",
             "Focus your roadmap and messaging on the use-case that’s working.",
             "Pause all changes while you think about a new idea.",
+            "Ask a mentor whether the exciting niche is 'big enough'.",
         ],
-        "scores": [2, 5, 1],
+        "scores": [1, 5, 2, 3],
     },
     "sk_team_2": {
         "skill": "Team & Strategy",
@@ -475,8 +523,9 @@ SKILL_QUESTIONS = {
             "Add more projects so nobody is idle.",
             "Narrow focus to a small number of high-leverage bets.",
             "Let each person pick whatever they want to work on.",
+            "Ask ChatGPT for a generic productivity framework and share it.",
         ],
-        "scores": [1, 5, 2],
+        "scores": [1, 5, 2, 3],
     },
 }
 
@@ -498,7 +547,7 @@ SKILL_SCENARIO_MAP = {
     "Team & Strategy": ["sk_team_1", "sk_team_2"],
 }
 
-# ================= RESOURCES (TIME & SUPPORT) =================
+# ================= RESOURCES =================
 
 RESOURCE_SUBDIMS = [
     "Financial Resources",
@@ -517,7 +566,7 @@ RESOURCE_DESCRIPTIONS = {
     "Support": "Emotional and practical support for ambitious goals.",
 }
 
-# ================= BUSINESS ACUMEN QUIZ =================
+# ================= ACUMEN QUIZ =================
 
 ACUMEN_SUBDIMS = [
     "Problem–Solution Fit",
@@ -609,7 +658,7 @@ ACUMEN_QUESTIONS = {
     },
 }
 
-# ================= STATE & HELPERS =================
+# ================= SESSION STATE =================
 
 if "page" not in st.session_state:
     st.session_state.page = 0
@@ -617,6 +666,8 @@ if "max_page" not in st.session_state:
     st.session_state.max_page = 0
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
+if "res_q_idx" not in st.session_state:
+    st.session_state.res_q_idx = 0  # index within resourcefulness questions
 
 
 def go_to(page_idx: int):
@@ -625,26 +676,92 @@ def go_to(page_idx: int):
         st.session_state.max_page = page_idx
     st.rerun()
 
+# ================= UI HELPERS =================
+
+def render_toggle_card(key: str, text: str):
+    """Clickable toggle card (Game 1)."""
+    selected = st.session_state.get(key, False)
+    bg = "#e3f2fd" if selected else "#f9f9f9"
+    border = "2px solid #1e88e5" if selected else "1px solid #cccccc"
+    label = f"{'✅ ' if selected else ''}{text}"
+    with st.container():
+        st.markdown(
+            f"""
+            <div style="
+                border:{border};
+                border-radius:0.6rem;
+                padding:0.75rem;
+                background-color:{bg};
+                min-height:4.5rem;
+                display:flex;
+                align-items:center;
+                font-size:0.9rem;
+            ">
+            {label}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("Select / unselect", key=f"btn_{key}", use_container_width=True):
+            st.session_state[key] = not selected
+
+
+def render_choice_cards(qid: str, prompt: str, options: list):
+    """Single-choice question rendered as clickable cards."""
+    st.markdown(f"**{prompt}**")
+    current = st.session_state.get(f"{qid}_choice", None)
+    for i, opt in enumerate(options):
+        selected = (current == i)
+        bg = "#e8f5e9" if selected else "#f9f9f9"
+        border = "2px solid #43a047" if selected else "1px solid #cccccc"
+        with st.container():
+            st.markdown(
+                f"""
+                <div style="
+                    border:{border};
+                    border-radius:0.6rem;
+                    padding:0.65rem;
+                    background-color:{bg};
+                    margin-bottom:0.3rem;
+                    font-size:0.9rem;
+                ">
+                {opt}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button("Choose this", key=f"{qid}_opt_{i}", use_container_width=True):
+                st.session_state[f"{qid}_choice"] = i
+    st.markdown("---")
+
 
 def get_mc_score(qdict, qid: str):
+    """Get score for a question that may be answered via cards (_choice) or radio (text)."""
     q = qdict[qid]
+    idx = st.session_state.get(f"{qid}_choice", None)
+    if idx is not None:
+        if 0 <= idx < len(q["scores"]):
+            return float(q["scores"][idx])
+        return None
     ans = st.session_state.get(qid)
     if not ans or ans not in q["options"]:
         return None
     idx = q["options"].index(ans)
     return float(q["scores"][idx])
 
-# ---- scoring ----
+# ================= SCORING FUNCTIONS =================
 
 def compute_mindset_scores():
     values = {s: [] for s in MINDSET_SUBDIMS}
+    # opportunity + value-creation games
     values["Opportunity Recognition"].append(compute_opportunity_score())
     values["Value Creation Focus"].append(compute_value_creation_score())
+    # games 2–4
     for qid, q in MINDSET_QUESTIONS.items():
-        score = get_mc_score(MINDSET_QUESTIONS, qid)
-        if score is None:
+        s = get_mc_score(MINDSET_QUESTIONS, qid)
+        if s is None:
             continue
-        values[q["subdim"]].append(score)
+        values[q["subdim"]].append(s)
     sub_scores = {}
     for sd in MINDSET_SUBDIMS:
         sub_scores[sd] = round(sum(values[sd]) / len(values[sd]), 2) if values[sd] else 1.0
@@ -671,6 +788,7 @@ def compute_skill_scores():
 
 
 def compute_resource_scores():
+    # sliders
     fin = float(st.session_state.get("res_fin_level", 3))
     tech = float(st.session_state.get("res_tech_level", 3))
     talent = float(st.session_state.get("res_talent_level", 3))
@@ -797,7 +915,7 @@ PAGE_LABELS = [
     "Game 2: Constraint Cards",
     "Game 3: Next-Step Choices",
     "Game 4: Shock Cards",
-    "Game 5: Feature Board",
+    "Game 5: Feature Budget",
     "Skills Game",
     "Resources",
     "Venture-Building Knowledge",
@@ -827,7 +945,7 @@ This is a **game-style simulation** to give you a snapshot of your current **ent
 
 You’ll work through:
 
-- **5 quick mini-games** (about 1–3 minutes each) on:
+- **5 mini-games** (about 1–3 minutes each) on:
   - spotting meaningful signals,
   - handling constraints,
   - deciding under pressure,
@@ -835,11 +953,9 @@ You’ll work through:
   - and prioritizing what to build.
 - A **Skills Game** (5–10 minutes) with self-ratings plus scenario rounds across core startup skills.
 - A **Resources check** and a short **venture-building knowledge quiz**.
-- A final **Readiness Profile** with component scores and archetype-style feedback.
+- A final **Readiness Profile** with component scores and suggestions for what to build next.
 
 Total time: roughly **20–25 minutes** depending on how quickly you move.
-
-There are no “perfect founders” here; the goal is to map where you are **right now** so you know what to strengthen next.
         """
     )
     if st.button("Start ▸"):
@@ -848,114 +964,148 @@ There are no “perfect founders” here; the goal is to map where you are **rig
 # Game 1 – customer signal cards
 elif page == 1:
     st.subheader("Game 1: Customer Signals")
-    st.caption("Flip through the cards and tag the ones that feel like **strong signals of real, fixable demand**.")
-    st.markdown("_Tip: try to be selective — you don’t have to mark everything._")
+    st.caption("For each card, click if you believe it’s a **strong signal of real, fixable demand**.")
+    st.markdown("_Be selective—some signals are much stronger than others._")
 
-    cols = st.columns(2)
+    # 3-column grid of cards
+    cols = st.columns(3)
     for idx, sc in enumerate(OPP_SCENARIOS):
-        col = cols[idx % 2]
-        with col:
-            card = st.container(border=True)
-            with card:
-                st.markdown(sc["text"])
-                st.checkbox(
-                    "Mark this as a strong demand signal",
-                    key=sc["key"],
-                )
+        with cols[idx % 3]:
+            render_toggle_card(sc["key"], sc["text"])
 
     if st.button("Next ▸"):
         go_to(2)
 
-# Game 2 – constraint cards
+# Game 2 – constraint cards (one scenario at a time)
 elif page == 2:
     st.subheader("Game 2: Constraint Cards")
-    st.caption("Each prompt is a constraint. Pick how you’d actually respond.")
-    for qid, q in MINDSET_QUESTIONS.items():
-        if q["subdim"] != "Resourcefulness":
-            continue
-        st.markdown(f"**{q['prompt']}**")
-        st.radio(
-            "",
-            options=["(select one)"] + q["options"],
-            key=qid,
-        )
-        st.markdown("---")
-    cols = st.columns(2)
-    if cols[0].button("◂ Back"):
-        go_to(1)
-    if cols[1].button("Next ▸"):
-        go_to(3)
+    st.caption("You’re working under real constraints. For each situation, pick the move you would actually make.")
 
-# Game 3 – execution choices
+    res_qids = [qid for qid, q in MINDSET_QUESTIONS.items() if q["subdim"] == "Resourcefulness"]
+    idx = st.session_state.res_q_idx
+    if idx < 0:
+        idx = 0
+    if idx >= len(res_qids):
+        idx = len(res_qids) - 1
+    st.session_state.res_q_idx = idx
+
+    current_qid = res_qids[idx]
+    q = MINDSET_QUESTIONS[current_qid]
+    st.markdown(f"_Decision {idx + 1} of {len(res_qids)}_")
+    render_choice_cards(current_qid, q["prompt"], q["options"])
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        if st.button("◂ Previous decision", disabled=(idx == 0)):
+            st.session_state.res_q_idx -= 1
+            st.rerun()
+    with c2:
+        if st.button("Next decision ▸", disabled=(idx == len(res_qids) - 1)):
+            # require answer to current before moving on
+            if st.session_state.get(f"{current_qid}_choice") is None:
+                st.error("Please choose what you would actually do for this decision before moving on.")
+            else:
+                st.session_state.res_q_idx += 1
+                st.rerun()
+    with c3:
+        # continue to next game only if all constraint decisions are answered
+        if st.button("Continue to next game ▸"):
+            missing = [qid for qid in res_qids if st.session_state.get(f"{qid}_choice") is None]
+            if missing:
+                st.error("Please make a choice for each decision before continuing.")
+            else:
+                go_to(3)
+
+# Game 3 – execution bias (card choices with more options)
 elif page == 3:
     st.subheader("Game 3: Next-Step Choices")
-    st.caption("Time and information are limited. For each situation, choose the next move you’d actually take.")
-    for qid, q in MINDSET_QUESTIONS.items():
-        if q["subdim"] != "Execution Bias":
-            continue
-        st.markdown(f"**{q['prompt']}**")
-        st.radio(
-            "",
-            options=["(select one)"] + q["options"],
-            key=qid,
-        )
-        st.markdown("---")
-    cols = st.columns(2)
-    if cols[0].button("◂ Back"):
-        go_to(2)
-    if cols[1].button("Next ▸"):
-        go_to(4)
+    st.caption("You have limited time and information. For each situation, pick what you would actually do next.")
 
-# Game 4 – shock cards
+    exec_qids = [qid for qid, q in MINDSET_QUESTIONS.items() if q["subdim"] == "Execution Bias"]
+    for qid in exec_qids:
+        q = MINDSET_QUESTIONS[qid]
+        render_choice_cards(qid, q["prompt"], q["options"])
+
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("◂ Back"):
+            go_to(2)
+    with c2:
+        if st.button("Next ▸"):
+            missing = [qid for qid in exec_qids if st.session_state.get(f"{qid}_choice") is None]
+            if missing:
+                st.error("Please choose what you’d actually do for each situation before continuing.")
+            else:
+                go_to(4)
+
+# Game 4 – shock cards as interactive cards
 elif page == 4:
     st.subheader("Game 4: Shock Cards")
-    st.caption("Unexpected things happen. For each shock, choose how you’d respond.")
-    for qid, q in MINDSET_QUESTIONS.items():
-        if q["subdim"] != "Resilience & Adaptability":
-            continue
-        st.markdown(f"**{q['prompt']}**")
-        st.radio(
-            "",
-            options=["(select one)"] + q["options"],
-            key=qid,
-        )
-        st.markdown("---")
-    cols = st.columns(2)
-    if cols[0].button("◂ Back"):
-        go_to(3)
-    if cols[1].button("Next ▸"):
-        go_to(5)
+    st.caption("Unexpected things happen. For each shock, choose how you’d respond in real life.")
 
-# Game 5 – feature priority
+    resil_qids = [qid for qid, q in MINDSET_QUESTIONS.items() if q["subdim"] == "Resilience & Adaptability"]
+    for qid in resil_qids:
+        q = MINDSET_QUESTIONS[qid]
+        render_choice_cards(qid, q["prompt"], q["options"])
+
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("◂ Back"):
+            go_to(3)
+    with c2:
+        if st.button("Next ▸"):
+            missing = [qid for qid in resil_qids if st.session_state.get(f"{qid}_choice") is None]
+            if missing:
+                st.error("Please choose how you’d respond to each shock before continuing.")
+            else:
+                go_to(5)
+
+# Game 5 – feature budget allocation
 elif page == 5:
-    st.subheader("Game 5: Feature Board")
-    st.caption("Imagine you have **10 units of priority** for this sprint. How would you spread attention across these options?")
-    st.markdown("_Use the sliders to show what you’d actually focus on — not what sounds good on paper._")
+    st.subheader("Game 5: Feature Budget")
+    st.caption("You’re planning a sprint. You have a **budget of points** and multiple ways you could spend attention.")
+
+    st.markdown(
+        f"""
+You have a budget of **{FEATURE_BUDGET} points** to allocate across these possible changes.
+
+- You can use **as much or as little** of the budget as you like.
+- Don’t assume you *should* use all of it.
+- Higher numbers = more attention/effort this sprint.
+        """
+    )
 
     total_alloc = 0
     for f in VALUE_FEATURES:
-        val = st.slider(
+        val = st.number_input(
             f["name"],
             min_value=0,
-            max_value=5,
-            value=3,
+            max_value=FEATURE_BUDGET,
+            value=st.session_state.get(f["key"], 0),
             key=f["key"],
         )
         total_alloc += val
 
-    st.markdown(f"**Total priority allocated:** {total_alloc} (guideline: around 10–20 total)")
+    st.markdown(f"**Total points allocated:** {total_alloc} (out of {FEATURE_BUDGET})")
 
-    cols = st.columns(2)
-    if cols[0].button("◂ Back"):
-        go_to(4)
-    if cols[1].button("Next ▸"):
-        go_to(6)
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("◂ Back"):
+            go_to(4)
+    with c2:
+        if st.button("Next ▸"):
+            # no strict validation here – zero allocation is allowed
+            go_to(6)
 
-# Skills page
+# Skills Game
 elif page == 6:
     st.subheader("Skills Game")
-    st.caption("First, a quick self-check. Then scenario rounds to see how you’d play different roles in a venture.")
+    st.caption(
+        "First, do a quick **self-assessment** of your skills. "
+        "Then, play through scenario rounds that simulate how you’d actually operate."
+    )
 
+    st.markdown("### Part 1 – Self-assessment")
     col1, col2 = st.columns(2)
     with col1:
         st.slider("Finding and understanding customers", 1, 5, 3, key="s_skill_mkt")
@@ -967,27 +1117,30 @@ elif page == 6:
         st.slider("Aligning people and priorities toward a plan", 1, 5, 3, key="s_skill_team")
 
     st.markdown("---")
-    st.markdown("### Scenario Rounds")
+    st.markdown("### Part 2 – Scenario Rounds")
 
     for skill in SKILL_AREAS:
         st.markdown(f"**{skill}**")
         for qid in SKILL_SCENARIO_MAP[skill]:
             q = SKILL_QUESTIONS[qid]
-            st.markdown(q["prompt"])
-            st.radio(
-                "",
-                options=["(select one)"] + q["options"],
-                key=qid,
-            )
-        st.markdown("---")
+            render_choice_cards(qid, q["prompt"], q["options"])
 
-    cols = st.columns(2)
-    if cols[0].button("◂ Back"):
-        go_to(5)
-    if cols[1].button("Next ▸"):
-        go_to(7)
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("◂ Back"):
+            go_to(5)
+    with c2:
+        if st.button("Next ▸"):
+            missing = [
+                qid for qid in SKILL_QUESTIONS.keys()
+                if st.session_state.get(f"{qid}_choice") is None
+            ]
+            if missing:
+                st.error("Please play through all skill scenarios before continuing.")
+            else:
+                go_to(7)
 
-# Resources page
+# Resources
 elif page == 7:
     st.subheader("Resources")
     st.caption("Answer based on what you could realistically tap into over the next 3–6 months.")
@@ -1000,10 +1153,9 @@ elif page == 7:
 
     st.markdown("---")
     st.markdown("**Time pattern:**")
-    st.radio(
+    time_choice = st.radio(
         "",
         options=[
-            "(select one)",
             "I can consistently protect 25+ hours most weeks.",
             "I can usually protect 10–25 hours, with some weeks disrupted.",
             "I have 5–10 hours in irregular pockets.",
@@ -1021,10 +1173,9 @@ elif page == 7:
     with sup_cols[1]:
         st.checkbox("Someone who is emotionally in my corner when things get rough.", key="sup_emotional")
         st.checkbox("Someone willing to make intros or open doors.", key="sup_intros")
-    st.radio(
+    sup_reaction = st.radio(
         "When I share an ambitious plan, the typical reaction from people around me is:",
         options=[
-            "(select one)",
             "They’re mostly encouraging and try to help.",
             "They’re neutral or politely interested.",
             "They tend to be skeptical or discouraging.",
@@ -1032,13 +1183,16 @@ elif page == 7:
         key="sup_reaction",
     )
 
-    cols = st.columns(2)
-    if cols[0].button("◂ Back"):
-        go_to(6)
-    if cols[1].button("Next ▸"):
-        go_to(8)
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("◂ Back"):
+            go_to(6)
+    with c2:
+        if st.button("Next ▸"):
+            # everything here has defaults except radios, but radios always have a selected value
+            go_to(8)
 
-# Acumen page
+# Acumen
 elif page == 8:
     st.subheader("Venture-Building Knowledge")
     st.caption("Quick questions on how you think about problems, markets, models, and scaling.")
@@ -1050,19 +1204,22 @@ elif page == 8:
             st.markdown(f"**{q['prompt']}**")
             st.radio(
                 "",
-                options=["(select one)"] + q["options"],
+                options=q["options"],
                 key=qid,
             )
             st.markdown("---")
 
-    cols = st.columns(2)
-    if cols[0].button("◂ Back"):
-        go_to(7)
-    if cols[1].button("Submit & see readiness profile ▸"):
-        st.session_state.submitted = True
-        go_to(9)
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("◂ Back"):
+            go_to(7)
+    with c2:
+        if st.button("Submit & see readiness profile ▸"):
+            # ensure all acumen questions answered (radios always have selection)
+            st.session_state.submitted = True
+            go_to(9)
 
-# Results page
+# Results
 elif page == 9:
     st.subheader("Readiness Profile")
     if not st.session_state.submitted:
