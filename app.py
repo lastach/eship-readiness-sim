@@ -160,7 +160,6 @@ VALUE_FEATURES = [
 
 
 def compute_value_creation_score():
-    # treat user number inputs as "units" of attention; cost = units * feature cost
     allocations = []
     for f in VALUE_FEATURES:
         val = st.session_state.get(f["key"], 0)
@@ -170,14 +169,9 @@ def compute_value_creation_score():
             val = 0.0
         allocations.append(val)
 
-    if not allocations:
+    if not allocations or all(a <= 0 for a in allocations):
         return 1.0
 
-    # if they allocate nothing, minimal score
-    if all(a <= 0 for a in allocations):
-        return 1.0
-
-    # normalize by max allocated units
     max_alloc = max(allocations)
     diffs = []
     for f, alloc in zip(VALUE_FEATURES, allocations):
@@ -196,7 +190,7 @@ MINDSET_QUESTIONS = {
         "prompt": "You need to understand why users churn, but have zero budget. What do you actually do first?",
         "options": [
             "Use existing signals (reviews, support tickets) and talk directly to a few churned users.",
-            "Wait until you have budget for a proper study.",
+            "Wait until you have budget for a formal study.",
             "Ask friends what they think about churn in general.",
             "Search online for articles and case studies about churn before talking to anyone.",
         ],
@@ -235,7 +229,7 @@ MINDSET_QUESTIONS = {
         ],
         "scores": [5, 3, 1, 2],
     },
-    # Execution bias – more options, not quiz-y
+    # Execution bias
     "ms_exec_1": {
         "subdim": "Execution Bias",
         "prompt": "You have one afternoon to de-risk a new idea. What do you actually do?",
@@ -265,7 +259,7 @@ MINDSET_QUESTIONS = {
             "Run two tiny tests in parallel and compare response.",
             "Pick one based purely on your intuition.",
             "Wait until you can do a full market study.",
-            "Ask someone experienced which segment sounds cooler and choose that.",
+            "Ask someone experienced which segment sounds more promising and choose that.",
         ],
         "scores": [5, 2, 1, 3],
     },
@@ -291,7 +285,7 @@ MINDSET_QUESTIONS = {
         ],
         "scores": [5, 1, 2, 3],
     },
-    # Resilience & adaptability – original 3 shocks
+    # Resilience & adaptability – 3 shocks
     "ms_resil_1": {
         "subdim": "Resilience & Adaptability",
         "prompt": "Shock: A contractor delays a deliverable by 3 days. What do you do?",
@@ -356,7 +350,7 @@ SKILL_QUESTIONS = {
             "Interview 5–10 recent trial users about their decision.",
             "Run a broad online survey with anyone you can find.",
             "Change the homepage headline based on your intuition.",
-            "Read marketing blogs instead of talking to users.",
+            "Read marketing articles instead of talking to users.",
         ],
         "scores": [5, 2, 1, 2],
     },
@@ -637,32 +631,12 @@ def go_to(page_idx: int):
 
 # ============== UI HELPERS ==============
 
-def render_toggle_card_multi(key: str, text: str):
-    """Multi-select card (for Game 1)."""
-    selected = st.session_state.get(key, False)
-    label = f"✅ {text}" if selected else text
-    bg = "#e3f2fd" if selected else "#f9f9f9"
-    border = "2px solid #1e88e5" if selected else "1px solid #cccccc"
-    if st.button(
-        label,
-        key=f"card_{key}",
-        use_container_width=True,
-    ):
-        st.session_state[key] = not selected
-    st.markdown(
-        f"""
-        <style>
-        div[data-testid="stButton"] button#card_{key} {{
-            border-radius: 0.6rem;
-            border: {border};
-            background-color: {bg};
-            text-align: left;
-            white-space: normal;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+def toggle_flag(state_key: str):
+    st.session_state[state_key] = not st.session_state.get(state_key, False)
+
+
+def set_choice(state_key: str, value):
+    st.session_state[state_key] = value
 
 
 def ensure_order(order_key: str, n: int):
@@ -671,6 +645,19 @@ def ensure_order(order_key: str, n: int):
         random.shuffle(order)
         st.session_state[order_key] = order
     return st.session_state[order_key]
+
+
+def render_toggle_card_multi(state_key: str, text: str):
+    """Multi-select card (for Game 1)."""
+    selected = st.session_state.get(state_key, False)
+    label = f"✅ {text}" if selected else text
+    st.button(
+        label,
+        key=f"btn_{state_key}",
+        use_container_width=True,
+        on_click=toggle_flag,
+        args=(state_key,),
+    )
 
 
 def render_choice_cards(qid: str, prompt: str, options: list):
@@ -683,24 +670,12 @@ def render_choice_cards(qid: str, prompt: str, options: list):
         opt = options[opt_idx]
         selected = (current == opt_idx)
         label = f"✅ {opt}" if selected else opt
-        bg = "#e8f5e9" if selected else "#f9f9f9"
-        border = "2px solid #43a047" if selected else "1px solid #cccccc"
-        btn_key = f"{qid}_opt_{pos}"
-        if st.button(label, key=btn_key, use_container_width=True):
-            st.session_state[f"{qid}_choice"] = opt_idx
-        st.markdown(
-            f"""
-            <style>
-            div[data-testid="stButton"] button#{btn_key} {{
-                border-radius: 0.6rem;
-                border: {border};
-                background-color: {bg};
-                text-align: left;
-                white-space: normal;
-            }}
-            </style>
-            """,
-            unsafe_allow_html=True,
+        st.button(
+            label,
+            key=f"{qid}_opt_{pos}",
+            use_container_width=True,
+            on_click=set_choice,
+            args=(f"{qid}_choice", opt_idx),
         )
     st.markdown("---")
 
@@ -709,11 +684,7 @@ def get_mc_score(qdict, qid: str):
     q = qdict[qid]
     idx = st.session_state.get(f"{qid}_choice", None)
     if idx is None:
-        ans = st.session_state.get(qid)
-        if ans and ans in q["options"]:
-            idx = q["options"].index(ans)
-        else:
-            return None
+        return None
     if 0 <= idx < len(q["scores"]):
         return float(q["scores"][idx])
     return None
@@ -1023,7 +994,7 @@ elif page == 5:
         f"""
 You have a budget of **{FEATURE_BUDGET} cost units** to allocate across these possible changes.
 
-- Each feature has its own **cost**.
+- Each feature has its own **cost per unit**.
 - You can use **as much or as little** of the budget as you like.
 - You **cannot exceed** the total budget.
         """
@@ -1040,7 +1011,6 @@ You have a budget of **{FEATURE_BUDGET} cost units** to allocate across these po
             value=int(existing),
             key=key,
         )
-        st.session_state[key] = val
         total_cost += val * f["cost"]
 
     st.markdown(f"**Total cost used:** {total_cost} / {FEATURE_BUDGET}")
@@ -1067,13 +1037,13 @@ elif page == 6:
     st.markdown("### Part 1 – Self-assessment")
     col1, col2 = st.columns(2)
     with col1:
-        st.slider("Finding and understanding customers", 1, 5, key="s_skill_mkt")
-        st.slider("Keeping day-to-day operations running smoothly", 1, 5, key="s_skill_ops")
-        st.slider("Budgeting, runway, and unit economics", 1, 5, key="s_skill_fin")
+        st.slider("Finding and understanding customers", 1, 5, 3, key="s_skill_mkt")
+        st.slider("Keeping day-to-day operations running smoothly", 1, 5, 3, key="s_skill_ops")
+        st.slider("Budgeting, runway, and unit economics", 1, 5, 3, key="s_skill_fin")
     with col2:
-        st.slider("Shaping and building products people can use", 1, 5, key="s_skill_prod")
-        st.slider("Selling and building relationships", 1, 5, key="s_skill_sales")
-        st.slider("Aligning people and priorities toward a plan", 1, 5, key="s_skill_team")
+        st.slider("Shaping and building products people can use", 1, 5, 3, key="s_skill_prod")
+        st.slider("Selling and building relationships", 1, 5, 3, key="s_skill_sales")
+        st.slider("Aligning people and priorities toward a plan", 1, 5, 3, key="s_skill_team")
 
     st.markdown("---")
     st.markdown("### Part 2 – Scenario Rounds")
@@ -1105,10 +1075,10 @@ elif page == 7:
     st.caption("Answer based on what you could realistically tap into over the next 3–6 months.")
 
     st.markdown("**Access to key resources (today):**")
-    st.slider("Money you could direct toward a venture.", 1, 5, key="res_fin_level")
-    st.slider("Tools, platforms, or infrastructure you already have access to.", 1, 5, key="res_tech_level")
-    st.slider("People you could involve (co-founders, contractors, employees).", 1, 5, key="res_talent_level")
-    st.slider("Connections to customers, partners, mentors, or gatekeepers.", 1, 5, key="res_network_level")
+    st.slider("Money you could direct toward a venture.", 1, 5, 3, key="res_fin_level")
+    st.slider("Tools, platforms, or infrastructure you already have access to.", 1, 5, 3, key="res_tech_level")
+    st.slider("People you could involve (co-founders, contractors, employees).", 1, 5, 3, key="res_talent_level")
+    st.slider("Connections to customers, partners, mentors, or gatekeepers.", 1, 5, 3, key="res_network_level")
 
     st.markdown("---")
     st.markdown("**Time pattern:**")
@@ -1125,24 +1095,12 @@ elif page == 7:
         with col:
             selected = (current_time == opt)
             label = f"✅ {opt}" if selected else opt
-            bg = "#fff3e0" if selected else "#f9f9f9"
-            border = "2px solid #fb8c00" if selected else "1px solid #cccccc"
-            btn_key = f"time_opt_{i}"
-            if st.button(label, key=btn_key, use_container_width=True):
-                st.session_state["res_time_pattern"] = opt
-            st.markdown(
-                f"""
-                <style>
-                div[data-testid="stButton"] button#{btn_key} {{
-                    border-radius: 0.6rem;
-                    border: {border};
-                    background-color: {bg};
-                    text-align: left;
-                    white-space: normal;
-                }}
-                </style>
-                """,
-                unsafe_allow_html=True,
+            st.button(
+                label,
+                key=f"time_opt_{i}",
+                use_container_width=True,
+                on_click=set_choice,
+                args=("res_time_pattern", opt),
             )
 
     st.markdown("---")
@@ -1168,24 +1126,12 @@ elif page == 7:
         with col:
             selected = (current_react == opt)
             label = f"✅ {opt}" if selected else opt
-            bg = "#e1f5fe" if selected else "#f9f9f9"
-            border = "2px solid #039be5" if selected else "1px solid #cccccc"
-            btn_key = f"react_opt_{i}"
-            if st.button(label, key=btn_key, use_container_width=True):
-                st.session_state["sup_reaction"] = opt
-            st.markdown(
-                f"""
-                <style>
-                div[data-testid="stButton"] button#{btn_key} {{
-                    border-radius: 0.6rem;
-                    border: {border};
-                    background-color: {bg};
-                    text-align: left;
-                    white-space: normal;
-                }}
-                </style>
-                """,
-                unsafe_allow_html=True,
+            st.button(
+                label,
+                key=f"react_opt_{i}",
+                use_container_width=True,
+                on_click=set_choice,
+                args=("sup_reaction", opt),
             )
 
     c1, c2 = st.columns(2)
