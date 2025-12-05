@@ -113,7 +113,7 @@ def compute_opportunity_score():
 
 FEATURE_BUDGET = 20  # total cost budget (cannot exceed)
 
-# Only three features are clearly best in scoring: A, C, E
+# A & G most important; then C/E; others much lower
 VALUE_FEATURES = [
     {
         "key": "feat_a",
@@ -131,7 +131,7 @@ VALUE_FEATURES = [
         "key": "feat_c",
         "name": "Add a guided checklist that helps new users complete the core workflow in their first session.",
         "cost": 6,
-        "ideal_points": 5,
+        "ideal_points": 4,
     },
     {
         "key": "feat_d",
@@ -143,7 +143,7 @@ VALUE_FEATURES = [
         "key": "feat_e",
         "name": "Run a small pilot with 10 ideal customers, including onboarding and follow-up.",
         "cost": 6,
-        "ideal_points": 5,
+        "ideal_points": 4,
     },
     {
         "key": "feat_f",
@@ -155,7 +155,7 @@ VALUE_FEATURES = [
         "key": "feat_g",
         "name": "Add instrumentation to capture where users drop off in key journeys.",
         "cost": 4,
-        "ideal_points": 3,
+        "ideal_points": 5,
     },
 ]
 
@@ -604,7 +604,7 @@ if "submitted" not in st.session_state:
 if "res_q_idx" not in st.session_state:
     st.session_state.res_q_idx = 0
 
-# Explicit default initialization so sliders/checkboxes persist
+# one-time defaults for resources/support
 if "defaults_initialized" not in st.session_state:
     defaults = {
         "res_fin_level": 3,
@@ -619,8 +619,7 @@ if "defaults_initialized" not in st.session_state:
         "sup_reaction": None,
     }
     for k, v in defaults.items():
-        if k not in st.session_state:
-            st.session_state[k] = v
+        st.session_state.setdefault(k, v)
     st.session_state.defaults_initialized = True
 
 
@@ -649,7 +648,6 @@ def ensure_order(order_key: str, n: int):
 
 
 def render_toggle_card_multi(state_key: str, text: str, suffix: str = ""):
-    """Multi-select card (for Game 1 and Game 5)."""
     selected = st.session_state.get(state_key, False)
     label_text = text + (f"  \n_{suffix}_" if suffix else "")
     label = f"✅ {label_text}" if selected else label_text
@@ -663,7 +661,6 @@ def render_toggle_card_multi(state_key: str, text: str, suffix: str = ""):
 
 
 def render_choice_cards(qid: str, prompt: str, options: list):
-    """Single-choice question rendered as clickable cards with randomized order."""
     st.markdown(f"**{prompt}**")
     order = ensure_order(f"{qid}_order", len(options))
     current = st.session_state.get(f"{qid}_choice", None)
@@ -1035,19 +1032,48 @@ elif page == 6:
     st.markdown("### Part 1 – Self-assessment")
     col1, col2 = st.columns(2)
     with col1:
-        st.slider("Finding and understanding customers", 1, 5, st.session_state.get("s_skill_mkt", 3), key="s_skill_mkt")
-        st.slider("Keeping day-to-day work running smoothly", 1, 5, st.session_state.get("s_skill_ops", 3), key="s_skill_ops")
-        st.slider("Budgeting, runway, and unit economics", 1, 5, st.session_state.get("s_skill_fin", 3), key="s_skill_fin")
+        st.slider(
+            "Finding and understanding customers",
+            1, 5,
+            st.session_state.get("s_skill_mkt", 3),
+            key="s_skill_mkt",
+        )
+        st.slider(
+            "Keeping day-to-day work running smoothly",
+            1, 5,
+            st.session_state.get("s_skill_ops", 3),
+            key="s_skill_ops",
+        )
+        st.slider(
+            "Budgeting, runway, and unit economics",
+            1, 5,
+            st.session_state.get("s_skill_fin", 3),
+            key="s_skill_fin",
+        )
     with col2:
-        st.slider("Shaping and building products people can use", 1, 5, st.session_state.get("s_skill_prod", 3), key="s_skill_prod")
-        st.slider("Selling and building relationships", 1, 5, st.session_state.get("s_skill_sales", 3), key="s_skill_sales")
-        st.slider("Aligning people and priorities toward a plan", 1, 5, st.session_state.get("s_skill_team", 3), key="s_skill_team")
+        st.slider(
+            "Shaping and building products people can use",
+            1, 5,
+            st.session_state.get("s_skill_prod", 3),
+            key="s_skill_prod",
+        )
+        st.slider(
+            "Selling and building relationships",
+            1, 5,
+            st.session_state.get("s_skill_sales", 3),
+            key="s_skill_sales",
+        )
+        st.slider(
+            "Aligning people and priorities toward a plan",
+            1, 5,
+            st.session_state.get("s_skill_team", 3),
+            key="s_skill_team",
+        )
 
     st.markdown("---")
     st.markdown("### Part 2 – Scenario Rounds")
 
     for skill in SKILL_AREAS:
-        # No skill labels here; just the questions
         for qid in SKILL_SCENARIO_MAP[skill]:
             q = SKILL_QUESTIONS[qid]
             render_choice_cards(qid, q["prompt"], q["options"])
@@ -1073,10 +1099,31 @@ elif page == 7:
     st.caption("Answer based on what you could realistically tap into over the next 3–6 months.")
 
     st.markdown("**Access to key resources (today):**")
-    st.slider("Money you could direct toward a venture.", 1, 5, st.session_state["res_fin_level"], key="res_fin_level")
-    st.slider("Tools, platforms, or infrastructure you already have access to.", 1, 5, st.session_state["res_tech_level"], key="res_tech_level")
-    st.slider("People you could involve (co-founders, contractors, employees).", 1, 5, st.session_state["res_talent_level"], key="res_talent_level")
-    st.slider("Connections to customers, partners, mentors, or gatekeepers.", 1, 5, st.session_state["res_network_level"], key="res_network_level")
+
+    st.slider(
+        "Money you could direct toward a venture.",
+        1, 5,
+        st.session_state.get("res_fin_level", 3),
+        key="res_fin_level",
+    )
+    st.slider(
+        "Tools, platforms, or infrastructure you already have access to.",
+        1, 5,
+        st.session_state.get("res_tech_level", 3),
+        key="res_tech_level",
+    )
+    st.slider(
+        "People you could involve (co-founders, contractors, employees).",
+        1, 5,
+        st.session_state.get("res_talent_level", 3),
+        key="res_talent_level",
+    )
+    st.slider(
+        "Connections to customers, partners, mentors, or gatekeepers.",
+        1, 5,
+        st.session_state.get("res_network_level", 3),
+        key="res_network_level",
+    )
 
     st.markdown("---")
     st.markdown("**Time pattern:**")
