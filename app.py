@@ -78,7 +78,7 @@ OPP_SCENARIOS = [
     },
     {
         "key": "opp_9",
-        "text": "Customers who churn still reach out months later asking if they can use the product again.",
+        "text": "You have a growing waitlist of people regularly following up asking when they can get access.",
         "is_opportunity": True,
     },
     {
@@ -113,6 +113,7 @@ def compute_opportunity_score():
 
 FEATURE_BUDGET = 20  # total cost budget (cannot exceed)
 
+# Only three features are clearly best in scoring: A, C, E
 VALUE_FEATURES = [
     {
         "key": "feat_a",
@@ -128,33 +129,33 @@ VALUE_FEATURES = [
     },
     {
         "key": "feat_c",
-        "name": "Improve a workflow that power users run daily.",
+        "name": "Add a guided checklist that helps new users complete the core workflow in their first session.",
         "cost": 6,
-        "ideal_points": 4,
+        "ideal_points": 5,
     },
     {
         "key": "feat_d",
         "name": "Ship an idea with no demand signals yet.",
         "cost": 5,
-        "ideal_points": 2,
+        "ideal_points": 1,
     },
     {
         "key": "feat_e",
-        "name": "Reduce server costs by 10% (no user-facing change).",
-        "cost": 4,
-        "ideal_points": 3,
-    },
-    {
-        "key": "feat_f",
-        "name": "Add a guided setup that cuts new-user time-to-value in half.",
-        "cost": 8,
+        "name": "Run a small pilot with 10 ideal customers, including onboarding and follow-up.",
+        "cost": 6,
         "ideal_points": 5,
     },
     {
-        "key": "feat_g",
-        "name": "Polish small UI details that only existing power users notice.",
+        "key": "feat_f",
+        "name": "Polish minor UI details that only existing power users occasionally notice.",
         "cost": 2,
         "ideal_points": 2,
+    },
+    {
+        "key": "feat_g",
+        "name": "Add instrumentation to capture where users drop off in key journeys.",
+        "cost": 4,
+        "ideal_points": 3,
     },
 ]
 
@@ -171,7 +172,7 @@ def compute_value_creation_score():
 # ============== MINDSET GAMES 2–4 ==============
 
 MINDSET_QUESTIONS = {
-    # Resourcefulness – 4 decisions used in Game 2
+    # Resourcefulness – Game 2
     "ms_res_1": {
         "subdim": "Resourcefulness",
         "prompt": "You need to understand why users churn, but have zero budget. What do you actually do first?",
@@ -189,7 +190,7 @@ MINDSET_QUESTIONS = {
         "options": [
             "Use a no-code template tool and ship something basic.",
             "Wait for a designer so it looks polished.",
-            "Write copy now and hope design time appears later.",
+            "Write copy now and wait for design time later.",
             "Mock it up in a slide deck and send screenshots only.",
         ],
         "scores": [5, 1, 2, 3],
@@ -201,7 +202,7 @@ MINDSET_QUESTIONS = {
             "Create a simple clickable mockup or fake-door test.",
             "Wait until engineers have time to build it properly.",
             "Write a long spec and share internally for feedback.",
-            "Look at similar tools and assume the idea is validated if they exist.",
+            "Look at similar tools and treat the idea as validated if they exist.",
         ],
         "scores": [5, 1, 2, 3],
     },
@@ -216,7 +217,7 @@ MINDSET_QUESTIONS = {
         ],
         "scores": [5, 3, 1, 2],
     },
-    # Execution bias
+    # Execution bias – Game 3
     "ms_exec_1": {
         "subdim": "Execution Bias",
         "prompt": "You have one afternoon to de-risk a new idea. What do you actually do?",
@@ -235,7 +236,7 @@ MINDSET_QUESTIONS = {
             "Add a 'coming soon' button and track clicks plus follow-up.",
             "Build the full feature and launch quietly.",
             "Survey friends who are not in your target segment.",
-            "Look at similar tools and assume that counts as validation.",
+            "Look at similar tools and treat that as enough validation.",
         ],
         "scores": [5, 2, 1, 2],
     },
@@ -272,12 +273,12 @@ MINDSET_QUESTIONS = {
         ],
         "scores": [5, 1, 2, 3],
     },
-    # Resilience & adaptability – 3 shocks
+    # Resilience & adaptability – Game 4
     "ms_resil_1": {
         "subdim": "Resilience & Adaptability",
         "prompt": "Shock: A contractor delays a deliverable by 3 days. What do you do?",
         "options": [
-            "Do nothing and hope it’s fine.",
+            "Do nothing and simply push the timeline back.",
             "Replace the contractor entirely.",
             "Re-scope the sprint and adjust dependent work.",
         ],
@@ -325,7 +326,7 @@ SKILL_DESCRIPTIONS = {
     "Financial Management": "Budgeting, runway, unit economics, and trade-offs.",
     "Product & Technical": "Designing and building solutions users can actually use.",
     "Sales & Networking": "Selling value and building relationships that move things forward.",
-    "Team & Strategy": "Aligning people, priorities, and plans toward a coherent direction.",
+    "Team & Strategy": "Aligning people and priorities toward a coherent direction.",
 }
 
 SKILL_QUESTIONS = {
@@ -413,7 +414,7 @@ SKILL_QUESTIONS = {
             "Check payback period and LTV, then decide how much you can afford to spend.",
             "Shut off acquisition until CAC is lower.",
             "Ignore the numbers and focus on top-line growth.",
-            "Search benchmarks and assume they apply exactly.",
+            "Search benchmarks and treat them as an exact template without checking your own numbers.",
         ],
         "scores": [5, 2, 1, 2],
     },
@@ -574,9 +575,9 @@ ACUMEN_QUESTIONS = {
         "subdim": "Operational Feasibility",
         "prompt": "Which setup is most likely to deliver consistently?",
         "options": [
-            "You rely on a fragile, manual process only you understand.",
+            "You rely on a manual process only you understand.",
             "You have documented processes and can train others to deliver.",
-            "You assume you’ll figure out delivery once demand shows up.",
+            "You plan to figure out delivery later once demand shows up.",
         ],
         "scores": [2, 5, 1],
     },
@@ -602,6 +603,25 @@ if "submitted" not in st.session_state:
     st.session_state.submitted = False
 if "res_q_idx" not in st.session_state:
     st.session_state.res_q_idx = 0
+
+# Explicit default initialization so sliders/checkboxes persist
+if "defaults_initialized" not in st.session_state:
+    defaults = {
+        "res_fin_level": 3,
+        "res_tech_level": 3,
+        "res_talent_level": 3,
+        "res_network_level": 3,
+        "res_time_pattern": None,
+        "sup_brainstorm": False,
+        "sup_tactical": False,
+        "sup_emotional": False,
+        "sup_intros": False,
+        "sup_reaction": None,
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
+    st.session_state.defaults_initialized = True
 
 
 def go_to(page_idx: int):
@@ -1015,19 +1035,19 @@ elif page == 6:
     st.markdown("### Part 1 – Self-assessment")
     col1, col2 = st.columns(2)
     with col1:
-        st.slider("Finding and understanding customers", 1, 5, 3, key="s_skill_mkt")
-        st.slider("Keeping day-to-day operations running smoothly", 1, 5, 3, key="s_skill_ops")
-        st.slider("Budgeting, runway, and unit economics", 1, 5, 3, key="s_skill_fin")
+        st.slider("Finding and understanding customers", 1, 5, st.session_state.get("s_skill_mkt", 3), key="s_skill_mkt")
+        st.slider("Keeping day-to-day work running smoothly", 1, 5, st.session_state.get("s_skill_ops", 3), key="s_skill_ops")
+        st.slider("Budgeting, runway, and unit economics", 1, 5, st.session_state.get("s_skill_fin", 3), key="s_skill_fin")
     with col2:
-        st.slider("Shaping and building products people can use", 1, 5, 3, key="s_skill_prod")
-        st.slider("Selling and building relationships", 1, 5, 3, key="s_skill_sales")
-        st.slider("Aligning people and priorities toward a plan", 1, 5, 3, key="s_skill_team")
+        st.slider("Shaping and building products people can use", 1, 5, st.session_state.get("s_skill_prod", 3), key="s_skill_prod")
+        st.slider("Selling and building relationships", 1, 5, st.session_state.get("s_skill_sales", 3), key="s_skill_sales")
+        st.slider("Aligning people and priorities toward a plan", 1, 5, st.session_state.get("s_skill_team", 3), key="s_skill_team")
 
     st.markdown("---")
     st.markdown("### Part 2 – Scenario Rounds")
 
     for skill in SKILL_AREAS:
-        st.markdown(f"**{skill}**")
+        # No skill labels here; just the questions
         for qid in SKILL_SCENARIO_MAP[skill]:
             q = SKILL_QUESTIONS[qid]
             render_choice_cards(qid, q["prompt"], q["options"])
@@ -1053,10 +1073,10 @@ elif page == 7:
     st.caption("Answer based on what you could realistically tap into over the next 3–6 months.")
 
     st.markdown("**Access to key resources (today):**")
-    st.slider("Money you could direct toward a venture.", 1, 5, 3, key="res_fin_level")
-    st.slider("Tools, platforms, or infrastructure you already have access to.", 1, 5, 3, key="res_tech_level")
-    st.slider("People you could involve (co-founders, contractors, employees).", 1, 5, 3, key="res_talent_level")
-    st.slider("Connections to customers, partners, mentors, or gatekeepers.", 1, 5, 3, key="res_network_level")
+    st.slider("Money you could direct toward a venture.", 1, 5, st.session_state["res_fin_level"], key="res_fin_level")
+    st.slider("Tools, platforms, or infrastructure you already have access to.", 1, 5, st.session_state["res_tech_level"], key="res_tech_level")
+    st.slider("People you could involve (co-founders, contractors, employees).", 1, 5, st.session_state["res_talent_level"], key="res_talent_level")
+    st.slider("Connections to customers, partners, mentors, or gatekeepers.", 1, 5, st.session_state["res_network_level"], key="res_network_level")
 
     st.markdown("---")
     st.markdown("**Time pattern:**")
