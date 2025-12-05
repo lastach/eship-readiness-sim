@@ -109,7 +109,7 @@ def compute_opportunity_score():
     norm = max(0.0, min(1.0, raw / max_raw))
     return round(1 + 4 * norm, 2)
 
-# ============== GAME 5: FEATURE BUDGET ==============
+# ============== GAME 5: FEATURE BUDGET (SELECT FEATURES ONLY) ==============
 
 FEATURE_BUDGET = 20  # total cost budget (cannot exceed)
 
@@ -160,25 +160,12 @@ VALUE_FEATURES = [
 
 
 def compute_value_creation_score():
-    allocations = []
-    for f in VALUE_FEATURES:
-        val = st.session_state.get(f["key"], 0)
-        try:
-            val = float(val)
-        except Exception:
-            val = 0.0
-        allocations.append(val)
-
-    if not allocations or all(a <= 0 for a in allocations):
+    selected = [f for f in VALUE_FEATURES if st.session_state.get(f["key"], False)]
+    if not selected:
         return 1.0
-
-    max_alloc = max(allocations)
-    diffs = []
-    for f, alloc in zip(VALUE_FEATURES, allocations):
-        normalized = 5.0 * alloc / max_alloc if max_alloc > 0 else 0.0
-        diffs.append(abs(normalized - f["ideal_points"]))
-    avg_diff = sum(diffs) / len(diffs)
-    norm = max(0.0, min(1.0, (5.0 - avg_diff) / 5.0))
+    selected_value = sum(f["ideal_points"] for f in selected)
+    max_possible = sum(f["ideal_points"] for f in VALUE_FEATURES)
+    norm = max(0.0, min(1.0, selected_value / max_possible))
     return round(1 + 4 * norm, 2)
 
 # ============== MINDSET GAMES 2–4 ==============
@@ -342,7 +329,6 @@ SKILL_DESCRIPTIONS = {
 }
 
 SKILL_QUESTIONS = {
-    # Market research & marketing
     "sk_mkt_1": {
         "skill": "Market Research & Marketing",
         "prompt": "Trial users aren’t converting. What do you do first?",
@@ -365,7 +351,6 @@ SKILL_QUESTIONS = {
         ],
         "scores": [5, 1, 2, 3],
     },
-    # Product & technical
     "sk_prod_1": {
         "skill": "Product & Technical",
         "prompt": "You can only ship one change this sprint. Which do you choose?",
@@ -388,7 +373,6 @@ SKILL_QUESTIONS = {
         ],
         "scores": [5, 1, 3, 2],
     },
-    # Sales & networking
     "sk_sales_1": {
         "skill": "Sales & Networking",
         "prompt": "You have 10 warm leads and limited time. What’s your approach?",
@@ -411,7 +395,6 @@ SKILL_QUESTIONS = {
         ],
         "scores": [5, 1, 2, 2],
     },
-    # Financial management
     "sk_fin_1": {
         "skill": "Financial Management",
         "prompt": "You have 3 months of runway left. What do you prioritize?",
@@ -434,7 +417,6 @@ SKILL_QUESTIONS = {
         ],
         "scores": [5, 2, 1, 2],
     },
-    # Operations
     "sk_ops_1": {
         "skill": "Operations",
         "prompt": "Support tickets are piling up. What’s your first move?",
@@ -457,7 +439,6 @@ SKILL_QUESTIONS = {
         ],
         "scores": [5, 1, 2, 3],
     },
-    # Team & strategy
     "sk_team_1": {
         "skill": "Team & Strategy",
         "prompt": "Traction is flat but a subset of users loves one use-case. What now?",
@@ -647,10 +628,11 @@ def ensure_order(order_key: str, n: int):
     return st.session_state[order_key]
 
 
-def render_toggle_card_multi(state_key: str, text: str):
-    """Multi-select card (for Game 1)."""
+def render_toggle_card_multi(state_key: str, text: str, suffix: str = ""):
+    """Multi-select card (for Game 1 and Game 5)."""
     selected = st.session_state.get(state_key, False)
-    label = f"✅ {text}" if selected else text
+    label_text = text + (f"  \n_{suffix}_" if suffix else "")
+    label = f"✅ {label_text}" if selected else label_text
     st.button(
         label,
         key=f"btn_{state_key}",
@@ -985,7 +967,7 @@ elif page == 4:
             else:
                 go_to(5)
 
-# Game 5 – feature budget
+# Game 5 – feature budget (select features only)
 elif page == 5:
     st.subheader("Game 5: Feature Budget")
     st.caption("You’re planning a sprint. You have a limited budget and multiple ways you could spend attention.")
@@ -994,30 +976,26 @@ elif page == 5:
         f"""
 You have a budget of **{FEATURE_BUDGET} cost units** to allocate across these possible changes.
 
-- Each feature has its own **cost per unit**.
-- You can use **as much or as little** of the budget as you like.
-- You **cannot exceed** the total budget.
+- Each card shows a **feature** and its **cost**.
+- Click to select the features you would ship in this sprint.
+- You can choose as many as you like, but you **cannot exceed the budget**.
         """
     )
 
-    total_cost = 0
-    for f in VALUE_FEATURES:
-        key = f["key"]
-        existing = st.session_state.get(key, 0)
-        val = st.number_input(
-            f"{f['name']}  \n_cost per unit: {f['cost']}_",
-            min_value=0,
-            max_value=100,
-            value=int(existing),
-            key=key,
-        )
-        total_cost += val * f["cost"]
+    cols = st.columns(2)
+    for i, f in enumerate(VALUE_FEATURES):
+        with cols[i % 2]:
+            suffix = f"Cost: {f['cost']}"
+            render_toggle_card_multi(f["key"], f["name"], suffix=suffix)
 
+    total_cost = sum(
+        f["cost"] for f in VALUE_FEATURES if st.session_state.get(f["key"], False)
+    )
     st.markdown(f"**Total cost used:** {total_cost} / {FEATURE_BUDGET}")
 
     over_budget = total_cost > FEATURE_BUDGET
     if over_budget:
-        st.error("You are over budget. Reduce some allocations to continue.")
+        st.error("You are over budget. Deselect some features to continue.")
 
     c1, c2 = st.columns(2)
     with c1:
@@ -1082,6 +1060,10 @@ elif page == 7:
 
     st.markdown("---")
     st.markdown("**Time pattern:**")
+
+    def set_time_choice(value: str):
+        st.session_state["res_time_pattern"] = value
+
     time_options = [
         "25+ hours most weeks",
         "10–25 hours most weeks",
@@ -1099,8 +1081,8 @@ elif page == 7:
                 label,
                 key=f"time_opt_{i}",
                 use_container_width=True,
-                on_click=set_choice,
-                args=("res_time_pattern", opt),
+                on_click=set_time_choice,
+                args=(opt,),
             )
 
     st.markdown("---")
@@ -1114,6 +1096,10 @@ elif page == 7:
         st.checkbox("Someone willing to make intros or open doors.", key="sup_intros")
 
     st.markdown("**Typical reaction when you share an ambitious plan:**")
+
+    def set_reaction_choice(value: str):
+        st.session_state["sup_reaction"] = value
+
     react_options = [
         "Mostly encouraging and try to help",
         "Neutral or politely interested",
@@ -1130,8 +1116,8 @@ elif page == 7:
                 label,
                 key=f"react_opt_{i}",
                 use_container_width=True,
-                on_click=set_choice,
-                args=("sup_reaction", opt),
+                on_click=set_reaction_choice,
+                args=(opt,),
             )
 
     c1, c2 = st.columns(2)
