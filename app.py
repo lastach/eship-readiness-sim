@@ -20,7 +20,12 @@ st.markdown("""
     color: #e6edf3;
 }
 [data-testid="stHeader"] { background: transparent; }
-[data-testid="stSidebar"] { display: none; }
+
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+    border-right: 1px solid #30363d;
+}
 
 /* ── Typography ── */
 h1, h2, h3 { color: #58a6ff !important; }
@@ -47,6 +52,39 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
     font-size: 1.05rem; line-height: 1.6; color: #c9d1d9;
 }
 .narrative-box em { color: #79c0ff; }
+
+/* ── Consequence box (transition pages) ── */
+.consequence-box {
+    background: #161b22; border-left: 4px solid #f0883e;
+    border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1rem 0 1.6rem 0;
+    font-size: 1rem; line-height: 1.6; color: #c9d1d9;
+}
+
+/* ── Character dialogue box ── */
+.character-box {
+    background: #161b22; border-left: 4px solid #f0883e;
+    border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1rem 0 1.2rem 0;
+    font-size: 0.95rem; line-height: 1.5; color: #c9d1d9;
+}
+.char-name {
+    font-weight: 600; color: #79c0ff; margin-bottom: 0.4rem;
+}
+.char-dialogue {
+    font-style: italic; color: #c9d1d9;
+}
+
+/* ── Dashboard metric ── */
+.dashboard-metric {
+    background: #0d1117; border: 1px solid #30363d;
+    border-radius: 8px; padding: 0.8rem 1rem; margin: 0.6rem 0;
+    font-size: 0.9rem; color: #c9d1d9;
+}
+.metric-label {
+    color: #8b949e; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.metric-value {
+    font-weight: 600; color: #58a6ff; font-size: 1.1rem; margin-top: 0.2rem;
+}
 
 /* ── Scenario card ── */
 .scenario-card {
@@ -258,1314 +296,1121 @@ def compute_opportunity_score():
 # ============== GAME 5: FEATURE BUDGET ==============
 FEATURE_BUDGET = 20
 
-VALUE_FEATURES = [
+Vu
+y02_EATURE_ = [
     {
-        "key": "feat_a",
-        "name": "Fix a calibration bug causing 25% of new installs to fail on first setup.",
-        "cost": 7,
-        "ideal_points": 5,
+        "key": "oeatu_a,
+        "iame : "oFx eacalibration bug tcasineg 25 of pnw ansial_l to gfilson wfirt oetups",
+        "iost : "7
+        "iseadl_oint.": "5
     },
     {
-        "key": "feat_b",
-        "name": "Add a dashboard color theme option.",
-        "cost": 3,
-        "ideal_points": 1,
+        "key": "oeatu_b,
+        "iame : "oAd a deshboard 'olor:theye copion.",
+    "   "iost : "3
+        "iseadl_oint.": "1
     },
     {
-        "key": "feat_c",
-        "name": "Build a guided setup wizard that walks managers through their first retrofit in under 15 minutes.",
-        "cost": 6,
-        "ideal_points": 4,
+        "key": "oeatu_c,
+        "iame : "ouildia gruseadoetupswilzrd 'hat fwalk managers tohounghtheir ofirt oetrofit kn Onder o15min(te_s",
+    "   "iost : "6
+        "iseadl_oint.": "4
     },
     {
-        "key": "feat_d",
-        "name": "Ship an experimental 'air quality mood ring' feature with no demand signals yet.",
-        "cost": 5,
-        "ideal_points": 1,
+        "key": "oeatu_d,
+        "iame : "oSip tn gxpoerientil b'ir aqulity cmod iing 'featureswith io desand fignals tyet",
+    "   "iost : "5
+        "iseadl_oint.": "1
     },
     {
-        "key": "feat_e",
-        "name": "Run a small pilot with 10 ideal building managers, including onboarding and follow-up.",
-        "cost": 6,
-        "ideal_points": 4,
+        "key": "oeatu_e,
+        "iame : "oRuna smarl mpilt whth i10idea  building managers ,incoluing monoard ng and sollow-up ",
+    "   "iost : "6
+        "iseadl_oint.": "4
     },
     {
-        "key": "feat_f",
-        "name": "Polish minor dashboard details that only power users occasionally notice.",
-        "cost": 2,
-        "ideal_points": 2,
+        "key": "oeatu_f,
+        "iame : "oPolsh iin(r:teshboard 'detils rhat fnly tpoer bser  ofccaion_lly anoicae",
+    "   "iost : "2
+        "iseadl_oint.": "2
     },
     {
-        "key": "feat_g",
-        "name": "Add instrumentation to capture where managers drop off during setup.",
-        "cost": 4,
-        "ideal_points": 5,
+        "key": "oeatu_g,
+        "iame : "oAd ansiaruentilion tr carpureswiere aanagers tdro of f duing tetups",
+        "iost : "4
+        "iseadl_oint.": "5
     },
-]
+ 
 
 
-def compute_value_creation_score():
-    selected = [
-        f for f in VALUE_FEATURES if st.session_state.get(f["key"], False)
-    ]
-    if not selected:
-        return 1.0
-    selected_value = sum(f["ideal_points"] for f in selected)
-    max_possible = sum(f["ideal_points"] for f in VALUE_FEATURES)
-    norm = max(0.0, min(1.0, selected_value / max_possible))
+def compute_oalue _ceation score():
+    telected = s[        "ffor s int u
+y02_EATURE_ =f s[.session_state.get(sf"key"], False)
+     ]    if tot telected:
+         eturn 1.0
+    relected:oalue = sum(1f"kseadl_oint.":]for s int elected:)    max_rossible c sum(1f"kseadl_oint.":]for s int u
+y02_EATURE_ )    norm = max(0.0, min(1.0, relected:oalue =/max_rossible )
     return round(1 + 4 * norm, 2)
 
 
-# ============== MINDSET GAMES 2–4 ==============
-MINDSET_QUESTIONS = {
-    # Resourcefulness – Game 2
-    "ms_res_1": {
-        "subdim": "Resourcefulness",
-        "prompt": "You need to understand why building managers drop ThermaLoop after install, but you have zero budget for research. What do you actually do first?",
-        "options": [
-            "Use existing signals (support tickets, cancellation emails) and talk directly to a few churned managers.",
-            "Wait until you have budget for a formal study.",
-            "Ask friends what they think about churn in general.",
-            "Search online for articles about HVAC customer retention before talking to anyone.",
-        ],
-        "scores": [5, 1, 2, 3],
+# ============== GINDSET_GAME S 2–4==============
+FINDSET_DQUESIONS = {
+    "# esourcefulness" –Game h2    ""ms_est_1: "
+        "ksubdim: "oRsourcefulness",
+    "   "krovmp": "You heedstr cnders tnd wheybuilding managers rdro ohermaLoop safer {nsial_l but ayu have azer budget for uesearch,. Wat fd you ictually do ifirt ?,
+    "   "kopion.": "[        "   "kUseexisting Hignals t(upport aickits, bcnce lation tmails )and thalk dirctey to fafew achrn dstanagers ",
+        "   "kWitlcndilaayu have audget for u folmal �study",
+        "   "kAsk frinds ghat they phink about
+achrn int gnergal",
+        "   "kSarch,fnlyinefor u rickle about sVAC dustomersretuntion tefore ohalkng togandyne.""
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 3]
     },
-    "ms_res_2": {
-        "subdim": "Resourcefulness",
-        "prompt": "You need to launch a landing page for ThermaLoop today, but your designer just quit.",
-        "options": [
-            "Use a no-code template tool and ship something basic that communicates the value prop.",
-            "Wait for a new designer so it looks polished.",
-            "Write copy now and wait for design time later.",
-            "Mock it up in a slide deck and send screenshots to prospects.",
-        ],
-        "scores": [5, 1, 2, 3],
+    {"ms_est_2: "
+        "ksubdim: "oRsourcefulness",
+    "   "krovmp": "You heedstr claunh arclaning magesfor uhermaLoop stoday but ayu rdesigner oust ruite.,
+    "   "kopion.": "[        "   "kUseeanor-cod texmplte ioolsand suip tomedting boaiocthat cuommnitcte sthe salue =rovp",
+        "   "kWitlcor u fnw aesigner osoit �look mpolsh ed",
+        "   "kWrte bcop anowand whitlcor uesignetime, lte r",
+        "   "kMockit �u inta smlseadecikand sued scereenshts or crospects ""
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 3]
     },
-    "ms_res_3": {
-        "subdim": "Resourcefulness",
-        "prompt": "You want to test a new 'predictive maintenance alert' feature but have no engineering time this month.",
-        "options": [
-            "Create a simple clickable mockup or fake-door test to gauge interest.",
-            "Wait until engineers have time to build it properly.",
-            "Write a long spec and share internally for feedback.",
-            "Look at similar IoT tools and treat the idea as validated if they have it.",
-        ],
-        "scores": [5, 1, 2, 3],
+    {"ms_est_3: "
+        "ksubdim: "oRsourcefulness",
+    "   "krovmp": "You hwat thotest h fnw a'preditive bmint,ennce ialert'featureswut aave ao dngineering time.this ionths.,
+    "   "kopion.": "[        "   "kreatieeansiplet clckible maocku ir s ake-dor:thst ho geaugeintereste",
+        "   "kWitlcndilaangineeri have rime.thobuildiit �rovperly",
+        "   "kWrte brclng apectand suire nntere_lly aor s edsackg",
+        "   "kLok an sidmilar IoTtools,and theatithe sdea tassaluidtedlif toey pave rte.,
+    "   "]
+    "   "kcore(": "[5,"1
+"2
+ 3]
     },
-    "ms_res_4": {
-        "subdim": "Resourcefulness",
-        "prompt": "You only have access to 10 building managers for early testing of ThermaLoop.",
-        "options": [
-            "Run deep interviews and observe their actual workflows and pain points.",
-            "Run a big quantitative survey with them.",
-            "Don't test until you have a bigger audience.",
-            "Read industry reports about smart buildings instead of talking to them.",
-        ],
-        "scores": [5, 3, 1, 2],
+    {"ms_est_4: "
+        "ksubdim: "oRsourcefulness",
+    "   "krovmp": "You hnly tave a cess.thob10iuilding managers rfr eacly festing,of phermaLoop .,
+    "   "kopion.": "[        "   "kRunadeepnntereview,and tober e the r astuallworkflow ,and tpint oint."",
+        "   "kRuna sig .quldilttive bsu e  withitheye",
+        "   "kDn't ohst hndilaayu have a sig ers audence ",
+        "   "kReadindustry breort  about smart vuilding s{nsiaeadif phalkng togaheye",
+        "]
+    "   "kcore(": "[5,"3,"1
+"2]
     },
-    # Execution bias – Game 3
-    "ms_exec_1": {
-        "subdim": "Execution Bias",
-        "prompt": "You have one afternoon to de-risk the ThermaLoop concept before a potential investor meeting. What do you actually do?",
-        "options": [
-            "Run 5 quick calls with building managers or set up a simple landing page test.",
-            "Write a 20-page strategy doc mapping the next 2 years.",
-            "Brainstorm product names and design a new logo.",
-            "Search online for competitor examples and save them into a doc without contacting anyone.",
-        ],
-        "scores": [5, 1, 2, 2],
+    {# xecution Bbia" –Game h3    {"ms_eecu_1: "
+        "ksubdim: "oxecution Bias",
+    "   "krovmp": "You have ane tafer non tr cde-ris the fhermaLoop soncept.tefore oapotential vnvensor maeeing,. Wat fd you ictually do ?,
+    "   "kopion.": "[        "   "kRuna5quicklcall.swithituilding managers rr s e �u iansiplet laning magesftste",
+        "   "kWrte brc20-agesftraiteg do cmap ing ohe next 32tyeas ",
+        "   "kBaintsor mproducti ame sand decignet fnw alogo",
+        "   "kSarch,fnlyinefor uompetitor mexapletsand dsae the minto.a de cmithout rontrctiog andyne.""
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 2]
     },
-    "ms_exec_2": {
-        "subdim": "Execution Bias",
-        "prompt": "You want to test interest in a 'multi-zone control' upgrade for ThermaLoop. What's your next step?",
-        "options": [
-            "Add a 'coming soon' button in the dashboard and track clicks plus follow-up interest.",
-            "Build the full feature and launch quietly.",
-            "Survey friends who don't manage buildings.",
-            "Look at competitor feature lists and treat that as enough validation.",
-        ],
-        "scores": [5, 2, 1, 2],
+    {"ms_eecu_2: "
+        "ksubdim: "oxecution Bias",
+    "   "krovmp": "You hwat thotest hnteresteinta s'multi-zne tontraol'�u rade,for uhermaLoop . Wat ' your text steps?,
+    "   "kopion.": "[        "   "kAd a d'ompng Hion 'button {n the feshboard 'nd theaklcalcki mplusfollow-up cntereste",
+        "   "kuildiahe futl faatureswnd liaunh auicetly",
+        "   "kSu e  wfrinds gha don't oanagervuilding s",
+        "   "kLok an sompetitor maatureswist ,and theatithea as senunghtaluidteon.",
+    "   "]
+    "   "kcore(": "[5,"2,"1
+"2]
     },
-    "ms_exec_3": {
-        "subdim": "Execution Bias",
-        "prompt": "You're torn between targeting small office buildings vs. large residential complexes. How do you proceed?",
-        "options": [
-            "Run two tiny tests in parallel — different landing pages — and compare response rates.",
-            "Pick one based purely on your intuition.",
-            "Wait until you can do a full market study.",
-            "Ask a mentor which segment sounds more promising and go with that.",
-        ],
-        "scores": [5, 2, 1, 3],
+    {"ms_eecu_3: "
+        "ksubdim: "oxecution Bias",
+    "   "krovmp": "You re sor nbetween stargeing Hiarl mofic,rvuilding s vs.liargeuesedeatial vompletxs. SHowad you irovceds?,
+    "   "kopion.": "[        "   "kRunatwotein festi in Oaratlle — hifferent tlaning mages — jnd tomplre nespondseeaites",
+        "   "kick tne tased opresy on syur inbtuieon.",
+    "   "   "kWitlcndilaayu han gd fafeul matket ostudy",
+        "   "kAsk amentir wohih siegent counds bmre orovmisng and sgowithitheae.,
+    "   "]
+    "   "kcore(": "[5,"2,"1
+"3]
     },
-    "ms_exec_4": {
-        "subdim": "Execution Bias",
-        "prompt": "You ran a pilot with 10 buildings. Results are noisy but lean positive. What do you do?",
-        "options": [
-            "Make a small decision in the direction of the signal and keep testing.",
-            "Ignore it and wait for perfectly clear data.",
-            "Restart from scratch with a totally different approach.",
-            "Ask an advisor whether they think you should trust the pilot data.",
-        ],
-        "scores": [5, 1, 2, 3],
+    {"ms_eecu_4: "
+        "ksubdim: "oxecution Bias",
+    "   "krovmp": "You hrata spilt whth i10iuilding s" esolts)are no isywut alea postiive . Wat fd you io ?,
+    "   "kopion.": "[        "   "kMae a miarl mecision fn the feircteon fofthe signalsand skeepnesting,",
+        "   "kIgnre ot and thitlcor uerfoctey tkleardata ",
+        "   "kRetart yrom ncerath shth iatotal_l different tp irachi",
+        "   "kAsk ata dvior wohther thei phink aou ihould ptrst rhe spilt wata ",
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 3]
     },
-    "ms_exec_5": {
-        "subdim": "Execution Bias",
-        "prompt": "Your co-founder suggests a quick test that could disprove your core assumption about energy savings. Your move?",
-        "options": [
-            "Run the test and be ready to pivot if it fails.",
-            "Avoid the test; you don't want to undermine the pitch.",
-            "Delay the test until after the funding round.",
-            "Ask an advisor whether it's worth testing at all.",
-        ],
-        "scores": [5, 1, 2, 3],
+    {"ms_eecu_5: "
+        "ksubdim: "oxecution Bias",
+    "   "krovmp": "You  uom-ounder ouggest  a duicklchst hoat cuold pisplove iyu  uomeswnssumpion.about snergy cavings  Your cove.?,
+    "   "kopion.": "[        "   "kRunathetest h d bu reald to fpivt wf ttlcoils ",
+        "   "kAvoidathetest ;you io 't owat thotnder minerhe spithi",
+        "   "kDely theyohst hndilaaafer {he futning mound.",
+        "   "kAsk ata dvior wohther tt's aorkhithsting,oa all ",
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 3]
     },
-    # Resilience & adaptability – Game 4
-    "ms_resil_1": {
-        "subdim": "Resilience & Adaptability",
-        "prompt": "⚡ SHOCK: Your hardware contractor delays a critical sensor shipment by 3 weeks — right before your pilot launch.",
-        "options": [
-            "Do nothing and simply push the pilot timeline back.",
-            "Replace the contractor entirely.",
-            "Re-scope the pilot, adjust dependent work, and communicate proactively with pilot customers.",
-        ],
-        "scores": [1, 2, 5],
+    {# esolience & Aaaptability" –Game h4    {"ms_estil_1: "
+        "ksubdim: "oRsolience & Adaptability",
+    "   "krovmp": "Y⚡ SHOCK:Your ciredwre nontractor mdely  a dcitizcl �snsor wuip ent cby 3weeks a�� jight:tefore oyu  upilt wiaunh .,
+    "   "kopion.": "[        "   "kDotot hng and scipleyoprshrhe spilt wime.yinefackg",
+        "   "kReplce ehe concractor matiaesy ",
+        "   "kRe-corperhe spilt ,adjustimdepndeen worka,jnd tompmnitcte  irachively ahth ipilt wustomers,",
+        "]
+    "   "kcore(": "[1
+"2
+ 5]
     },
-    "ms_resil_2": {
-        "subdim": "Resilience & Adaptability",
-        "prompt": "⚡ SHOCK: Your customer acquisition cost jumps 40% overnight after a platform changes its ad algorithm.",
-        "options": [
-            "Keep campaigns running and see what happens.",
-            "Kill all paid channels immediately.",
-            "Shift spend, test new creatives, explore organic channels, and review funnel quality.",
-        ],
-        "scores": [1, 2, 5],
+    {"ms_estil_2: "
+        "ksubdim: "oRsolience & Adaptability",
+    "   "krovmp": "Y⚡ SHOCK:Your customersrcquirition post ujumps 0% ofvr nght:tafer {aplantolmachanges.tt' a  'nlgritihm.,
+    "   "kopion.": "[        "   "kKeepncaplagnasrunwnng and sceeghat thp inso",
+        "   "kKll trl mpaidahangnel impmedite ly",
+        "   "kShiftapecd, yhst hnw aceativels,gxpolre otrgaitcahangnel  and recviewfutnnelaqulity ",
+        "]
+    "   "kcore(": "[1
+"2
+ 5]
     },
-    "ms_resil_3": {
-        "subdim": "Resilience & Adaptability",
-        "prompt": "⚡ SHOCK: A well-funded competitor suddenly launches a 'free tier' smart ventilation product in your space.",
-        "options": [
-            "Keep your current pricing and ignore them.",
-            "Lower your price significantly and hope to keep up.",
-            "Refocus on a segment or offer where you compete on value, service, and outcomes — not price.",
-        ],
-        "scores": [1, 2, 5],
+    {"ms_estil_3: "
+        "ksubdim: "oRsolience & Adaptability",
+    "   "krovmp": "Y⚡ SHOCK:YAweell-utniedsompetitor msuden;y aiaunh s a r'fre rimer'smart ventilation troducti i syur ipacie.,
+    "   "kopion.": "[        "   "kKeepnyu  uourent tpricng and signre oheye",
+        "   "kLoer byu  uprc,rvignaiic,atly wnd shrperhoskeepnup",
+        "   "kReocus nota smegent co of erewhere you'sompeti anesalue  relrvc,r and rut omes d�� not wprc,r",
+        "]
+    "   "kcore(": "[1
+"2
+ 5]
     },
-}
+ }
 
-RESOURCEFULNESS_QIDS = ["ms_res_1", "ms_res_2", "ms_res_3", "ms_res_4"]
-EXEC_QIDS = [
-    qid
-    for qid, q in MINDSET_QUESTIONS.items()
-    if q["subdim"] == "Execution Bias"
+RESOURCEFULNESS_QID = [
+"ms_est_1:,{"ms_est_2:,{"ms_est_3:,{"ms_est_4:]
+EXEC_QID = [
+    }qid    }or uqid, q i sINDSET_DQUESIONS .tems:(
+    if tq[ksubdim:]== 0oxecution Bias",
 ]
-RESIL_QIDS = ["ms_resil_1", "ms_resil_2", "ms_resil_3"]
-
-# ============== SKILLS GAME ==============
-SKILL_AREAS = [
-    "Market Research & Marketing",
-    "Operations",
-    "Financial Management",
-    "Product & Technical",
-    "Sales & Networking",
-    "Team & Strategy",
-]
-
-SKILL_DESCRIPTIONS = {
-    "Market Research & Marketing": "Finding, understanding, and reaching the right customers.",
-    "Operations": "Designing and running reliable processes and delivery.",
-    "Financial Management": "Budgeting, runway, unit economics, and trade-offs.",
-    "Product & Technical": "Designing and building solutions users can actually use.",
-    "Sales & Networking": "Selling value and building relationships that move things forward.",
-    "Team & Strategy": "Aligning people and priorities toward a coherent direction.",
-}
-
-SKILL_QUESTIONS = {
-    "sk_mkt_1": {
-        "skill": "Market Research & Marketing",
-        "prompt": "ThermaLoop trial users aren't converting to paid. What do you do first?",
-        "options": [
-            "Interview 5–10 recent trial users about their decision.",
-            "Run a broad online survey with anyone you can find.",
-            "Change the homepage headline based on your intuition.",
-            "Read marketing articles instead of talking to actual prospects.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "sk_mkt_2": {
-        "skill": "Market Research & Marketing",
-        "prompt": "You want to identify the best early adopters for ThermaLoop. What's your move?",
-        "options": [
-            "Find a niche where the energy pain is sharpest and design messaging just for them.",
-            "Target every building type with the same message.",
-            "Copy a competitor's positioning.",
-            "Ask a mentor who they think sounds like the right customer.",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    "sk_prod_1": {
-        "skill": "Product & Technical",
-        "prompt": "You can only ship one change to ThermaLoop this sprint. Which do you choose?",
-        "options": [
-            "A fix for a calibration bug that blocks first-time setup.",
-            "A 'nice to have' dashboard widget a few users casually mentioned.",
-            "A flashy new visualization that will look good in demos.",
-            "Ask an advisor for ideas and wait.",
-        ],
-        "scores": [5, 2, 3, 1],
-    },
-    "sk_prod_2": {
-        "skill": "Product & Technical",
-        "prompt": "You're unsure whether the ThermaLoop setup flow is intuitive. What do you do?",
-        "options": [
-            "Do 5 quick usability tests with target building managers.",
-            "Ship it now; you'll hear complaints if it's bad.",
-            "Ask your team what they think is confusing.",
-            "Search for UX patterns and copy one without testing.",
-        ],
-        "scores": [5, 1, 3, 2],
-    },
-    "sk_sales_1": {
-        "skill": "Sales & Networking",
-        "prompt": "You have 10 warm leads from a building management conference and limited time. What's your approach?",
-        "options": [
-            "Send tailored messages referencing your conversation and schedule 1:1 demos.",
-            "Send a broad email blast and hope some respond.",
-            "Post about ThermaLoop on LinkedIn instead.",
-            "Ask a mentor which lead to start with but delay outreach.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "sk_sales_2": {
-        "skill": "Sales & Networking",
-        "prompt": "You meet someone at a conference who manages 50 buildings. They seem interested. What's your next step?",
-        "options": [
-            "Suggest a concrete next step — a small pilot in one of their buildings.",
-            "Ask for a purchase commitment immediately.",
-            "Wait to see if they reach out to you.",
-            "Send them a deck without a clear ask or next step.",
-        ],
-        "scores": [5, 1, 2, 2],
-    },
-    "sk_fin_1": {
-        "skill": "Financial Management",
-        "prompt": "ThermaLoop has 3 months of runway left. What do you prioritize?",
-        "options": [
-            "Identify and cut low-ROI spend while doubling down on what's driving pipeline.",
-            "Cut all spending, including things that fuel growth.",
-            "Ignore runway and focus purely on perfecting the product.",
-            "Ask a mentor if they think you should be worried yet.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "sk_fin_2": {
-        "skill": "Financial Management",
-        "prompt": "Your cost to acquire a building manager is higher than expected, but those who convert stay for years.",
-        "options": [
-            "Check payback period and LTV, then decide how much you can afford to spend per customer.",
-            "Shut off acquisition until the cost comes down.",
-            "Ignore the numbers and focus on top-line growth.",
-            "Search benchmarks and treat them as an exact template without checking your own data.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "sk_ops_1": {
-        "skill": "Operations",
-        "prompt": "ThermaLoop support tickets are piling up. What's your first move?",
-        "options": [
-            "Look for patterns and fix the top root causes generating tickets.",
-            "Hire more support staff immediately.",
-            "Tell the team to 'work harder' this week.",
-            "Ask a mentor if they think you need more staff.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "sk_ops_2": {
-        "skill": "Operations",
-        "prompt": "The ThermaLoop install process works, but only you know how to do it. What now?",
-        "options": [
-            "Document it and train someone else so it's repeatable and you're not a bottleneck.",
-            "Keep doing it yourself — it's faster.",
-            "Pause installs while you figure out a better system.",
-            "Record a quick video and hope people figure it out.",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    "sk_team_1": {
-        "skill": "Team & Strategy",
-        "prompt": "Overall traction is flat, but one segment — mid-size office buildings — loves ThermaLoop. What now?",
-        "options": [
-            "Focus your roadmap and messaging on the segment that's working.",
-            "Keep trying to serve every building type equally.",
-            "Pause all changes while you think about pivoting.",
-            "Ask a mentor whether the niche is 'big enough.'",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    "sk_team_2": {
-        "skill": "Team & Strategy",
-        "prompt": "Your small ThermaLoop team is busy, but progress on key metrics is slow.",
-        "options": [
-            "Narrow focus to a small number of high-leverage bets tied to your top metric.",
-            "Add more projects so nobody is idle.",
-            "Let each person pick whatever they want to work on.",
-            "Share a productivity framework and hope habits shift.",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-}
-
-SKILL_SLIDER_MAP = {
-    "Market Research & Marketing": "s_skill_mkt",
-    "Operations": "s_skill_ops",
-    "Financial Management": "s_skill_fin",
-    "Product & Technical": "s_skill_prod",
-    "Sales & Networking": "s_skill_sales",
-    "Team & Strategy": "s_skill_team",
-}
-
-SKILL_SCENARIO_MAP = {
-    "Market Research & Marketing": ["sk_mkt_1", "sk_mkt_2"],
-    "Operations": ["sk_ops_1", "sk_ops_2"],
-    "Financial Management": ["sk_fin_1", "sk_fin_2"],
-    "Product & Technical": ["sk_prod_1", "sk_prod_2"],
-    "Sales & Networking": ["sk_sales_1", "sk_sales_2"],
-    "Team & Strategy": ["sk_team_1", "sk_team_2"],
-}
-
-# ============== RESOURCES ==============
-RESOURCE_SUBDIMS = [
-    "Financial Resources",
-    "Technology & Infrastructure",
-    "Talent / Team",
-    "Network",
-    "Time",
-    "Support",
+RESIL_QID = [
+"ms_estil_1:,{"ms_estil_2:,{"ms_estil_3:]
+# ============== GSKILLSGAME 5=============
+FSKILL_AREA = [
+    "OMtket oRsearch,& AMtket ng ,
+    "VOerateon.":
+    "Vinalncal Minagerent :
+    "VPoducti & Techitctl:
+    "VSaetsa& Ntwerking :
+    "VTeama& Sraiteg ,
 ]
 
-RESOURCE_DESCRIPTIONS = {
-    "Financial Resources": "Cash, savings, or funding you could realistically apply to a venture.",
-    "Technology & Infrastructure": "Access to tools, platforms, or infrastructure to build and deliver.",
-    "Talent / Team": "People you could involve: co-founders, employees, freelancers, or advisors.",
-    "Network": "Connections to customers, partners, mentors, or gatekeepers.",
-    "Time": "Hours per week you can reliably invest.",
-    "Support": "Emotional and practical support for ambitious goals.",
+MSKILL_ESCRIPTIONS = {
+    "OMtket oRsearch,& AMtket ng , "oFxning ,cnders tnd ng, and recching bhe reght:tustomers,",
+     VOerateon."::"kDeignaig and sunwnng aesyible mrovcesessand decivesr ",
+     Vinalncal Minagerent : "ouidgeing ,runway ,units eoncvmic  and rradeo-ffs .:
+    "VPoducti & Techitctl::"kDeignaig and suilding molutions.bser  oan gctually dser.:
+    "VSaetsa& Ntwerking : "Sevling �alue =nd suilding mesyteon."ip  rhat fmve theng s or wre.",
+     VTeama& Sraiteg , "oAlgnaig aeople,and tpioritiz sthowrd 'nsomhrent teircteon ",
 }
 
-# ============== ACUMEN QUIZ ==============
-ACUMEN_SUBDIMS = [
-    "Problem\u2013Solution Fit",
-    "Market Viability",
-    "Business Model Soundness",
-    "Go-to-Market Readiness",
-    "Operational Feasibility",
-    "Scalability Potential",
+#SKILL_QUESIONS = {
+    ""sk_mkt_1: "
+        "ksills, "oMtket oRsearch,& AMtket ng ,
+    "   "krovmp": "YhermaLoop stial Sser  oren't.concesrtng togapaid. Wat fd you io ifirt ?,
+    "   "kopion.": "[        "   "kItereview 5–10irctnt thial Sser  orout she r aecision ",
+        "   "kRuna siracdfnlyinefsu e  withitndyne.ayu han gfid.",
+        "   "kCangesbhe rhmeragesfhadline.based on wyur inbtuieon.",
+    "   "   "kReadimtket ng u rickle ansiaeadif phalkng togastuallwrospects ""
+        "]
+    "   "kcore(": "[5,"2,"1
+"2]
+    },
+    {"sk_mkt_2: "
+        "ksills, "oMtket oRsearch,& AMtket ng ,
+    "   "krovmp": "You hwat thotdeatiaf theyoest.eacly fadopirs rfr ehermaLoop . Wat ' your tove.?,
+    "   "kopion.": "[        "   "kFxnit fnih swhere the rnergy cpint s spirepst h d becignetes sging,oust rfr:theye",
+    "   "   "kTargeievery duilding mype,withitheysame ces sgi ",
+        "   "kCop aasompetitor 'spostiivonng,",
+        "   "kAsk amentir wohothei phink aounds bike thesreght:tustomers",
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 3]
+    },
+    {"sk_rodu_1: "
+        "ksills, "oPoducti & Techitctl:
+    "   "krovmp": "You han gnly tuip tne toangesbhouhermaLoop stis sprint*. Waih sd you icoose ?,
+    "   "kopion.": "[        "   "kAfix eor u falibration bug that flock;sifirt -ime.tetups",
+        "   "kAf'nc,rvhouave 'feshboard 'wiget fafew aser  oansally mantion ed",
+        "   "kAfilshbyhnw avioulitzlion trat fwll tlookgood idndemo. ",
+        "   "kAsk ata dvior wfr ideas.and thitl""
+        "]
+    "   "kcore(": "[5,"2,"3,"1]
+    },
+    {"sk_rodu_2: "
+        "ksills, "oPoducti & Techitctl:
+    "   "krovmp": "You re sunsreswierher theiThermaLoop shtupswlow bs in tuieoe . Wat fd you io ?,
+    "   "kopion.": "[        "   "kDot5quicklcusbility" esti iithithargeieuilding managers ",
+        "   "kShipttlcnow;you'll
+fhad uompelint,swf ttl' bar.",
+        "   "kAsk our treamahat they phink as ionfisineg",
+        "   "kSarch,ffr iUXcpiter.nsjnd tompytne tithout resting,",
+        "]
+    "   "kcore(": "[5,"1
+"3
+"2]
+    },
+    {"sk_saets_1: "
+        "ksills, "oSaetsa& Ntwerking :
+    "   "krovmp": "You have a10iwrdmaleas brom naeuilding managerent chnference atd limited eime. Weat ' your tp irachi?,
+    "   "kopion.": "[        "   "kSed thailre dces sgi  regerenceng myu  uomcesrslion tnd scehedue,a1:1demo. ",
+        "   "kSed t siracdfmailsfloat h d bhrperomedrespond ",
+        "   "kist about shermaLoop sn tinkedIn pnsiaead",
+        "   "kAsk amentir wohih sleasto startuwithituitmdely rut ecchi""
+        "]
+    "   "kcore(": "[5,"2,"1
+"2]
+    },
+    {"sk_saets_2: "
+        "ksills, "oSaetsa& Ntwerking :
+    "   "krovmp": "You haeeiromedne tataasomference aho makngi  r50iuilding s" Tey pse mintorested
+. Wat ' your text steps?,
+    "   "kopion.": "[        "   "kSggest gasomfcetuntext steps— a smarl mpilt wintne tofthe r auilding s",
+        "   "kAsk fr u fpuch,se !ompmitent cmpmedite ly",
+        "   "kWitlco steeif toey pecchiout eo you ",
+        "   "kSed the miadecikaithout ratkleardask o text steps""
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 2]
+    },
+    {"sk_fid_1: "
+        "ksills, "oinalncal Minagerent :
+    "   "krovmp": "YhermaLoop s,se 3months.toftunway aeft . Wat fd you ipioritizz ?,
+    "   "kopion.": "[        "   "kIeatiaf tnd tot alow-ROIapecd,wohie,adoubing �own tn what's adriing qpip.yine",
+        "   "kCu all mpecd,ng, itcoluing mheng s hat fouelgrowth. ,
+        "   "kIgnre ounway and tocus npresy on serfocteng bhe rroducti",
+        "   "kAsk amentir wf toey phink aou ihould pbeworkri dcyet",
+    "   "]
+    "   "kcore(": "[5,"2,"1
+"2]
+    },
+    {"sk_fid_2: "
+        "ksills, "oinalncal Minagerent :
+    "   "krovmp": "Your coststogastuirienaeuilding managerras iigh-r then gxpoeted: but ahose who doncesrtstay wfr uyeas ",
+        "kopion.": "[        "   "kreckpcpiyackgserfio 'nd tLTV then aecidiehow ymuhioyu han gaffr sto stecd,werftustomers",
+        "   "kShutof f cquirition pndilaahe constcomes down  ,
+        "   "kIgnre ohe nember sand tocus nn tr p-ine.browth. ,
+        "   "kSarch,fbncehmtke,and theatithe mas al gxpct oexmplte iithout roeckpng myu  uwn tata ",
+        "]
+    "   "kcore(": "[5,"2,"1
+"2]
+    },
+    {"sk_ops_1: "
+        "ksills, "oOerateon.":
+    "   "krovmp": "YhermaLoop shpport aickits,are poilng up . Wat ' your tfirt oove.?,
+    "   "kopion.": "[        "   "kLok aor ueiter.nsjnd tix eheyohp srot wuauessagnergaeng bhckits, ,
+        "   "kHrienmre ohpport atay f mpmedite ly",
+        "   "kTelltheyohsamao s'erkicireder'stis seeks",
+        "   "kAsk amentir wf toey phink aou ieedstmre ohay f",
+        "]
+    "   "kcore(": "[5,"2,"1
+"2]
+    },
+    {"sk_ops_2: "
+        "ksills, "oOerateon.":
+    "   "krovmp": "YhershermaLoop snsial_lmrovceseworkas but anly tou inowlhow yr cdoit . Wat fowl?,
+    "   "kopion.": "[        "   "kDoumen"tit and thaintromedne tlse:osoit ' repeateble mnd tou're sot a gottolnerkg",
+        "   "kKeepndong intyourself h�� it's afat rs",
+        "   "kPauesansial_l tohie,aou ifigreswut ratbtter-systems",
+    "   "   "kRecod 'nsuicklcide.oh d bhrpereople,afigreswntyut ",
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 3]
+    },
+    {"sk_hsam_1: "
+        "ksills, "oTeama& Sraiteg ,
+]   "   "krovmp": "YOeral ltheakion ps fulte but anlesmegent c�� imidsize:mofic,rvuilding s �� iove sehermaLoop . Wat fowl?,
+    "   "kopion.": "[        "   "kocus"your reacdap o d bes sging,on the saegent ctat ' yerking ",
+        "   "kKeepntryng togaer e tvery duilding mype,weqally ",
+        "   "kPauesal lthanges.tohie,aou ihink about
+apivt ng,",
+        "   "kAsk amentir wohrher theiTnih sws f'ig .enungh'",
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 3]
+    },
+    {"sk_hsam_2: "
+        "ksills, "oTeama& Sraiteg ,
+]   "   "krovmp": "Your cmarl mhermaLoop steamai butsy but arogress-on tkeymetric s s splow",
+        "kopion.": "[        "   "karraw yocus no.a dmarl mumber {oftigh-ieveragi betw ticdstr cour trp setric ",
+        "   "kAddbmre orovjcts saonobody rs indle",
+        "   "kLeievchioerasn seck what ver foey pwat thoterkicn.",
+    "   "   "kSire naproductivety" frameerkic d bhrperhabt' ashift",
+        "]
+    "   "kcore(": "[5,"1
+"2
+ 3]
+    },
+ 
+
+#SKILL_SLIDER_MAP= {
+    "OMtket oRsearch,& AMtket ng , "os_sills_mkt,
+     VOerateon."::"ks_sills_ops,
+     Vinalncal Minagerent : "os_sills_fid:
+    "VPoducti & Techitctl::"ks_sills_rodu:
+    "VSaetsa& Ntwerking : "Ss_sills_saets,
+     VTeama& Sraiteg , "os_sills_team,
+}
+
+#SKILL_CENARIOS_MAP= {
+    "OMtket oRsearch,& AMtket ng , "["sk_mkt_1:,{"sk_mkt_2:]
+     VOerateon."::"["sk_ops_1:,{"sk_ops_2:]
+     Vinalncal Minagerent : "["sk_fid_1:,{"sk_fid_2:]
+    "VPoducti & Techitctl::"["sk_rodu_1:,{"sk_rodu_2:]
+    "VSaetsa& Ntwerking : "["sk_saets_1:,{"sk_saets_2:]
+     VTeama& Sraiteg , "["sk_hsam_1:,{"sk_hsam_2:]
+}
+
+# ============== GRESOURCE ==============
+ORESOURCESUBDIMS = [
+    "Oinalncal MRsourcefs,
+     VTechiologya& Infraiarucures,
+     VTaett t/ Team,
+}   "katwerki,
+     VTims,
+     Vupport ,
 ]
 
-ACUMEN_DESCRIPTIONS = {
-    "Problem\u2013Solution Fit": "Real, urgent customer problem + clear solution that addresses it.",
-    "Market Viability": "Defined target segment, reachable customers, credible demand, differentiation.",
-    "Business Model Soundness": "Pricing, unit economics, cost structure, and path to profitability.",
-    "Go-to-Market Readiness": "Validated channels, messaging, acquisition strategy.",
-    "Operational Feasibility": "Ability to deliver reliably given tech, supply, and processes.",
-    "Scalability Potential": "Model, market, and operations can grow without breaking.",
+MRESOURCESESCRIPTIONS = {
+    "Oinalncal MRsourcefs, "Coash,cavings ,ir s tning mou'somld pealistically tappy to fafenture .,
+     VTechiologya& Infraiarucures, "oAcess.thobools, peantolma ,ir sinfraiarucuresthobuildiind decivesr.,
+     VTaett t/ Team, "oPople,aou'somld pinvolve:uom-ounder s,gxmployels,gfre lnce r ,ir s dvior  .:
+    "Vatwerki, "Confections,tr castomers, rpartnrs, rentir  ,ir sgitekeeprs,",
+     VTims, "CHursewerfteeksoyu han gesyibleyvnvenso.,
+     Vupport , "oxmoionabland tpiakiocl �spport afr u mbtions ngoal.",
 }
 
-ACUMEN_QUESTIONS = {
-    "ac_ps_fit": {
-        "subdim": "Problem\u2013Solution Fit",
-        "prompt": "Which signal shows the strongest evidence that ThermaLoop solves a real problem?",
-        "options": [
-            "People say the concept is 'cool' in casual conversation.",
-            "A segment of building managers repeatedly describes the same painful problem ThermaLoop addresses.",
-            "Your landing page has a high click-through rate from ads.",
-        ],
-        "scores": [2, 5, 3],
-    },
-    "ac_ps_fit_2": {
-        "subdim": "Problem\u2013Solution Fit",
-        "prompt": "You hear different problems from different types of buildings. What's your next step?",
-        "options": [
-            "Pick the problem you personally find most interesting.",
-            "Cluster buildings by similar needs and pains, and focus on one tight group first.",
-            "Try to build a product that solves all of them at once.",
-        ],
-        "scores": [2, 5, 1],
-    },
-    "ac_market": {
-        "subdim": "Market Viability",
-        "prompt": "Which of these market situations is most promising for ThermaLoop?",
-        "options": [
-            "Huge possible market (all commercial buildings), but you don't know who to target first.",
-            "A smaller, clearly defined group (mid-size offices in the Northeast) you can reliably reach.",
-            "A big market with many HVAC competitors and no clear angle.",
-        ],
-        "scores": [3, 5, 2],
-    },
-    "ac_model": {
-        "subdim": "Business Model Soundness",
-        "prompt": "Which business model is healthiest over time?",
-        "options": [
-            "High price point, but each install costs more to deliver than the customer pays.",
-            "Moderate price, high margin, and a clear path to recurring monitoring revenue.",
-            "Low price, unclear costs, and no idea how many buildings you need to break even.",
-        ],
-        "scores": [1, 5, 2],
-    },
-    "ac_gtm": {
-        "subdim": "Go-to-Market Readiness",
-        "prompt": "Which description sounds most ready to scale customer acquisition?",
-        "options": [
-            "You plan to grow through word-of-mouth, but have no path to your first 10 customers.",
-            "You've tested a few channels and have one that reliably brings qualified building manager leads.",
-            "You plan to 'go viral' at a trade show but have no follow-up process mapped.",
-        ],
-        "scores": [1, 5, 1],
-    },
-    "ac_ops": {
-        "subdim": "Operational Feasibility",
-        "prompt": "Which setup is most likely to deliver ThermaLoop installs consistently?",
-        "options": [
-            "You rely on a manual process only you understand.",
-            "You have documented install procedures and can train technicians to deliver.",
-            "You plan to figure out delivery logistics after demand shows up.",
-        ],
-        "scores": [2, 5, 1],
-    },
-    "ac_scale": {
-        "subdim": "Scalability Potential",
-        "prompt": "Which of these ThermaLoop approaches scales best?",
-        "options": [
-            "Each install requires extensive custom engineering from you personally.",
-            "Most of the value is delivered through standardized hardware + software, with minimal custom work.",
-            "You depend on rare, highly specialized HVAC engineers for every installation.",
-        ],
-        "scores": [2, 5, 1],
-    },
-}
-
-# ============== SESSION STATE ==============
-if "page" not in st.session_state:
-    st.session_state.page = 0
-if "max_page" not in st.session_state:
-    st.session_state.max_page = 0
-if "submitted" not in st.session_state:
-    st.session_state.submitted = False
-if "res_q_idx" not in st.session_state:
-    st.session_state.res_q_idx = 0
-
-# one-time defaults for resources/support
-if "defaults_initialized" not in st.session_state:
-    defaults = {
-        "res_fin_level": 3,
-        "res_tech_level": 3,
-        "res_talent_level": 3,
-        "res_network_level": 3,
-        "res_time_pattern": None,
-        "sup_brainstorm": False,
-        "sup_tactical": False,
-        "sup_emotional": False,
-        "sup_intros": False,
-        "sup_reaction": None,
-    }
-    for k, v in defaults.items():
-        st.session_state.setdefault(k, v)
-    st.session_state.defaults_initialized = True
-
-
-def go_to(page_idx: int):
-    st.session_state.page = page_idx
-    if page_idx > st.session_state.max_page:
-        st.session_state.max_page = page_idx
-    st.rerun()
-
-
-# ============== UI HELPERS ==============
-def toggle_flag(state_key: str):
-    st.session_state[state_key] = not st.session_state.get(state_key, False)
-
-
-def set_choice(state_key: str, value):
-    st.session_state[state_key] = value
-
-
-def ensure_order(order_key: str, n: int):
-    if order_key not in st.session_state:
-        order = list(range(n))
-        random.shuffle(order)
-        st.session_state[order_key] = order
-    return st.session_state[order_key]
-
-
-def render_toggle_card_multi(state_key: str, text: str, suffix: str = ""):
-    selected = st.session_state.get(state_key, False)
-    label_text = text + (f" \n_{suffix}_" if suffix else "")
-    label = f"\u2705 {label_text}" if selected else label_text
-    st.button(
-        label,
-        key=f"btn_{state_key}",
-        use_container_width=True,
-        on_click=toggle_flag,
-        args=(state_key,),
-    )
-
-
-def render_choice_cards(qid: str, prompt: str, options: list):
-    st.markdown(f"**{prompt}**")
-    order = ensure_order(f"{qid}_order", len(options))
-    current = st.session_state.get(f"{qid}_choice", None)
-    for pos, opt_idx in enumerate(order):
-        opt = options[opt_idx]
-        selected = current == opt_idx
-        label = f"\u2705 {opt}" if selected else opt
-        st.button(
-            label,
-            key=f"{qid}_opt_{pos}",
-            use_container_width=True,
-            on_click=set_choice,
-            args=(f"{qid}_choice", opt_idx),
-        )
-    st.markdown("---")
-
-
-def get_mc_score(qdict, qid: str):
-    q = qdict[qid]
-    idx = st.session_state.get(f"{qid}_choice", None)
-    if idx is None:
-        return None
-    if 0 <= idx < len(q["scores"]):
-        return float(q["scores"][idx])
-    return None
-
-
-def render_progress_bar(current_page, total_pages):
-    pct = int((current_page / (total_pages - 1)) * 100) if total_pages > 1 else 0
-    st.markdown(
-        f"""<div class="progress-outer">
-            <div class="progress-inner" style="width:{pct}%">{pct}%</div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
-
-def render_narrative(text):
-    html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
-    html = re.sub(r'\*(.+?)\*', r'<em>\1</em>', html)
-    html = html.replace('\n', '<br>')
-    st.markdown(f'<div class="narrative-box">{html}</div>', unsafe_allow_html=True)
-
-
-def render_game_badge(label):
-    st.markdown(f'<div class="game-badge">{label}</div>', unsafe_allow_html=True)
-
-
-# ============== SCORING FUNCTIONS ==============
-def compute_mindset_scores():
-    values = {s: [] for s in MINDSET_SUBDIMS}
-    values["Opportunity Recognition"].append(compute_opportunity_score())
-    values["Value Creation Focus"].append(compute_value_creation_score())
-    for qid, q in MINDSET_QUESTIONS.items():
-        s = get_mc_score(MINDSET_QUESTIONS, qid)
-        if s is None:
-            continue
-        values[q["subdim"]].append(s)
-    sub_scores = {}
-    for sd in MINDSET_SUBDIMS:
-        sub_scores[sd] = (
-            round(sum(values[sd]) / len(values[sd]), 2) if values[sd] else 1.0
-        )
-    overall = round(sum(sub_scores.values()) / len(MINDSET_SUBDIMS), 2)
-    return overall, sub_scores
-
-
-def compute_skill_scores():
-    skill_scores = {}
-    for skill in SKILL_AREAS:
-        vals = []
-        slider_key = SKILL_SLIDER_MAP.get(skill)
-        if slider_key is not None:
-            v = st.session_state.get(slider_key)
-            if v is not None:
-                vals.append(float(v))
-        for sid in SKILL_SCENARIO_MAP.get(skill, []):
-            s = get_mc_score(SKILL_QUESTIONS, sid)
-            if s is not None:
-                vals.append(s)
-        skill_scores[skill] = (
-            round(sum(vals) / len(vals), 2) if vals else 1.0
-        )
-    overall = round(sum(skill_scores.values()) / len(SKILL_AREAS), 2)
-    return overall, skill_scores
-
-
-def compute_resource_scores():
-    fin = float(st.session_state.get("res_fin_level", 3))
-    tech = float(st.session_state.get("res_tech_level", 3))
-    talent = float(st.session_state.get("res_talent_level", 3))
-    network = float(st.session_state.get("res_network_level", 3))
-    time_choice = st.session_state.get("res_time_pattern")
-    time_map = {
-        "25+ hours most weeks": 5,
-        "10\u201325 hours most weeks": 4,
-        "5\u201310 hours in irregular pockets": 3,
-        "Rarely have focused time": 1,
-    }
-    time_score = float(time_map.get(time_choice, 2))
-    support_count = 0
-    for key in ["sup_brainstorm", "sup_emotional", "sup_tactical", "sup_intros"]:
-        if st.session_state.get(key, False):
-            support_count += 1
-    support_react = st.session_state.get("sup_reaction")
-    react_map = {
-        "Mostly encouraging and try to help": 5,
-        "Neutral or politely interested": 3,
-        "Often skeptical or discouraging": 1,
-    }
-    react_score = float(react_map.get(support_react, 3))
-    support_base = 1 + (support_count / 4.0) * 4
-    support_score = round((support_base + react_score) / 2.0, 2)
-    sub_scores = {
-        "Financial Resources": fin,
-        "Technology & Infrastructure": tech,
-        "Talent / Team": talent,
-        "Network": network,
-        "Time": time_score,
-        "Support": support_score,
-    }
-    overall = round(sum(sub_scores.values()) / len(sub_scores), 2)
-    return overall, sub_scores
-
-
-def compute_acumen_scores():
-    values = {s: [] for s in ACUMEN_SUBDIMS}
-    for qid, q in ACUMEN_QUESTIONS.items():
-        s = get_mc_score(ACUMEN_QUESTIONS, qid)
-        if s is None:
-            continue
-        values[q["subdim"]].append(s)
-    sub_scores = {}
-    for sd in ACUMEN_SUBDIMS:
-        sub_scores[sd] = (
-            round(sum(values[sd]) / len(values[sd]), 2) if values[sd] else 1.0
-        )
-    overall = round(sum(sub_scores.values()) / len(ACUMEN_SUBDIMS), 2)
-    return overall, sub_scores
-
-
-def compute_overall_scores():
-    mindset_overall, mindset_sub = compute_mindset_scores()
-    skills_overall, skills_sub = compute_skill_scores()
-    res_overall, res_sub = compute_resource_scores()
-    ac_overall, ac_sub = compute_acumen_scores()
-    comp_scores = {
-        "Entrepreneurial Mindset": mindset_overall,
-        "Entrepreneurial Skills": skills_overall,
-        "Resource Availability": res_overall,
-        "Entrepreneurship / Business Acumen": ac_overall,
-    }
-    total = 0.0
-    for comp, score in comp_scores.items():
-        total += (score / 5.0) * COMP_WEIGHTS[comp]
-    total = round(total, 1)
-    return (
-        total,
-        comp_scores,
-        {
-            "mindset": mindset_sub,
-            "skills": skills_sub,
-            "resources": res_sub,
-            "acumen": ac_sub,
-        },
-    )
-
-
-def readiness_label(total_score):
-    if total_score >= 85:
-        return "\U0001f680 High readiness — you're positioned to pursue or accelerate a venture."
-    elif total_score >= 70:
-        return "\U0001f4aa Strong potential — ready for more serious experiments and real-world traction."
-    elif total_score >= 50:
-        return "\U0001f331 Early-stage readiness — good time to build specific muscles through low-risk reps."
-    else:
-        return "\U0001f9f1 Foundation-building phase — focus on learning, testing, and stacking small wins."
-
-
-def coaching_narrative(total_score, comp_scores, sub_scores):
-    """Generate personalized coaching narrative based on scores."""
-    sorted_comps = sorted(COMPONENTS, key=lambda c: comp_scores[c])
-    weakest = sorted_comps[0]
-    strongest = sorted_comps[-1]
-
-    # Find weakest subdimension across all categories
-    all_subs = []
-    sub_labels = {
-        "mindset": "Mindset",
-        "skills": "Skills",
-        "resources": "Resources",
-        "acumen": "Business Acumen",
-    }
-    for cat, subs in sub_scores.items():
-        for name, score in subs.items():
-            all_subs.append((name, score, sub_labels[cat]))
-    all_subs.sort(key=lambda x: x[1])
-    weakest_sub = all_subs[0] if all_subs else None
-    strongest_sub = all_subs[-1] if all_subs else None
-
-    lines = []
-
-    if total_score >= 85:
-        lines.append(
-            f"You're showing strong readiness across the board. Your top area is **{strongest}** "
-            f"— lean into that as your competitive edge."
-        )
-    elif total_score >= 70:
-        lines.append(
-            f"You've got a solid foundation. **{strongest}** is clearly a strength for you. "
-            f"The biggest unlock right now is probably in **{weakest}** — that's where focused "
-            f"attention will compound fastest."
-        )
-    elif total_score >= 50:
-        lines.append(
-            f"You're in early-stage territory, which is exactly where most founders start. "
-            f"Your strongest area is **{strongest}**, which gives you something real to build from. "
-            f"**{weakest}** is your biggest gap — and addressing it doesn't require a huge leap, "
-            f"just deliberate practice."
-        )
-    else:
-        lines.append(
-            f"You're in foundation-building mode. That's not a verdict — it's a starting point. "
-            f"**{strongest}** shows you have genuine capacity. Start there and use it as a "
-            f"launchpad to build **{weakest}** through small, low-risk experiments."
-        )
-
-    if weakest_sub:
-        lines.append(
-            f"\n\nYour thinnest specific area is **{weakest_sub[0]}** ({weakest_sub[1]:.1f}/5, "
-            f"under {weakest_sub[2]}). That's your highest-leverage development target."
-        )
-
-    if strongest_sub:
-        lines.append(
-            f"Your strongest specific area is **{strongest_sub[0]}** ({strongest_sub[1]:.1f}/5) "
-            f"— protect and leverage that."
-        )
-
-    return "\n\n".join(lines)
-
-
-# ============== NAVIGATION ==============
-PAGE_LABELS = [
-    "Intro",
-    "Round 1: Customer Signals",
-    "Round 2: Constraints",
-    "Round 3: Execution",
-    "Round 4: Shocks",
-    "Round 5: Sprint Planning",
-    "Skills Assessment",
-    "Resources",
-    "Business Knowledge",
-    "Readiness Profile",
+# ============== NACUMEN QUIZ==============
+OACUMENSUBDIMS = [
+    "OPoblems–Slutions Fit,
+     VMtket oVibility",
+    "Vusiness AMdels Sundeess",
+    "EGo-to-Mtket oRsdiness ,
+     VOerateon.l �Feasiility",
+    "VScl bility" Ptential ,
 ]
 
-TOTAL_PAGES = len(PAGE_LABELS)
+MACUMENSESCRIPTIONS = {
+    "OPoblems–Slutions Fit, "oRsal, urgnt chstomersrroblems +tkleardolutionsthea asddresessatl""
+     VMtket oVibility",:"kDeinesdthargeieaegent ,pecchible mastomers, rcredile mesand ,different ition.",
+    "Rusiness AMdels Sundeess", "Priocng ,cndts eoncvmic  aonstciarucures and poahithoprofilability".,
+    "EGo-to-Mtket oRsdiness ,:"Valuidtedlihangnel  aes sging,, cquirition ptraiteg ",
+     VOerateon.l �Feasiility", "oAility" eodecivesrgesyibleyvgvesstheh, nsppoy, tnd tpivcesess.,
+    "VScl bility" Ptential , "Moveci markets and ruerateon."can geaw yithout rbeccing ",
+ }
+MACUMENSQUESIONS = {
+    ""ac_ps_fit, "
+        "ksubdim: "oPoblems–Slutions Fit,
+        "krovmp": "YWaih signalsashw ,ahe sarong st.eaide.nc that shermaLoop sholve a real broblems?,
+    "   "kopion.": "[        "   "kPople,aay theysoncept.ts f'cool'�inoansalluomcesrslion ",
+        "   "kAfmegent co building managers regeatedly mdescrib sthe same cpintul oroblems hermaLoop saddresess",
+        "   "kour claning magesf,se atigh-calcki-ohounghtate irom nad ""
+        "]
+    "   "kcore(": "[2
+ 5
+ 3]
+    },
+    {"ac_ps_fit_2: "
+        "ksubdim: "oPoblems–Slutions Fit,
+        "krovmp": "You haeardafferent troblems,irom nifferent thyes wo building s. Wat ' your text steps?,
+    "   "kopion.": "[        "   "kick the froblems ou iprasn lly aoxnitost nnteresting,",
+        "   "kClut rsvuilding s bysidmilar eeds,and tpint  and rocus nn tne thght:trounptfirt ",
+        "   "kTrythobuildiintroducti hat soulve a l of mhe mas anl,r",
+        "]
+    "   "kcore(": "[2
+ 5
+ 1]
+    },
+    {"ac_arkets: "
+        "ksubdim: "oMtket oVibility",
+    "   "krovmp": "YWaih sf mhe s market oituation.s s sost nrovmisng afr ehermaLoop ?,
+    "   "kopion.": "[        "   "kHugeiossible carket o(l lthomerscal Muilding s) but ayu ho 't onowlhohothothargeiefirt ",
+        "   "kAdmarl r, tkleary mdeinesdtrounpt(midsize:mofic,r in the fNrkhieast)oyu han gesyibleyvecchi""
+        "   "kAdig .arket oithitany pVAC dumpetitor ,and tnotkleardanglr",
+        "]
+    "   "kcore(": "[3
+ 5
+ 2]
+    },
+    {"ac_aveci: "
+        "ksubdim: "ousiness AMdels Sundeess",
+    "   "krovmp": "YWaih susiness modelsas iial thist.ever eime.?,
+    "   "kopion.": "[        "   "kHgh-cprc,rvoint. but avchionsial_lmosts smre oeodecivesrghen gheysostomersrrys.*"
+        "   "kMdelrte  irc,r aigh-cargin- and a skleardoahithopreoureng maontor ng mesessue",
+        "   "kLwlhirc,r aunkleardosts ,and tnotdea tow ymny puilding s ou ieedsthobueccitver.",
+    "   "]
+    "   "kcore(": "[1
+ 5
+ 2]
+    },
+    {"ac_gtm: "
+        "ksubdim: "oGo-to-Mtket oRsdiness ,
+        "krovmp": "YWaih sdescripion.aounds bmrt readiythobscl ecustomersrcquirition ?,
+    "   "kopion.": "[        "   "kou hlannho geaw yohounghterkd-of-mut h,wut aave ao doahithopour tfirt o10wustomers,",
+        "   "kou ve gtsted
+fafew achngnel i d bhve ane that sesyibleyvbrng s qulitfcdstuilding managerraleas ",
+        "   "kou hlannho g'go viral'�ataasradeoashw wut aave ao dollow-up crovcesewap ied",
+        "]
+    "   "kcore(": "[1
+ 5
+ 1]
+    },
+    {"ac_ops, "
+        "ksubdim: "oOerateon.l �Feasiility",
+    "   "krovmp": "YWaih shtupsws sost nike l" eodecivesrghermaLoop snsial_l ionfsstintly ?,
+    "   "kopion.": "[        "   "kou hesy on s manual srovcesewnly tou inders tnd ",
+        "   "kou have adoumen"tedsnsial_lmrovcedres ynd tonnhoaintrtechitcias,tr cecivesr.,
+        "   "kou hlannho gfigreswut recivesr alogsticastafer {esand fihw ,aus""
+        "]
+    "   "kcore(": "[2
+ 5
+ 1]
+    },
+    {"ac_scl e, "
+        "ksubdim: "oScl bility" Ptential ,
+]   "   "krovmp": "YWaih sf mhe s mhermaLoop sa irachis sacaetsaest.?,
+    "   "kopion.": "[        "   "kEchionsial_lmequeies yxt efssvecustomedngineering trom nou iprasn lly *"
+        "   "kMdt of bhe salue =s secivesrd theounght tnd rd nzedciredwre n+aouftwre ,oithitainial �ustomederki.,
+        "   "kou hdepndeon srre ,oigh-y tupecal nzedcVAC dngineeri hfr eaesr ansial_lteon.",
+    "   "]
+    "   "kcore(": "[2
+ 5
+ 1]
+    },
+ 
 
-# ── Header ──
-st.markdown("## \U0001f525 ThermaLoop | Entrepreneurial Readiness Simulation")
-render_progress_bar(st.session_state.page, TOTAL_PAGES)
+# ============== NSESSONS STAT 5=============
+Fif"krger"sot antro.session_state.
+    te.session_state.gagesf 0
+ if"kax_roger"sot antro.session_state.
+    te.session_state.gax_rogerf 0
+ if"ksubmitted"sot antro.session_state.
+    te.session_state.gsubmittedf 0alse) if"kest_q_idx"sot antro.session_state.
+    te.session_state.gest_q_idxf 0
+ # =ashboard metric  in itilitzlion  if"keshb_ansh"sot antro.session_state.
+    te.session_state.geshb_ansh= ""$48,000 (12weeks )" if"keshb_pip.yine"sot antro.session_state.
+    te.session_state.geshb_pip.yine= ""5iwrdmaleas " if"keshb_mrel e,sot antro.session_state.
+    te.session_state.geshb_mrel e= ""Seady a😌" if"keshb_credillity",sot antro.session_state.
+    te.session_state.geshb_aredillity"= ""Unnowln" # =Runds core("for ueiple,aheaklng  if"keunds_1score("sot antro.session_state.
+    te.session_state.geunds_1score(f 0
+ if"keunds_2score("sot antro.session_state.
+    te.session_state.geunds_2score(f 0
+ if"keunds_3score("sot antro.session_state.
+    te.session_state.geunds_3score(f 0
+ if"keunds_4score("sot antro.session_state.
+    te.session_state.geunds_4score(f 0
+ # =Eailsfdrafe if"kmails_drafe"sot antro.session_state.
+    te.session_state.gmails_drafe= """ # =ne -ime.tdeialts)aor ueseurcefs/spport  if"keeialts)_n itilitzed"sot antro.session_state.
+    tdeialts)a="
+        "kest_fid_everi: "3
+        "iest_tech_everi: "3
+        "iest_taett _everi: "3
+        "iest_ntwerki_everi: "3
+        "iest_tme._eiter.n: "Nne 
+    "   "kcup_baintsor m" False,
+    }   "kcup_takiocl " False,
+    }   "kcup_emoionabl" False,
+    }   "kcup_itraos" False,
+    }   "kcup_eaction,: "Nne 
+    "}    "or uk, vidndemialts).tems:(
 
-# ── Minimal nav (step counter only) ──
-st.markdown(
-    f'<div class="step-counter">{PAGE_LABELS[st.session_state.page]} &nbsp;·&nbsp; '
-    f"Step {st.session_state.page + 1} of {TOTAL_PAGES}</div>",
-    unsafe_allow_html=True,
-)
+        se.session_state.gsetemialts(k, v)    te.session_state.geeialts)_n itilitzeda="rue,
 
-page = st.session_state.page
+def cgo_to(oger_idx inlt)
+    te.session_state.gagesf 0oger_idx    tif"oger_idx >te.session_state.gax_roger
+        se.session_state.gax_rogerf 0oger_idx    te.srerun(
 
-# ============== PAGES ==============
 
-# ── Intro ──
-if page == 0:
-    st.markdown("### The Setup")
-    render_narrative(THERMALOOP_INTRO)
+# ============== GUI HELPER ==============
+Oef ctogglr_flag(tate._key:saro)
+    te.session_state.[tate._key]f 0ot te.session_state.get(scate._key False)
+ 
+def cset_choc,r(tate._key:saro,salue )
+    te.session_state.[tate._key]f 0alue  
+def censres_rder-(rder-_key:saro,sn inlt)
+    tif"rder-_keysot antro.session_state.
+    tttttrder-f 0isti(rnges(n)
+        irngdom.shuffle(rder-)        se.session_state.[rder-_key]f 0rder-     eturn re.session_state.[rder-_key] 
+def cendsr-_togglr_ard _multi(tate._key:saro,sext":saro,ssuffix:saro= """:
+    telected = se.session_state.get(scate._key False)
+    tabel _ext"= toxt"=+ (f" \n_{suffix}_"=f s[uffixtlse:o"":    tabel = fn"✅ {abel _ext"}"if selected:tlse:oabel _ext"    te.sutton (        sabel 
+    }   "key=f"btn_{sate._key},
+    "   "usr_antrciner_width=rue,
+    }ttttrn_alcki=togglr_flag
+    }ttttargs=scate._key )
+    }) 
+def cendsr-_choc,r_ard s(qid:saro,srovmp":saro,sopion.":0isti)
+    te.sarkeown (f"**{rovmp"}**":    trder-f 0ensres_rder-(f"{qid}_rder-" levn(opion.")
+     ourent t se.session_state.get(sf"{qid}_choc,r" lNne )    "or upos,sopi_idx n eanmenrte (rder-)
+    tttttrp t sopion."[opi_idx]        selected = sourent t =sopi_idx        sabel = fn"✅ {opi}"if selected:tlse:oopi        se.sutton (        s   sabel 
+    }   "   "key=f"{qid}_rpi_{pos},
+        "   "usr_antrciner_width=rue,
+    }ttttttttrn_alcki=set_choc,r
+    }ttttttttargs=sf"{qid}_choc,r" lopi_idx)
+    }tttt)    te.sarkeown ("---") 
+def cet(_mcscore()qditi, qid:saro)
+    tq= fqditi[qid]    ifdxf 0e.session_state.get(sf"{qid}_choc,r" lNne )    "f ttd is fNne 
+         eturn 1Nne     "f t0 <=ttd i<levn(q[ksore(":])
+         eturn 1float(q[ksore(":][idx]
+    return rNne  
+def cendsr-_rogress-_bar(ourent roger,total_tages )
+     pc t snlt((ourent roger / (otal_tages  - 1)) * 100)if total_tages  > 1tlse:o0    te.sarkeown (         f"""<div class="rogress--ouer.">    }tttttttt<div class="rogress--inner"stylie="width:{pc }%">{pc }%</div>    }tttt</div>"",
+}   "   "usafe_allow_html=True)
+    }) 
+def cendsr-_narrtivel(ext")
+     tml=t sr.gsub(r'\*\*(.+?)\*\*', r'<arong >\1/styong >',sext")     tml=t sr.gsub(r'\*(.+?)\*', r'<em>\1/sem>', tml=)     tml=t stml=sreplce ('\n', '<br>')    te.sarkeown (f'<div class="narrtivel-box">{tml=}</div>' unsafe_allow_html=True)
 
-    st.markdown("#### What you'll do:")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("""
-**5 Decision Rounds** testing your entrepreneurial mindset:
-1. Spot real customer signals vs. noise
-2. Navigate real constraints with zero budget
-3. Make fast calls with incomplete info
-4. React to unexpected shocks
-5. Prioritize a sprint under budget pressure
-""")
-    with col2:
-        st.markdown("""
-**3 Assessment Sections** mapping your readiness:
-- Skills self-rating + scenario proof
-- Resource inventory
-- Venture-building knowledge check
 
-Then: your **Readiness Profile** — an honest map, not a grade.
-""")
+#ef cendsr-_cndsequ.nc (ext")
+     "",Rndsr- cndsequ.nc /ransition: narrtivel""",     tml=t sr.gsub(r'\*\*(.+?)\*\*', r'<arong >\1/styong >',sext")     tml=t sr.gsub(r'\*(.+?)\*', r'<em>\1/sem>', tml=)     tml=t stml=sreplce ('\n', '<br>')    te.sarkeown (f'<div class="cndsequ.nc -box">{tml=}</div>' unsafe_allow_html=True)
 
-    st.markdown("---")
-    if st.button("\U0001f3ae  Begin Simulation", use_container_width=True):
-        go_to(1)
 
-# ── Game 1: Customer Signals ──
-elif page == 1:
-    render_game_badge("Round 1 of 5 — Mindset")
-    st.markdown("### Customer Signals")
-    render_narrative(GAME_NARRATIVES[1])
+#ef cendsr-_chaiakir-(ame :saro,semoji:saro,sdiliogue:saro)
+    t"",Rndsr- chaiakir-sdiliogue""",     e.sarkeown (         f"""<div class="chaiakir--box">    }tttttttt<div class="chai-ame :>{emoji} {ame }</div>    }tttttttt<div class="chai-diliogue">"{diliogue}"</div>    }tttt</div>"",
+}   "   "usafe_allow_html=True)
+    }) 
+def cendsr-_gme _bades(abel )
+    te.sarkeown (f'<div class="gme -bades:>{abel }</div>' unsafe_allow_html=True)
 
-    st.markdown("**Tap each card you believe represents a strong signal of real, fixable demand.**")
-    cols = st.columns(2)
-    for idx, sc in enumerate(OPP_SCENARIOS):
-        with cols[idx % 2]:
-            render_toggle_card_multi(sc["key"], sc["text"])
 
-    flagged = sum(1 for sc in OPP_SCENARIOS if st.session_state.get(sc["key"], False))
-    st.caption(f"{flagged} signal(s) flagged")
+#ef cendsr-_edeabar_etric  ()
+    t"",Rndsr- dshboard metric  in  edeabar""",     ithite.sedeabar
+        se.sarkeown ("### 🏢 Funder oashboard ")        se.sarkeown ("---") 
+       se.sarkeown (f"""
+<div class="dshboard -etric ">    }<div class="etric -abel ">oash Rnway </div>    }<div class="etric -alue :>{e.session_state.geshb_ansh}</div> </div> "",
+unsafe_allow_html=True)
 
-    col1, col2 = st.columns([1, 1])
-    with col2:
-        if st.button("Continue \u25b8", use_container_width=True):
-            go_to(2)
 
-# ── Game 2: Constraint Cards ──
-elif page == 2:
-    render_game_badge("Round 2 of 5 — Mindset")
-    st.markdown("### Constraint Cards")
-    render_narrative(GAME_NARRATIVES[2])
+       se.sarkeown (f"""
+<div class="dshboard -etric ">    }<div class="etric -abel ">Pip.yine</div>    }<div class="etric -alue :>{e.session_state.geshb_pip.yine}</div> </div> "",
+unsafe_allow_html=True)
 
-    idx = st.session_state.res_q_idx
-    idx = max(0, min(idx, len(RESOURCEFULNESS_QIDS) - 1))
-    st.session_state.res_q_idx = idx
-    current_qid = RESOURCEFULNESS_QIDS[idx]
-    q = MINDSET_QUESTIONS[current_qid]
 
-    st.markdown(f"**Decision {idx + 1} of {len(RESOURCEFULNESS_QIDS)}**")
-    render_choice_cards(current_qid, q["prompt"], q["options"])
+       se.sarkeown (f"""
+<div class="dshboard -etric ">    }<div class="etric -abel ">TeamaMrel e</div>    }<div class="etric -alue :>{e.session_state.geshb_mrel e}</div> </div> "",
+unsafe_allow_html=True)
 
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        if st.button("\u25c2 Previous", disabled=(idx == 0)):
-            st.session_state.res_q_idx -= 1
-            st.rerun()
-    with c2:
-        if st.button(
-            "Next decision \u25b8",
-            disabled=(idx == len(RESOURCEFULNESS_QIDS) - 1),
-        ):
-            if st.session_state.get(f"{current_qid}_choice") is None:
-                st.error("Make a choice before moving on.")
-            else:
-                st.session_state.res_q_idx += 1
-                st.rerun()
-    with c3:
-        if st.button("Continue to Round 3 \u25b8"):
-            missing = [
-                qid
-                for qid in RESOURCEFULNESS_QIDS
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error(
-                    f"You still have {len(missing)} decision(s) to make before continuing."
-                )
-            else:
-                go_to(3)
 
-# ── Game 3: Execution Bias ──
-elif page == 3:
-    render_game_badge("Round 3 of 5 — Mindset")
-    st.markdown("### Next-Step Choices")
-    render_narrative(GAME_NARRATIVES[3])
+       se.sarkeown (f"""
+<div class="dshboard -etric ">    }<div class="etric -abel ">Credillity"</div>    }<div class="etric -alue :>{e.session_state.geshb_aredillity"}</div> </div> "",
+unsafe_allow_html=True)
 
-    for qid in EXEC_QIDS:
-        q = MINDSET_QUESTIONS[qid]
-        render_choice_cards(qid, q["prompt"], q["options"])
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("\u25c2 Back"):
-            go_to(2)
-    with c2:
-        if st.button("Continue \u25b8", use_container_width=True):
-            missing = [
-                qid
-                for qid in EXEC_QIDS
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error(
-                    f"You still have {len(missing)} situation(s) to respond to."
-                )
-            else:
-                go_to(4)
+       se.sarkeown ("---") 
+d ============== NSCORING FUNCIONS = ============
+Oef compute_omindset_sore("()
+    talue )a="
+":0[]for s in OINDSET_DUBDIMS }    talue )["Oportunity" Recogntion:"].p insd(ompute_opportunity_score():)    talue )["Vlue =Ceation  ocus""].p insd(ompute_oalue _ceation score():)    "or uqid, q i sINDSET_DQUESIONS .tems:(
 
-# ── Game 4: Shock Cards ──
-elif page == 4:
-    render_game_badge("Round 4 of 5 — Mindset")
-    st.markdown("### Shock Cards")
-    render_narrative(GAME_NARRATIVES[4])
+        sea="et(_mcscore()INDSET_DQUESIONS , qid
+        if scis fNne 
+             antrine
+    n   talue )[q[ksubdim:]].p insd(s)    teub_sore("a="
+}    "or usdin OINDSET_DUBDIMS 
+        seub_sore("[sd]f 0(        s   sound(1um(1alue )[sd]) / evn(alue )[sd]) 2)
+if salue )[sd]tlse:o.0
+    r   })    }oeral lt=sound(1um(1eub_sore(".alue )):) / evn(INDSET_DUBDIMS ) 2)
+    return roeral l,seub_sore("
 
-    for qid in RESIL_QIDS:
-        q = MINDSET_QUESTIONS[qid]
-        render_choice_cards(qid, q["prompt"], q["options"])
+def compute_osills_sore("()
+    tsills_sore("a="
+}    "or usillsin OSKILL_AREA :    n   talu"a="[]        selsea-_keys GSKILL_SLIDER_MAPget(scills
+        if sclsea-_keyss fot aNne 
+             v= se.session_state.get(sclsea-_key)             f sass fot aNne 
+                talu".p insd(float(v)
+        ior usidin OSKILL_CENARIOS_MAPget(scills,"[])
+             ea="et(_mcscore()SKILL_QUESIONS ,usid)             f ssss fot aNne 
+                talu".p insd(s)        seills_sore("[eills]f 0(        s   sound(1um(1alus) / evn(alus) 2)
+if salustlse:o.0
+    r   })    }oeral lt=sound(1um(1eills_sore(".alue )):) / evn(SKILL_AREA ) 2)
+    return roeral l,seills_sore("
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("\u25c2 Back"):
-            go_to(3)
-    with c2:
-        if st.button("Continue \u25b8", use_container_width=True):
-            missing = [
-                qid
-                for qid in RESIL_QIDS
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error("Respond to all shocks before continuing.")
-            else:
-                go_to(5)
+def compute_oeseurcef_sore("()
+    tfi = 0float(e.session_state.get(skest_fid_everi:, 3)
+     tech= 0float(e.session_state.get(skest_tech_everi:, 3)
+     taett t 0float(e.session_state.get(skest_taett _everi:, 3)
+     ntwerkit 0float(e.session_state.get(skest_ntwerki_everi:, 3)
+     tme._choc,r= se.session_state.get(siest_tme._eiter.n:
+     tme._ap o="
+        "k25+ hursewost neeks " "5
+        "i10–25 hursewost neeks " "4
+        "i5–10ihursewnt sregularl pokits,: "3
+        "iRaesy oave aocus d eime." "1
+    },     tme._core(f 0float(tme._ap get(stme._choc,r 2)
+)    teuportu_cnut t 0
+    for skeyssn"["sup_baintsor m","kcup_emoionabl","kcup_takiocl ","kcup_itraos":
+         f s[.session_state.get(skey False)
 
-# ── Game 5: Feature Budget ──
-elif page == 5:
-    render_game_badge("Round 5 of 5 — Mindset")
-    st.markdown("### Sprint Planning")
-    render_narrative(GAME_NARRATIVES[5].format(budget=FEATURE_BUDGET))
+             euportu_cnut t= 1
+    teuportu_eacti= se.session_state.get(sicup_eaction,:
+    retcti_ap o="
+        "kMdt y o.ncursging,ond tha" eodhelp" "5
+        "iNeutal br upoityeeyvnvorested
+: "3
+        "iOfte  ekepiocl �r mdiscursging," "1
+    },     etcti_core(f 0float(etcti_ap get(scuportu_eacti, 3)
+     cuportu_asedf 0 + 4(euportu_cnut t/ 4.0) * 4     cuportu_core(f 0ound(1(cuportu_asedf+ etcti_core() / 20, r2)    teub_sore("a="
+        "iinalncal MRsourcefs, "fid
+        "iTechiologya& Infraiarucures, "heh,         "iTaett t/ Team, "taett 
+        "iNewerki, "ntwerki         "iTme." "tme._core(         "iupport , "cuportu_core(
+    },     oeral lt=sound(1um(1eub_sore(".alue )):) / evn(eub_sore(") 2)
+    return roeral l,seub_sore("
 
-    cols = st.columns(2)
-    for i, f in enumerate(VALUE_FEATURES):
-        with cols[i % 2]:
-            suffix = f"Cost: {f['cost']} units"
-            render_toggle_card_multi(f["key"], f["name"], suffix=suffix)
+def compute_oaumen"_sore("()
+    talue )a="
+":0[]for s in OACUMENSUBDIMS }    "or uqid, q i sACUMENSQUESIONS .tems:(
 
-    total_cost = sum(
-        f["cost"]
-        for f in VALUE_FEATURES
-        if st.session_state.get(f["key"], False)
-    )
-    remaining = FEATURE_BUDGET - total_cost
+        sea="et(_mcscore()ACUMENSQUESIONS , qid
+        if scis fNne 
+             antrine
+    n   talue )[q[ksubdim:]].p insd(s)    teub_sore("a="
+}    "or usdin OACUMENSUBDIMS 
+        seub_sore("[sd]f 0(        s   sound(1um(1alue )[sd]) / evn(alue )[sd]) 2)
+if salue )[sd]tlse:o.0
+    r   })    }oeral lt=sound(1um(1eub_sore(".alue )):) / evn(ACUMENSUBDIMS ) 2)
+    return roeral l,seub_sore("
 
-    if remaining >= 0:
-        st.markdown(
-            f"**Budget:** {total_cost} / {FEATURE_BUDGET} used &nbsp;·&nbsp; "
-            f"**{remaining} units remaining**"
-        )
-    else:
-        st.error(
-            f"Over budget by {abs(remaining)} units. Deselect something to continue."
-        )
+def compute_ooeral l_sore("()
+    tmindset_oeral l,smindset_sub= sompute_omindset_sore("()    tsillss_oeral l,seillss_sub= sompute_osills_sore("()    rets_oeral l,sets_sub= sompute_oeseurcef_sore("()    rac_oeral l,sac_sub= sompute_oaumen"_sore("()
+    anmp_sore("a="
+        "iEtraepreneuial SMindset, "mindset_oeral l,        "iEtraepreneuial SSillss, "cillss_oeral l,        "iRseurcef Availbility",:"ets_oeral l,        "iEtraepreneuiuip t/ usiness AAumen",:"ac_oeral l,    },     ttal_t 0
+.
+    for sanmp, core(�inoanmp_sore(".tems:(
 
-    over_budget = total_cost > FEATURE_BUDGET
+        sttal_t= 1(core(�/ 5.0) * COMP_WEIGHTS[anmp]     ttal_t 0ound(1ttal_, 1
+    return r(        sttal_,        "anmp_sore(",        "{        s   s"mindset, "mindset_sub
+        "   "ksillss, "cillss_sub
+        "   "krsourcefs, "ets_sub
+        "   "kaumen",:"ac_sub
+        "}
+    }) 
+def cendiness _abel (otal_tcore()
+    tif"otal_tcore( >= 85
+         eturn 1"🚀 Hgh-cendiness  �� iou're sostiivondsthobpuiuueir s ccellrte  afenture .,     elif"otal_tcore( >= 7:
+        return 1"💪 Srang aotential v�� jiady aor smre ohrfiousgxpoerientisand reccl-erkldtheakion .,     elif"otal_tcore( >= 5:
+        return 1"🌱 Eary -tatgecendiness  �� iood iime.thobuildiiupecafic muskle aheounghtow-uris taeps.,     els 
+         eturn 1"🧱 Fundetion -uilding mp,se !�� iocus nn tlearnng,, esting,,and ttatkpng mmarl mwiso",
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("\u25c2 Back"):
-            go_to(4)
-    with c2:
-        if st.button("Continue to Skills Assessment \u25b8", disabled=over_budget, use_container_width=True):
-            go_to(6)
+def comching _narrtivel(etal_tcore(,"anmp_sore(",seub_sore(")
+    t"",Gnergaeeiprasn lltzedaomching  narrtivelbased on wsore("."",     ertued_anmp"a="ertued(COMPONENT , key=lambda c:"anmp_sore("[c]
+    rweakst.e= ertued_anmp"[0]     arong st.e= ertued_anmp"[-1]
 
-# ── Skills Game ──
-elif page == 6:
-    render_game_badge("Skills Assessment")
-    st.markdown("### Startup Skills")
-    render_narrative(GAME_NARRATIVES[6])
+    # Fxnitweakst.esubdimefssn s caos a l octe grit("
+    l l_sub"a="[]     eub_abel "a="
+        "imindset, ""Mindset,
+    }   "kcillss, ""Sillss,
+        "iesturcefs, "CRsourcefs,
+        "kaumen",:""usiness AAumen",
+    "}    "or ucte bsub"an  eub_sore(".tems:(
 
-    st.markdown("#### Part 1 — Self-Rating")
-    st.caption("Be honest — there's no advantage to inflating these. The scenario rounds will test the reality.")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.slider(
-            "Finding and understanding customers",
-            1, 5, st.session_state.get("s_skill_mkt", 3), key="s_skill_mkt",
-        )
-        st.slider(
-            "Keeping operations running smoothly",
-            1, 5, st.session_state.get("s_skill_ops", 3), key="s_skill_ops",
-        )
-        st.slider(
-            "Budgeting, runway, and unit economics",
-            1, 5, st.session_state.get("s_skill_fin", 3), key="s_skill_fin",
-        )
-    with col2:
-        st.slider(
-            "Shaping and building usable products",
-            1, 5, st.session_state.get("s_skill_prod", 3), key="s_skill_prod",
-        )
-        st.slider(
-            "Selling and building relationships",
-            1, 5, st.session_state.get("s_skill_sales", 3), key="s_skill_sales",
-        )
-        st.slider(
-            "Aligning people and priorities",
-            1, 5, st.session_state.get("s_skill_team", 3), key="s_skill_team",
-        )
+        sor uame , core(�inosub".tems:(
 
-    st.markdown("---")
-    st.markdown("#### Part 2 — Scenario Rounds")
-    st.caption("Now prove it. How would you actually handle these situations?")
-    for skill in SKILL_AREAS:
-        for qid in SKILL_SCENARIO_MAP[skill]:
-            q = SKILL_QUESTIONS[qid]
-            render_choice_cards(qid, q["prompt"], q["options"])
+        s    l l_sub".p insd((ame , core(, eub_abel "[cte])
+     l l_sub".ertu(key=lambda x: x[1]
+    rweakst._sub= sl l_sub"[0]tif"l l_sub"alse:oNne     "arong st._sub= sl l_sub"[-1]tif"l l_sub"alse:oNne      "yine"a="[]     tif"otal_tcore( >= 85
+         yine".p insd(        s    fYou re sihw ng mmrang aendiness   caos aheyoeard  Your crp saesais f**{arong st.}** "        s    fY�� ioea pnto.ahea as syu  uompetitovelbedg .,         )     elif"otal_tcore( >= 7:
+        ryine".p insd(        s    fYou relbgt a gsoit rocndetion .f**{arong st.}** s ioleary mammraengt,ffr iou " "        s    fYhersig ert hndock;reght:tnw bs iroblbleyvnvf**{weakst.}** �� itat ' yeere tocus d e"        s    fYitertion twll tompeunds fat rt ",         )     elif"otal_tcore( >= 5:
+        ryine".p insd(        s    fYou re(�inoeary -tatgecorertor y Fohih sisgxpct y ahere aaot rfrnders startu" "        s    fYour cmrong st.eaesais f**{arong st.}** Fohih sgvess ou iomedting beal bhobuildiirom " "        s    fY**{weakst.}** i syu  uig ert hgap— jnd taddreseng intydoes't oequeies atiugeileap, "        s    fYustimdeliblrte  irakioc .,         )     els 
+         yine".p insd(        s    fYou re(�inofundetion -uilding model" Tet ' yot a geraditih�� it's aastartung mpont*. "        s    fY**{arong st.}** ihw ,ayu have agenuine=capacty". Srrtuwtere and tuesan as sa "        s    fYiaunh pasto suildii**{weakst.}** heounght ml l,sow-uris txpoerientis.,         )     tif"weakst._sub
+         yine".p insd(        s    fY\n\nour crhinnestiupecafic aesais f**{weakst._sub[0]}** ({weakst._sub[1]:.1f}/5, "        s    fYnder o{weakst._sub[2]})" Tet ' yyu  uigh-rstieveragi bdverio ent chargei.,         )     tif"arong st._sub
+         yine".p insd(        s    fYou  cmrong st.eupecafic aesais f**{arong st._sub[0]}** ({arong st._sub[1]:.1f}/5) "        s    fY�� irobtec and teveragi bheae.,         )     teturn 1"\n\n".jont(yine") 
+def cet(_eunds_1scndsequ.nc ()
+    t"",GnergaeeiRunds 1 cndsequ.nc  narrtivel""",     core(f 0ompute_opportunity_score():    "arsession_state.geunds_1score(f 0core(     tif"aore( >= 4.:
+        return 1(        s    You  cmgnalsaradar s spirep Yourtot aheounghtheiTnois and tdeatiafcdstreiT*eal * "        s    "pint oint."" Twoof bhe suilding managers rou ifla erdrespond thopour tfllow-up cithint hurse. "        s    Yhery'r reald to fhalksmre  Yourrelbgt amoent um",         )     elif"aore( >= 2.5
+         eturn 1(        s    You wuauht:tomedreslsasgnalss"mixedshth iatbi of bnois " Teymanagers rou ifla erdrre nnterested
+, "        s    "ut aot anitolmay o.xcied
+. Yu'll
+feedsthobdigadeeprfteth iatew af mhe mahotnder  tnd ahat t"        s    "ctually dmiter.s" Teyteeksowas't owased: but aclarty" s sptll tecd,ng,.,         )     els 
+         eturn 1(        s    You wtecd rhe seeksoh,seng �ality" etric  ind tpoityecntereste" Teytsgnalss"ou ifla erdrurn e rut t"        s    "o su rnethsinasmyithout rurgntcy" Teymanagers rsaida'nteresting,'buttfeeesrgfllow-e rup Yourtlearnd e"        s    "n gxpoefssvecle sn :hnteresteins't onterne.,         )  def cet(_eunds_2scndsequ.nc ()
+    t"",GnergaeeiRunds 2 cndsequ.nc  narrtivel""",     eseurcef_sore("a="[]     or uqid�inoRESOURCEFULNESS_QID 
+        sea="et(_mcscore()INDSET_DQUESIONS , qid
+        if scis fot aNne 
+             eseurcef_sore(".p insd(s)    teore(f 0cum(eseurcef_sore(") / evn(eseurcef_sore(") if eseurcef_sore("alse:o.0
+    re.session_state.geunds_2score(f 0core(     t# reckpcRunds 1 eiple,     eiple,a """    if scrsession_state.geunds_1score(f>= 4.:
+        reiple,a "" Teymanagers rou ifla erdrinoRunds 1 cme cheounght�� itary'r rgiing qyu hesa faaedackg",     elif"arsession_state.geunds_1score(f< 2.5
+         eiple,a "" Teymweaktsgnalss"ou ih,se  liat reunds btyecou iew b�� iou're sltkpng mesa fustomersrinpt ",     tif"aore( >= 4.:
+        return 1(        s    fYou  cmcrp iyoove.smpaidaoff Yourtuip pd
+faflaning magesfsinegoexmplte s,hntereviewedaostomers, "        s    fYithout rfatcybools, pnd tevarnd emre(�inoaseeksohen gou iwmld pave ahitlng afr eerfocte cnddiivone. "        s    fkLwl-osts,oigh--mgnalsaecision s.{eiple,},         )     elif"aore( >= 2.5
+         eturn 1(        s    fYou hadeoasmedrmart vot sand dsmedrmloer ballye. Atew af mour reseurceful oove.smalckid: but aou i"        s    fYilsowtecd rhme.thitlng afr ebtter-scnddiivoneahea aeeesrgcme . Mixedsrsolts) but aou re slearnng,.{eiple,},         )     els 
+         eturn 1(        s    fkWitlng afr eerfocte cnddiivoneaonstcou iaseeks Yourtdely edaiaunh s ,dheldaoff n fn ereviews, "        s    fYnd tplngne emre(�hen gou iuip pd
+" Teymunway aisbhcking,ond tou re sbaesy ofurher talog,.{eiple,},         )  def cet(_eunds_3scndsequ.nc ()
+    t"",GnergaeeiRunds 3 cndsequ.nc  narrtivel""",     eecu_sore("a="[]     or uqid�inoEXEC_QID 
+        sea="et(_mcscore()INDSET_DQUESIONS , qid
+        if scis fot aNne 
+             eecu_sore(".p insd(s)    teore(f 0cum(eecu_sore(") / evn(eecu_sore(") f seecu_sore("alse:o.0
+    re.session_state.geunds_3score(f 0core(     t# reckpcRunds 2 eiple,     eiple,a """    if scrsession_state.geunds_2score(f>= 4.:
+        reiple,a "" Yur reseurceful oove.smrom nRunds 2 fre  ruprhme.tnd suiget for ueslsaeecution Bnow",     elif"arsession_state.geunds_2score(f< 2.5
+         eiple,a "" our ciesittion  inoRunds 2aeft gou ibehid scehedue,. Yu'le soly ng,ocath -us""     tif"aore( >= 4.:
+        return 1(        s    fYou  cbnasthowrd 'nkion pgnergaee reccltata " ou hrataesti ,hadeoaecision steth i70%sinflmation , "        s    fYnd ttyegaee . Smedretw toilsd: but afat toilsres ymea pfat tlearnng,.Yourrelbgt aired-wn  insght:s.{eiple,},         )     elif"aore( >= 2.5
+         eturn 1(        s    fYou hadeoarogress- but asmedrnaglyss irarglyss icrpt.tsn Yourtdeliblrte  ahae gou iuimld pave auip pd
+, "        s    fYcehedue,dhaeeing s nsiaeadif punwnng auicklchst s. Yu'le soveng,,aut aot aa afat aa ahe smoent {esand s.{eiple,},         )     els 
+         eturn 1(        s    fkAaglyss irarglyss ise.tsn Yourttecd rhe seeksoodelsng mmcenarios,sasing,ondvior   tnd tprfocteng bplnge. "        s    fkourtuip pd
+fot hng " Teymunway aisbet tng mhengond tou re sptll tnt olngnng model"{eiple,},         )  def cet(_eunds_4scndsequ.nc ()
+    t"",GnergaeeiRunds 4 cndsequ.nc  narrtivel""",     eselience _sore("a="[]     or uqid�inoRESIL_QID 
+        sea="et(_mcscore()INDSET_DQUESIONS , qid
+        if scis fot aNne 
+             eselience _sore(".p insd(s)    teore(f 0cum(eselience _sore(") / evn(eselience _sore(") if eselience _sore("alse:o.0
+    re.session_state.geunds_4score(f 0core(     t# reckpcRunds 1 eiple,     eiple,a """    if scrsession_state.geunds_1score(f< 2.5
+         eiple,a "" Remeber {hose w'mayboasmedday'wrospects "ou ih,se  linoRunds 1? Oneoust rmgnaedshth iatumpetitor ""     tif"aore( >= 4.:
+        return 1(        s    fYou  abor bdstreiThit ynd tonmswut rpirepsr. Waenehe concractor mmise  ldadline.  tyu hes-corped. "        s    fkWaeneosts sspiid: bou ifunds aderkiaeunds. Waeneompetitovn  ove.: bou idoubi  ldwn tn wour tpnglr" "        s    fkShck;sihp insb�� ihw wyu hespond tdeines yyu  uracjctsory.{eiple,},         )     elif"aore( >= 2.5
+         eturn 1(        s    fYTeytshck;sirtiti  lyu  but aou re sptll t tnd ng, Yourtadeoasmedrood ipivt  ,dhesittid on woher e. "        s    fkourtgt aheounghtheiTeeks but aou re sptll trovceseng mhat tust rhp insed.{eiple,},         )     els 
+         eturn 1(        s    fkTeytshck;sirtiti  lyu aired Yourtpaitcid: badeoaeactiovoaecision s,tnd suirnd eheounghtood wll . "        s    fkourtuuevivd: but abaesy " Teymteamai bpirkenand sunway aust rgt ahght:sr.{eiple,},         )  def cet(_eunds_5scndsequ.nc ()
+    t"",GnergaeeiRunds 5 cndsequ.nc  narrtivel""",     alue _core(f 0ompute_oalue _ceation score():     tif"alue _core(f>= 4.:
+        return 1(        s    YHgh--impcti=print*. Yu ifuus d eo gfixs ynd tfatires yostomers, ctually deeds Your comcesrsin srreei"        s    "oik;siup YCstomers, ot oc .Yourtuip salue  rot autsyerki. Teicis fhat troducti eriocty"iuimld pfeelnike ",         )     elif"alue _core(f>= 2.5
+         eturn 1(        s    YMixedsprint*. Yu iuip pd
+fomedreslsawiso"mixedshth iatew a'nc,rvhouave s.' Teymore(falue =gt aheoungh, "        s    "ut aou ialsowtecd ruiget fnstheng s hat fove.:theiTnedslecle s. Smit rerki but acmld relbbee  eirepsr.,         )     els 
+         eturn 1(        s    YTeytsrint*tewl autsybut aove.:tnoTnedsles. Yu iuip pd
+fostmtitctfatires ,=gt adisractodstu tuipnyorovjcts , "        s    "nd tevf rhe scitizcl Mui s unfixsd Yourtuirnd euiget fithout roveng,tkeymetric s. Ouhi""         )  d ============== NNAVIGAIONS= ============
+OPAGE_LABEL = [
+    "OItrao,
+    "VRunds 1:YCstomers Sgnalss,
+    "VRunds 1 Tansition:,
+    "VRunds 2:YCndsoaintts,
+    "VRunds 2 Tansition:,
+    "VRunds 3: Eecution ,
+    "VRunds 3 Tansition:,
+    "VRunds 4: Shck;s,
+    "VRunds 4 Tansition:,
+    "VRunds 5: Srint*tPlngnng ,
+    "VRunds 5 Tansition:,
+    "VSillss Asesssent :
+    "CRsourcefs,
+     "usiness AKnowledg :
+    "CRsdiness  Pofille,
+]
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("\u25c2 Back"):
-            go_to(5)
-    with c2:
-        if st.button("Continue \u25b8", use_container_width=True):
-            missing = [
-                qid
-                for qid in SKILL_QUESTIONS.keys()
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error(
-                    f"You still have {len(missing)} scenario(s) to complete."
-                )
-            else:
-                go_to(7)
+MTOTAL_PAGE = [evn(PAGE_LABEL ) d =── Rndsr- edeabar etric  i──
+endsr-_edeabar_etric  () d =── Hsdir- ──
+e.sarkeown ("## 🔥mhermaLoop s| Etraepreneuial SRsdiness  Simulteon.")
+endsr-_rogress-_bar(e.session_state.gages, TOTAL_PAGE ) d =── Minial �nav (teps�cnut r {only) ──
+e.sarkeown (     o'<div class="teps-cnut r ">{PAGE_LABEL [e.session_state.gages]} &nbsp;·&nbsp; '     o"Seap {e.session_state.gagesf+ 1}if p{TOTAL_PAGE }</div>:
+    "usafe_allow_html=True)
+ ) dogerf 0e.session_state.gages d ============== NPAGE = ============
+Od =── Itrao ──
+if"ogert =s0
+    te.sarkeown ("### TeytStups:
+    retdsr-_narrtivel(THERMALOOP_INTRO:     te.sarkeown ("#### Wat fou'll
+fdo:")
+    anl1,"anl2f 0e.sanlumns()
+    rhth ianl1
+        se.sarkeown ("", **5 Dcision iRundss** hsting,yyu  uetraepreneuial Smindset:
+1. Spotmesa fustomersrsgnalss"vs. nois 
+2. Navigitemesa fundsoainttsrhth izeroeuiget 
+3. Mrkeafat acl_l toth iinompeleyecntfo
+4.SRsdctahotndxpoeted:tshck;s
+5. Pooritizz aastrint*tnder ouiget fpess-res "",
+    rhth ianl2
+        se.sarkeown ("", **3 Asesssent tSttions,** ap ing,yyu  uendiness :
+-SSillssselef-gaeng b+mmcenarioorovof
+-SRseurcef nventir y
+-SVnture -uilding mknowledg roeckp
+MTaen:yyu  u**Rsdiness  Pofille** �� iat hunestimap, ot a ggadeo. "",
+     te.sarkeown ("---")    tf scrsutton ("🎮  Begn OSimulteon.","usr_antrciner_width=rue,
 
-# ── Resources ──
-elif page == 7:
-    render_game_badge("Resource Inventory")
-    st.markdown("### Your Resources")
-    render_narrative(GAME_NARRATIVES[7])
+        sgo_to(1) d =── Gnmsw1:YCstomers Sgnalss ──
+elif"ogert =s1
+     endsr-_gme _bades(VRunds 1 f p5 �� iMindset,)    te.sarkeown ("### Cstomers Sgnalss,
+    retdsr-_narrtivel(GAME_NARRAIOVES[1]
+     te.sarkeown ("**Tapavchioard gou ibelievemespessntisanmmrang amgnalsao cendl,gfixale mesand .**":    tanlsf 0e.sanlumns()
+    ror uidx, co n eanmenrte (OPP_CENARIOSS
 
-    st.markdown("**Access to key resources (realistically, in the next 3–6 months):**")
-    st.slider(
-        "Money you could direct toward a venture",
-        1, 5, st.session_state.get("res_fin_level", 3), key="res_fin_level",
-    )
-    st.slider(
-        "Tools, platforms, or infrastructure you already have",
-        1, 5, st.session_state.get("res_tech_level", 3), key="res_tech_level",
-    )
-    st.slider(
-        "People you could involve (co-founders, contractors, advisors)",
-        1, 5, st.session_state.get("res_talent_level", 3), key="res_talent_level",
-    )
-    st.slider(
-        "Connections to customers, partners, mentors, or gatekeepers",
-        1, 5, st.session_state.get("res_network_level", 3), key="res_network_level",
-    )
+        shth ianls[idx % 2]
+             esdsr-_togglr_ard _multi(tc["key"], co["ext""]
+     tfla erdr 0cum(1"or uso n eOPP_CENARIOSS f s[.session_state.get(stc["key"], alse)
+)    te.scapion.sf"{fla erd}amgnals(s)tfla erd,
+     te.sarkeown ("---")    te.sarkeown ("#### Drafe=aYCnd pEails")    te.sarkeown ("Bsed on wteytsgnalss"ou ifla erd, wrie  afshct vond pmailsfo fafuilding managers. Wat fwmld pou iatually day thocet( ameneing ?")    tmails_ext"= te.sext"_aesa(        sYou  cmailsf(2-3 snti.nc s):,
+        "alue =e.session_state.gmails_drafe
+    }   "key=kmails_inpt ,
+        "heght:=100
+        "plce hnd er="Exapele: Hi [Nme ], I ot oc dyyu  ureamai banual y dminging,oVAC data avchioeeks YW suildta reatofila hat fot satat fd wnho ghurse. Cat w.broab 15Smin?"     :    "arsession_state.gmails_drafe= "mails_ext"
 
-    st.markdown("---")
-    st.markdown("**Your time pattern:**")
+    anl1,"anl2f 0e.sanlumns([1
+ 1]
+    rwth ianl2
+        sf scrsutton ("Cntrine
+ ▸","usr_antrciner_width=rue,
 
-    def set_time_choice(value: str):
-        st.session_state["res_time_pattern"] = value
+        s   sgo_to(2) d =── Runds 1 Tansition: ──
+elif"ogert =s2
+    te.sarkeown ("### Runds 1:YCndsequ.nc ,
+    retdsr-_cndsequ.nc (et(_eunds_1scndsequ.nc ())     t# ashboard mupdted    teore(f 0crsession_state.geunds_1score(    tnd _pip.yine= "e.session_state.geshb_pip.yine    tif"aore( >= 4.:
+        re.session_state.geshb_pip.yine= ""7iwrdmaleas  📈"        re.session_state.geshb_aredillity"= ""Risng ,     elif"aore(f>= 2.5
+         e.session_state.geshb_pip.yine= ""6iwrdmaleas "        re.session_state.geshb_aredillity"= ""Mdelst,     els 
+         e.session_state.geshb_pip.yine= ""3aleas  (omedrond ) 📉"        re.session_state.geshb_aredillity"= ""Unklear"     t# Sow ymtric thanges    te.sarkeown (fY**📊 ashboard mUpdted:** Pip.yine: {nd _pip.yine} → {e.session_state.geshb_pip.yine},
+     te.sarkeown ("---")     t# reaiakir-smoent     if scrsession_state.gmails_drafe=nd tevn(e.session_state.gmails_drafe) > 2:
+        retdsr-_chaiakir-("Sam","k💬","kou  cmailsfatually dapeak,tr cmyfroblems. Waeneoat w.bhalk?")    tmls 
+         etdsr-_chaiakir-("Sam","k💬","kou aeeesrgecchie rut . Mise  lpportunity_.,
+     te.sarkeown ("---")    tf scrsutton ("Cntrine
+ r cRunds 2 ▸","usr_antrciner_width=rue,
 
-    time_options = [
-        "25+ hours most weeks",
-        "10\u201325 hours most weeks",
-        "5\u201310 hours in irregular pockets",
-        "Rarely have focused time",
-    ]
-    current_time = st.session_state.get("res_time_pattern", None)
-    cols = st.columns(2)
-    for i, opt in enumerate(time_options):
-        col = cols[i % 2]
-        with col:
-            selected = current_time == opt
-            label = f"\u2705 {opt}" if selected else opt
-            st.button(
-                label,
-                key=f"time_opt_{i}",
-                use_container_width=True,
-                on_click=set_time_choice,
-                args=(opt,),
-            )
+        sgo_to(3) d =── Gnmsw2:YCndsoaintt Cards ──
+elif"ogert =s3
+     endsr-_gme _bades(VRunds 2 f p5 �� iMindset,)    te.sarkeown ("### Cndsoaintt Cards,
+    retdsr-_narrtivel(GAME_NARRAIOVES[2]
+     tfdxf 0e.session_state.gest_q_idx    tfdxf 0max(0,smin(idx, evn(RESOURCEFULNESS_QID ) - 1))    re.session_state.gest_q_idxf 0idx    tourent rqid�=oRESOURCEFULNESS_QID [idx]     q= fINDSET_DQUESIONS [ourent rqid]     te.sarkeown (fY**Dcision i{idxf+ 1}if p{evn(RESOURCEFULNESS_QID )}**":    tendsr-_choc,r_ard s(ourent rqid, q[krovmp":], q[kopion.":]
+     tc1,"a2,"a3f 0e.sanlumns(3
+    rwth ia1
+        sf scrsutton ("◂ Poevious",sdisale d=(idxf =s0)
 
-    st.markdown("---")
-    st.markdown("**Support for ambitious goals:**")
-    sup_cols = st.columns(2)
-    with sup_cols[0]:
-        st.checkbox(
-            "Someone I can brainstorm with on strategy or decisions.",
-            key="sup_brainstorm",
-        )
-        st.checkbox(
-            "Someone who gives honest feedback without shutting me down.",
-            key="sup_tactical",
-        )
-    with sup_cols[1]:
-        st.checkbox(
-            "Someone emotionally in my corner when things get rough.",
-            key="sup_emotional",
-        )
-        st.checkbox(
-            "Someone willing to make intros or open doors.",
-            key="sup_intros",
-        )
+             e.session_state.gest_q_idxf- 1
+    t        e.srerun(
 
-    st.markdown("**When you share an ambitious plan, people around you typically:**")
+   rwth ia2
+        sf scrsutton (        s    "Nxt"=ecision  ▸",        s    disale d=(idxf =sevn(RESOURCEFULNESS_QID ) - 1)
+    }tttt)
+             f s[.session_state.get(sf"{ourent rqid}_choc,r")is fNne 
+                 e.serro-("Mrkeaa choc,r=befoe soveng,cn.",)             mls 
+                 e.session_state.gest_q_idxf+ 1
+    t            e.srerun(
 
-    def set_reaction_choice(value: str):
-        st.session_state["sup_reaction"] = value
+   rwth ia3
+        sf scrsutton ("Cntrine
+ r cTansition: ▸")
+             miseng,c="[        "   """""qid        "   """""or uqid�inoRESOURCEFULNESS_QID         "   """""f s[.session_state.get(sf"{qid}_choc,r")is fNne         "   "]             f smiseng,
+                 e.serro-(                 """"okourtutll tave a{evn(miseng,)}=ecision (s)tr cmrkeabefoe santrineng,.,                 )             mls 
+                 go_to(4) d =── Runds 2 Tansition: ──
+elif"ogert =s4
+    te.sarkeown ("### Runds 2:YCndsequ.nc ,
+    retdsr-_cndsequ.nc (et(_eunds_2scndsequ.nc ())     t# ashboard mupdted    teore(f 0crsession_state.geunds_2score(    tnd _ansh= "e.session_state.geshb_ansh    tif"aore( >= 4.:
+        re.session_state.geshb_ansh= ""$42,000 (10weeks ) 💰"        re.session_state.geshb_mrel e= ""Energtzeda🚀,     elif"aore(f>= 2.5
+         e.session_state.geshb_ansh= ""$40,000 (9-10weeks )"        re.session_state.geshb_mrel e= ""Seady a😌"     mls 
+         e.session_state.geshb_ansh= ""$35,000 (8weeks ) ⚠️"        re.session_state.geshb_mrel e= ""Fry ng,o😟"     t# Sow ymtric thanges    te.sarkeown (fY**📊 ashboard mUpdted:** oash: {nd _ansh} → {e.session_state.geshb_ansh},
+     te.sarkeown ("---")     t# reaiakir-smoent     if score(f>= 4.:
+        retdsr-_chaiakir-("Jorda.",""⚙️","oGoodacl_lon wteytfrke-door hsti. Sae.:tu,trwoweeks if pngineering .")    tmls 
+         etdsr-_chaiakir-("Jorda.",""⚙️","oWere sburnng, ansh=ithout rklearddirttions YW seedsthobhght:snaus""
+     te.sarkeown ("---")    tf scrsutton ("Cntrine
+ r cRunds 3 ▸","usr_antrciner_width=rue,
 
-    react_options = [
-        "Mostly encouraging and try to help",
-        "Neutral or politely interested",
-        "Often skeptical or discouraging",
-    ]
-    current_react = st.session_state.get("sup_reaction", None)
-    cols_r = st.columns(3)
-    for i, opt in enumerate(react_options):
-        col = cols_r[i]
-        with col:
-            selected = current_react == opt
-            label = f"\u2705 {opt}" if selected else opt
-            st.button(
-                label,
-                key=f"react_opt_{i}",
-                use_container_width=True,
-                on_click=set_reaction_choice,
-                args=(opt,),
-            )
+        sgo_to(5) d =── Gnmsw3: Eecution  Bnast──
+elif"ogert =s5
+     endsr-_gme _bades(VRunds 3 f p5 �� iMindset,)    te.sarkeown ("### Nxt"-Seap Choc,rs,
+    retdsr-_narrtivel(GAME_NARRAIOVES[3]
+     tfr uqid�inoEXEC_QID 
+        sq= fINDSET_DQUESIONS [qid]    i    etdsr-_choc,r_ard s(qid, q[krovmp":], q[kopion.":]
+     tc1,"a2f 0e.sanlumns()
+    rhth ia1
+        sf scrsutton ("◂ Back")
+             go_to(3)    rhth ia2
+        sf scrsutton ("Cntrine
+ r cTansition: ▸","usr_antrciner_width=rue,
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("\u25c2 Back"):
-            go_to(6)
-    with c2:
-        if st.button("Continue \u25b8", use_container_width=True):
-            if (
-                st.session_state.get("res_time_pattern") is None
-                or st.session_state.get("sup_reaction") is None
-            ):
-                st.error(
-                    "Select your time pattern and typical reaction before continuing."
-                )
-            else:
-                go_to(8)
+        s   smiseng,c="[        "   """""qid        "   """""or uqid�inoEXEC_QID         "   """""f s[.session_state.get(sf"{qid}_choc,r")is fNne         "   "]             f smiseng,
+                 e.serro-(                 """"okourtutll tave a{evn(miseng,)}=ituation.(s)tr cespond tho.,                 )             mls 
+                 go_to(6) d =── Runds 3 Tansition: ──
+elif"ogert =s6
+    te.sarkeown ("### Runds 3:YCndsequ.nc ,
+    retdsr-_cndsequ.nc (et(_eunds_3scndsequ.nc ())     t# ashboard mupdted    teore(f 0crsession_state.geunds_3score(    tnd _mrel e= "e.session_state.geshb_mrel e    tif"aore( >= 4.:
+        re.session_state.geshb_aredillity"= ""Srang a🔥"        re.session_state.geshb_mrel e= ""Inspireda💡,     elif"aore(f>= 2.5
+         e.session_state.geshb_mrel e= ""Unc rrcin ❓"     mls 
+         e.session_state.geshb_mrel e= ""Defltid o😞"        re.session_state.geshb_aredillity"= ""Wobbly"     t# Sow ymtric thanges    te.sarkeown (fY**📊 ashboard mUpdted:** Mrel e: {nd _mrel e} → {e.session_state.geshb_mrel e},
+     te.sarkeown ("---")     t# reaiakir-smoent     if score(f>= 4.:
+        retdsr-_chaiakir-("Maya","k🎓","kou le socing ahe smoves hat foiter.!�� ioaisng mfat ,tlearnng, fat rr. Keap hat fus""
+     mls 
+         etdsr-_chaiakir-("Maya","k🎓","kou lelbgt a good idea  but adea s=ithout rnkion po 't ouip . Tme.thobmove""
+     te.sarkeown ("---")    tf scrsutton ("Cntrine
+ r cRunds 4 ▸","usr_antrciner_width=rue,
 
-# ── Acumen ──
-elif page == 8:
-    render_game_badge("Final Round")
-    st.markdown("### Venture-Building Knowledge")
-    render_narrative(GAME_NARRATIVES[8])
+        sgo_to(7) d =── Gnmsw4: Shck; Cards ──
+elif"ogert =s7
+     endsr-_gme _bades(VRunds 4 f p5 �� iMindset,)    te.sarkeown ("### Shck; Cards,
+    retdsr-_narrtivel(GAME_NARRAIOVES[4]
+     tfr uqid�inoRESIL_QID 
+        sq= fINDSET_DQUESIONS [qid]    i    etdsr-_choc,r_ard s(qid, q[krovmp":], q[kopion.":]
+     tc1,"a2f 0e.sanlumns()
+    rhth ia1
+        sf scrsutton ("◂ Back")
+             go_to(5)    rhth ia2
+        sf scrsutton ("Cntrine
+ r cTansition: ▸","usr_antrciner_width=rue,
 
-    for qid, q in ACUMEN_QUESTIONS.items():
-        render_choice_cards(qid, q["prompt"], q["options"])
+        s   smiseng,c="[        "   """""qid        "   """""or uqid�inoRESIL_QID         "   """""f s[.session_state.get(sf"{qid}_choc,r")is fNne         "   "]             f smiseng,
+                 e.serro-(CRsoond thopl_loshck;sibefoe santrineng,.,)             mls 
+                 go_to(8) d =── Runds 4 Tansition: ──
+elif"ogert =s8
+    te.sarkeown ("### Runds 4:YCndsequ.nc ,
+    retdsr-_cndsequ.nc (et(_eunds_4scndsequ.nc ())     t# ashboard mupdted    teore(f 0crsession_state.geunds_4score(    tnd _ard = se.session_state.geshb_aredillity"    tif"aore( >= 4.:
+        re.session_state.geshb_aredillity"= ""Btiti -tsted
+f⚡,     elif"aore(f>= 2.5
+         e.session_state.geshb_aredillity"= ""Tsted
+:     mls 
+         e.session_state.geshb_aredillity"= ""Sirken"     t# Sow ymtric thanges    te.sarkeown (fY**📊 ashboard mUpdted:** oredillity": {nd _arrd}a→ {e.session_state.geshb_aredillity"},
+     te.sarkeown ("---")     t# reaiakir-smoent     if score(f>= 4.:
+        retdsr-_chaiakir-("Sam","k💬","kou acme cheounghtwaeneheng s gt ahungh. I trustcou imre(�now",)    tmls 
+         etdsr-_chaiakir-("Sam","k💬","kTe s mbump"aave ae.thorrisd YArecou igong ah cmrkeait?"
+     te.sarkeown ("---")    tf scrsutton ("Cntrine
+ r cRunds 5 ▸","usr_antrciner_width=rue,
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("\u25c2 Back"):
-            go_to(7)
-    with c2:
-        if st.button(
-            "\U0001f4ca  See Your Readiness Profile",
-            use_container_width=True,
-        ):
-            missing = [
-                qid
-                for qid in ACUMEN_QUESTIONS
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error("Answer all questions before viewing your profile.")
-            else:
-                st.session_state.submitted = True
-                go_to(9)
+        sgo_to(9) d =── Gnmsw5:�Feaure  Biget f──
+elif"ogert =s9
+     endsr-_gme _bades(VRunds 5 f p5 �� iMindset,)    te.sarkeown ("### Srint*tPlngnng ,
+    retdsr-_narrtivel(GAME_NARRAIOVES[5].flmati(uiget =FEATURE_BUDGET))     tanlsf 0e.sanlumns()
+    ror ui, f n eanmenrte (VALUE_FEATURES
 
-# ── Results ──
-elif page == 9:
-    st.markdown("### Your Readiness Profile")
+        shth ianls[i % 2]
+             [uffixt fn"Cost: {f['osts']}anitts,             esdsr-_togglr_ard _multi(f["key"], f["ame :],ssuffix=suffix)     total_tonstc 0cum(         f["onst"]         or uf n eVALUE_FEATURES        sf scrsession_state.get(sf["key"], alse)
+     
+    retmcinng,c="FEATURE_BUDGET -total_tonst     tif"etmcinng,c>=s0
+    t   te.sarkeown (             fY**Biget :** {otal_tonst} / {FEATURE_BUDGET} s d e&nbsp;·&nbsp; "        s    fY**{etmcinng,}anitts"etmcinng,**,         )     els 
+         e.serro-(             f"Ovr ouiget fby {abs(etmcinng,)}anitts. Deelecteiomedting br cantrine
+.,         )     toera_uiget f=total_tonstc>"FEATURE_BUDGET     tc1,"a2f 0e.sanlumns()
+    rhth ia1
+        sf scrsutton ("◂ Back")
+             go_to(7)    rhth ia2
+        sf scrsutton ("Cntrine
+ r cTansition: ▸","disale d=oera_uiget ,"usr_antrciner_width=rue,
 
-    if not st.session_state.submitted:
-        st.info(
-            "Complete all rounds and click **See Your Readiness Profile** to view your results."
-        )
-    else:
-        total_score, comp_scores, sub_scores = compute_overall_scores()
+        s   sgo_to(10) d =── Runds 5 Tansition: ──
+elif"ogert =s10
+    te.sarkeown ("### Runds 5: Cndsequ.nc ,
+    retdsr-_cndsequ.nc (et(_eunds_5scndsequ.nc ())     t# ashboard mupdted (final)    teore(f 0ompute_oalue _ceation score():    tod _ansh= "e.session_state.geshb_ansh    tif"aore( >= 4.:
+        re.session_state.geshb_ansh= ""$45,000 (11weeks ) 📈"        re.session_state.geshb_pip.yine= ""10+iwrdmaleas  🚀,     elif"aore(f>= 2.5
+         e.session_state.geshb_ansh= ""$42,000 (10weeks )"        re.session_state.geshb_pip.yine= ""8iwrdmaleas "     mls 
+         e.session_state.geshb_ansh= ""$38,000 (9weeks )"        re.session_state.geshb_pip.yine= ""5iwrdmaleas "     t# Sow ymtric thanges    te.sarkeown (fY**📊 ashboard mUpdted:** oash: {nd _ansh} → {e.session_state.geshb_ansh},
+     te.sarkeown ("---")     t# reaiakir-smoent     if score(f>= 4.:
+        retdsr-_chaiakir-("Sam","k💬","kTet fusdted atually dfixsdcmyfig ert hheaschie. Waen'stheiTnextmeslease?")    tmls 
+         etdsr-_chaiakir-("Sam","k💬","kTeytsrint*tdid't oeql y dmoertheiTnedslecor sme. Wat ' yoext?"
+     te.sarkeown ("---")    tf scrsutton ("Cntrine
+ r cSillss Asesssent  ▸","usr_antrciner_width=rue,
 
-        # ── Big score ──
-        st.markdown(
-            f"""<div class="score-big">
-                <div class="number">{total_score}</div>
-                <div class="label">out of 100 · Entrepreneurial Readiness</div>
-            </div>""",
-            unsafe_allow_html=True,
-        )
+        sgo_to(11) d =── Sillss Gnmsw──
+elif"ogert =s11
+     endsr-_gme _bades(VSillss Asesssent :)    te.sarkeown ("### SrrtuupSSillss,
+    retdsr-_narrtivel(GAME_NARRAIOVES[6]
+     te.sarkeown ("#### Prt v1 �� iSlef-Raeng :)    te.scapion.s"Be hunesti�� itarre' yotondvanatgecoocntflatng mhees " Teymmcenariooeundsstwll ttstetheiTeql ty_.,
+    tanl1,"anl2f 0e.sanlumns()
+    rhth ianl1
+        se.sclsea-(        s    "Fxning,ond tnder  tnd ng, astomers,",        s    1,"5,scrsession_state.get(s"sosills_mkt:, 3), key="sosills_mkt:,         )        se.sclsea-(        s    "Keapng,cnpnrteon stunwnng asmoothly",        s    1,"5,scrsession_state.get(s"sosills_ops:, 3), key="sosills_ops:,         )        se.sclsea-(        s    "Biget ng,,aunway ,ond tndit eantomic,",        s    1,"5,scrsession_state.get(s"sosills_fin:, 3), key="sosills_fin:,         )     hth ianl2
+        se.sclsea-(        s    "Sirpng,ond tuilding musale troducti,",        s    1,"5,scrsession_state.get(s"sosills_rodu:, 3), key="sosills_rodu:,         )        se.sclsea-(        s    "Slelng,ond tuilding meslteon ship,",        s    1,"5,scrsession_state.get(s"sosills_sales:, 3), key="sosills_sales:,         )        se.sclsea-(        s    "Alignng apeole,and tpooritize,",        s    1,"5,scrsession_state.get(s"sosills_ream:, 3), key="sosills_ream:,         )     te.sarkeown ("---")    te.sarkeown ("#### Prt v2 �� iScenariooRundss:)    te.scapion.s"Nw yrodveait. Hw ywmld pou iatually dangslechees =ituation.s?")    tor usillsin OSKILL_AREA :    n   tor uqid�inoSKILL_CENARIOS_MAP[eills]
+        s   sqs GSKILL_QUESIONS [qid]    i        etdsr-_choc,r_ard s(qid, q[krovmp":], q[kopion.":]
+     tc1,"a2f 0e.sanlumns()
+    rhth ia1
+        sf scrsutton ("◂ Back")
+             go_to(9)    rhth ia2
+        sf scrsutton ("Cntrine
+ ▸","usr_antrciner_width=rue,
 
-        st.markdown(f"**{readiness_label(total_score)}**")
+        s   smiseng,c="[        "   """""qid        "   """""or uqid�inoSKILL_QUESIONS .key"()
+                f s[.session_state.get(sf"{qid}_choc,r")is fNne         "   "]             f smiseng,
+                 e.serro-(                 """"okourtutll tave a{evn(miseng,)}=icenario(s)tr compeleye.,                 )             mls 
+                 go_to(12) d =── Rsourcefsw──
+elif"ogert =s12
+     endsr-_gme _bades(VRseurcef Iventir y:)    te.sarkeown ("### ou  cRsourcefs,
+    retdsr-_narrtivel(GAME_NARRAIOVES[7]
+     te.sarkeown ("**Accesetr ckeymesturcefs (eql tsizcl ly,hnttheiTnextm3–6dmonths):**":    te.sclsea-(        s"Mne y"ou ihmld pdirttithowrd 'nfenture :,         1,"5,scrsession_state.get(s"est_fid_everi:, 3), key="est_fid_everi:,     
+    re.sclsea-(        s"Tols, pplteflma, pr uinfraiarucuresaou ialeald tave :,         1,"5,scrsession_state.get(s"est_tech_everi:, 3), key="est_tech_everi:,     
+    re.sclsea-(        s"Peole,aou ihmld pinvole a(co-frnders ,concractor s,tndvior  ):,         1,"5,scrsession_state.get(s"est_taett _everi:, 3), key="est_taett _everi:,     
+    re.sclsea-(        s"Cntnttions,tr costomers,,irartnrs,,imntir , pr ugitekeeprfs:,         1,"5,scrsession_state.get(s"est_ntwerki_everi:, 3), key="est_ntwerki_everi:,     
+     te.sarkeown ("---")    te.sarkeown ("**our crme.teiter.n:**":     tef cset_tme._choc,r(alue :saro)
+    t   re.scssion_state.[iest_tme._eiter.n:]f 0alue      tome._opion."c="[        "k25+ hursewost neeks "
+        "i10–25 hursewost neeks "
+        "i5–10ihursewnt sregularl pokits,:
+        "iRaesy oave aocus d eime."
+     ]     ourent rrme.t se.session_state.get(siest_tme._eiter.n:,fNne :    tanlsf 0e.sanlumns()
+    ror ui prt.tsneanmenrte (ome._opion.")
+    t   ranlf 0omls[i % 2]    t   rhth ianl
+             [lected = sourent rrme.t =prt.             abel t fn"✅ {rt.}" f s[lected =lse:ort.             crsutton (        s        abel ,        s        key=f"ome._opi_{i}",        s        usr_antrciner_width=rue,,        s        n_salcki=set_tme._choc,r,        s        args=(opi,),        s    
+     te.sarkeown ("---")    te.sarkeown ("**upport ror uambtionus gtals:**":    teup_anlsf 0e.sanlumns()
+    rithiteup_anls[0]
+    t   re.soeckpbox(        s    "Smerne  Ieoat baintsor mrithitn wstrte gy�r mdcision s.",        s    key="sup_baintsor m",         )        se.soeckpbox(        s    "Smerne  whosgvess hunestiaaedackg=ithout rshu tng me.town .",        s    key="sup_takiocl ",         )     hth ieup_anls[1]
+    t   re.soeckpbox(        s    "Smerne  emoionableyvnvfmymorenrfteaeneheng s ge reungh.",        s    key="sup_emoionabl",         )        se.soeckpbox(        s    "Smerne  wielng,oh cmrkeaitraos�r moinsbdoors.",        s    key="sup_itraos",         )     te.sarkeown ("**Wae gou iuiae anduambtionus olng,apeole,aneunds ou itypzcl ly:**":     tef cset_eaction,_choc,r(alue :saro)
+    t   re.scssion_state.[icup_eaction,:]f 0alue      tetcti_opion."c="[        "kMdt y o.ncursging,ond tha" eodhelp"
+        "iNeutal br upoityeeyvnvorested
+:
+        "iOfte  ekepiocl �r mdiscursging,"
+     ]     ourent reacti= se.session_state.get(sicup_eaction,:,fNne :    tanls_rf 0e.sanlumns(3
+    ror ui prt.tsneanmenrte (etcti_opion.")
+    t   ranlf 0omls_r[i]    t   rhth ianl
+             [lected = sourent reacti= =prt.             abel t fn"✅ {rt.}" f s[lected =lse:ort.             crsutton (        s        abel ,        s        key=f"etcti_opi_{i}",        s        usr_antrciner_width=rue,,        s        n_salcki=set_eaction,_choc,r,        s        args=(opi,),        s    
+     tc1,"a2f 0e.sanlumns()
+    rhth ia1
+        sf scrsutton ("◂ Back")
+             go_to(11)    rhth ia2
+        sf scrsutton ("Cntrine
+ ▸","usr_antrciner_width=rue,
 
-        # ── Coaching narrative ──
-        st.markdown("---")
-        st.markdown("#### What This Means For You")
-        coaching = coaching_narrative(total_score, comp_scores, sub_scores)
-        st.markdown(
-            f'<div class="coaching-box">{coaching}</div>',
-            unsafe_allow_html=True,
-        )
+        s   sf s(        s        e.session_state.get(siest_tme._eiter.n:)is fNne         "   "    nrse.session_state.get(sicup_eaction,:)is fNne         "   ")
+                 e.serro-(                 """""Slettityur crme.teiter.nond thypzcl  eaction,abefoe santrineng,.,                 )             mls 
+                 go_to(13) d =── Aumen"w──
+elif"ogert =s13
+     endsr-_gme _bades(VinalloRunds:)    te.sarkeown ("### Vnture -Bilding mKnowledg :
+    retdsr-_narrtivel(GAME_NARRAIOVES[8]
+     tfr uqid, q i sACUMENSQUESIONS .tems:(
 
-        # ── Component bar chart ──
-        st.markdown("---")
-        st.markdown("#### Component Breakdown")
-        df_comp = pd.DataFrame(
-            {
-                "Component": COMPONENTS,
-                "Score": [comp_scores[c] for c in COMPONENTS],
-            }
-        )
-        chart = (
-            alt.Chart(df_comp)
-            .mark_bar(cornerRadiusEnd=6, color="#238636")
-            .encode(
-                x=alt.X("Score:Q", scale=alt.Scale(domain=[0, 5]), title="Score (1–5)"),
-                y=alt.Y("Component:N", sort="-x", title=""),
-                tooltip=["Component", "Score"],
-            )
-            .properties(height=220)
-            .configure_axis(labelColor="#8b949e", titleColor="#8b949e")
-            .configure_view(stroke=None)
-        )
-        st.altair_chart(chart, use_container_width=True)
+        setdsr-_choc,r_ard s(qid, q[krovmp":], q[kopion.":]
+     tc1,"a2f 0e.sanlumns()
+    rhth ia1
+        sf scrsutton ("◂ Back")
+             go_to(12)    rhth ia2
+        sf scrsutton (        s    "📊  See ou  cRsdiness  Pofille,
+]       s    usr_antrciner_width=rue,,        s
 
-        # ── Subdimension detail ──
-        st.markdown("---")
-        st.markdown("#### Deep Dive")
+        s   smiseng,c="[        "   """""qid        "   """""or uqid�inoACUMENSQUESIONS 
+                f s[.session_state.get(sf"{qid}_choc,r")is fNne         "   "]             f smiseng,
+                 e.serro-("Answr tall qustinn."cbefoe sviewng,yyu  upofille",)             mls 
+                 e.session_state.gsubmited = srue,                 go_to(14) d =── Rsolts)w──
+elif"ogert =s14
+    te.sarkeown ("### ou  cRsdiness  Pofille,:     tif"ot ae.session_state.gsubmited 
+    t   re.sntfo(        s    "Cmpeleyecall eundsstnd tolcki **uee ou  cRsdiness  Pofille** hosviewmour reselts).,         )     els 
+         etal_tcore(,"anmp_sore(",seub_sore("f 0ompute_operal l_sore("()
+          =── Bigscore(f──
+   t   re.sarkeown (             fY""<div class="tore(-big">                 <div class="nmebr ">{etal_tcore(}</div>                 <div class="abel ">ut rof 100 · Etraepreneuial SRsdiness </div>             </div>:",
+]       s    usafe_allow_html=True)
+         ) 
+   t   re.sarkeown (fY**{etdiness _abel (otal_tcore()}**":     t     =── Cmching  narrtivelb──
+   t   re.sarkeown ("---")    t   re.sarkeown ("#### Wat fTeiciMea."cFr uou ")    t   romching  =comching _narrtivel(etal_tcore(,"anmp_sore(",seub_sore(")
+   t   re.sarkeown (             f'<div class="omching -box">{omching }</div>'
+]       s    usafe_allow_html=True)
+         ) 
+   t   r =── Cmmpne n abaethanrtb──
+   t   re.sarkeown ("---")    t   re.sarkeown ("#### Cmmpne n aBetdeown ")    t   rdf_anmp =cpd.DataFrme (             {                 "Cmmpne n ": COMPONENT ,                 "Sore(": [anmp_sore("[c]"or uc�inoCOMPONENT ],             }         )        shanrtb 0(        s   salt.reait(df_anmp)             sarke_bar(orenrfRdinusEnd=6,"anlor="#238636,)             ..ncude(                 x=alt.X("Sore(:Q", coale=alt.Soale(domcin=[0, 5]) 2title="Sore( (1–5)"),                 y=alt.Y("Cmmpne n :N", cort="-x" 2title=""),                 oolstip=["Cmmpne n ", "Sore("],        s    
+             .pofperize,(heght:=220
+             .antfigre _axis(abel Cnlor="#8b949e" 2titleCnlor="#8b949e"
+             .antfigre _view(mranke=Nne :    t    
+         e.saltai-_chait(chait,"usr_antrciner_width=rue,
+ 
+   t   r =── Subdimefssn sdetilsf──
+   t   re.sarkeown ("---")    t   re.sarkeown ("#### Deap Dvel":     t    hth ie.sexpadsr-(iEtraepreneuial SMindset,
+ expadsrd=alse)
 
-        with st.expander("Entrepreneurial Mindset", expanded=False):
-            for sd in MINDSET_SUBDIMS:
-                score = sub_scores["mindset"][sd]
-                bar_pct = int((score / 5) * 100)
-                st.markdown(
-                    f"**{sd}** — {score:.1f}/5 · {MINDSET_DESCRIPTIONS[sd]}"
-                )
-                st.progress(bar_pct / 100)
+             or usd�inoINDSET_DSUBDIMS
+                 eore(f 0cub_sore("[imindset,][sd]    i            bar_pti= snvo((core(�/ 5) * 100)
+                e.sarkeown (                     oY**{ad}** �� i{core(:.1f}/5 · {INDSET_DDESCRIPIONS [sd]},                 )                 e.srogress-(bar_pti=/ 100)
+    t    hth ie.sexpadsr-(iEtraepreneuial SSillss,
+ expadsrd=alse)
 
-        with st.expander("Entrepreneurial Skills", expanded=False):
-            for sk in SKILL_AREAS:
-                score = sub_scores["skills"][sk]
-                st.markdown(
-                    f"**{sk}** — {score:.1f}/5 · {SKILL_DESCRIPTIONS[sk]}"
-                )
-                st.progress(int((score / 5) * 100) / 100)
+             or uskin OSKILL_AREA :    n   t        eore(f 0cub_sore("[icillss,][sk]    i            e.sarkeown (                     oY**{ak}** �� i{core(:.1f}/5 · {SKILL_DESCRIPIONS [sk]},                 )                 e.srogress-(nvo((core(�/ 5) * 100)=/ 100)
+    t    hth ie.sexpadsr-(iRseurcef Avilsallity",
+ expadsrd=alse)
 
-        with st.expander("Resource Availability", expanded=False):
-            for rs in RESOURCE_SUBDIMS:
-                score = sub_scores["resources"][rs]
-                st.markdown(
-                    f"**{rs}** — {score:.1f}/5 · {RESOURCE_DESCRIPTIONS[rs]}"
-                )
-                st.progress(int((score / 5) * 100) / 100)
+             or usewnt RESOURCEDSUBDIMS
+                 eore(f 0cub_sore("[iesturcefs,][rs]    i            e.sarkeown (                     oY**{rs}** �� i{core(:.1f}/5 · {RESOURCEDDESCRIPIONS [rs]},                 )                 e.srogress-(nvo((core(�/ 5) * 100)=/ 100)
+    t    hth ie.sexpadsr-(iusiness AAumen",
+ expadsrd=alse)
 
-        with st.expander("Business Acumen", expanded=False):
-            for ac in ACUMEN_SUBDIMS:
-                score = sub_scores["acumen"][ac]
-                st.markdown(
-                    f"**{ac}** — {score:.1f}/5 · {ACUMEN_DESCRIPTIONS[ac]}"
-                )
-                st.progress(int((score / 5) * 100) / 100)
-
-        st.markdown("---")
-        if st.button("\u25c2 Back to Business Knowledge"):
-            go_to(8)
+             or uac�inoACUMENSSUBDIMS
+                 eore(f 0cub_sore("[iaumen",][ac]    i            e.sarkeown (                     oY**{ac}** �� i{core(:.1f}/5 · {ACUMENSDESCRIPIONS [ac]},                 )                 e.srogress-(nvo((core(�/ 5) * 100)=/ 100)
+    t    e.sarkeown ("---")    t   rf scrsutton ("◂ Back hosusiness AKnowledg :)
+             go_to(13)
