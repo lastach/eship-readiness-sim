@@ -14,24 +14,24 @@ st.set_page_config(
 # ============== CUSTOM CSS FOR GAME-LIKE FEEL ==============
 st.markdown("""
 <style>
-/* ── Global ── */
+/* ─── Global ─── */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(170deg, #0d1117 0%, #161b22 100%);
     color: #e6edf3;
 }
 [data-testid="stHeader"] { background: transparent; }
 
-/* ── Sidebar ── */
+/* ─── Sidebar ─── */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
     border-right: 1px solid #30363d;
 }
 
-/* ── Typography ── */
+/* ─── Typography ─── */
 h1, h2, h3 { color: #58a6ff !important; }
 h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
 
-/* ── Progress bar ── */
+/* ─── Progress bar ─── */
 .progress-outer {
     background: #21262d; border-radius: 12px; height: 18px;
     margin: 0.8rem 0 1.6rem 0; overflow: hidden;
@@ -45,7 +45,7 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
     padding-right: 8px; font-size: 11px; color: #fff; font-weight: 600;
 }
 
-/* ── Narrative box ── */
+/* ─── Narrative box ─── */
 .narrative-box {
     background: #161b22; border-left: 4px solid #58a6ff;
     border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1rem 0 1.6rem 0;
@@ -53,14 +53,14 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
 }
 .narrative-box em { color: #79c0ff; }
 
-/* ── Consequence box (transition pages) ── */
+/* ─── Consequence box (transition pages) ─── */
 .consequence-box {
     background: #161b22; border-left: 4px solid #f0883e;
     border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1rem 0 1.6rem 0;
     font-size: 1rem; line-height: 1.6; color: #c9d1d9;
 }
 
-/* ── Character dialogue box ── */
+/* ─── Character dialogue box ─── */
 .character-box {
     background: #161b22; border-left: 4px solid #f0883e;
     border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1rem 0 1.2rem 0;
@@ -73,7 +73,7 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
     font-style: italic; color: #c9d1d9;
 }
 
-/* ── Dashboard metric ── */
+/* ─── Dashboard metric ─── */
 .dashboard-metric {
     background: #0d1117; border: 1px solid #30363d;
     border-radius: 8px; padding: 0.8rem 1rem; margin: 0.6rem 0;
@@ -86,7 +86,7 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
     font-weight: 600; color: #58a6ff; font-size: 1.1rem; margin-top: 0.2rem;
 }
 
-/* ── Scenario card ── */
+/* ─── Scenario card ─── */
 .scenario-card {
     background: #0d1117; border: 1px solid #30363d;
     border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.8rem;
@@ -94,7 +94,7 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
 }
 .scenario-card strong { color: #58a6ff; }
 
-/* ── Game header badge ── */
+/* ─── Game header badge ─── */
 .game-badge {
     display: inline-block; background: #238636; color: #fff;
     font-weight: 700; font-size: 0.75rem; letter-spacing: 1.2px;
@@ -102,7 +102,7 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
     text-transform: uppercase;
 }
 
-/* ── Score card (results) ── */
+/* ─── Score card (results) ─── */
 .score-big {
     text-align: center; padding: 2rem;
     background: linear-gradient(135deg, #161b22, #0d1117);
@@ -112,7 +112,7 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
 .score-big .number { font-size: 4rem; font-weight: 800; color: #58a6ff; }
 .score-big .label { font-size: 1.1rem; color: #8b949e; margin-top: 0.4rem; }
 
-/* ── Coaching box ── */
+/* ─── Coaching box ─── */
 .coaching-box {
     background: #0d1117; border: 1px solid #238636;
     border-radius: 10px; padding: 1.2rem 1.4rem; margin: 1rem 0;
@@ -120,7 +120,7 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
 }
 .coaching-box strong { color: #56d364; }
 
-/* ── Button styling ── */
+/* ─── Button styling ─── */
 .stButton > button {
     border-radius: 8px !important; font-weight: 600 !important;
     transition: all 0.2s ease !important;
@@ -134,7 +134,7 @@ h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
     color: #e6edf3 !important;
 }
 
-/* ── Step counter ── */
+/* ─── Step counter ─── */
 .step-counter {
     color: #8b949e; font-size: 0.85rem; margin-bottom: 0.3rem;
 }
@@ -352,6 +352,35 @@ def compute_value_creation_score():
     max_possible = sum(f["ideal_points"] for f in VALUE_FEATURES)
     norm = max(0.0, min(1.0, selected_value / max_possible))
     return round(1 + 4 * norm, 2)
+
+
+def compute_email_quality_score(email_text: str) -> float:
+    """Score an email draft on key quality indicators (1-5 scale)."""
+    if not email_text or len(email_text) < 20:
+        return 1.0
+
+    score = 1.0  # Base point for > 20 chars
+
+    # Keywords for pain point/problem
+    pain_keywords = ["energy", "cost", "HVAC", "calibration", "retrofit", "savings", "efficiency"]
+    if any(kw.lower() in email_text.lower() for kw in pain_keywords):
+        score += 1.0
+
+    # Keywords for clear ask/CTA
+    cta_keywords = ["call", "meet", "demo", "chat", "schedule", "discuss", "15 minutes"]
+    if any(kw.lower() in email_text.lower() for kw in cta_keywords):
+        score += 1.0
+
+    # Keywords for specific data/situation
+    data_keywords = ["30%", "building", "manager", "ventilation", "%", "week", "day", "hours"]
+    if any(kw.lower() in email_text.lower() for kw in data_keywords):
+        score += 1.0
+
+    # Personalized / not generic (length > 50 chars)
+    if len(email_text) > 50:
+        score += 1.0
+
+    return min(5.0, score)
 
 
 # ============== MINDSET GAMES 2–4 ==============
@@ -791,11 +820,11 @@ if "submitted" not in st.session_state:
 if "res_q_idx" not in st.session_state:
     st.session_state.res_q_idx = 0
 
-# Dashboard metrics initialization
+# Dashboard metrics initialization (now numeric for cumulative tracking)
 if "dash_cash" not in st.session_state:
-    st.session_state.dash_cash = "$48,000 (12 weeks)"
+    st.session_state.dash_cash = 48000
 if "dash_pipeline" not in st.session_state:
-    st.session_state.dash_pipeline = "5 warm leads"
+    st.session_state.dash_pipeline = 5
 if "dash_morale" not in st.session_state:
     st.session_state.dash_morale = "Steady 😌"
 if "dash_credibility" not in st.session_state:
@@ -811,9 +840,11 @@ if "round_3_score" not in st.session_state:
 if "round_4_score" not in st.session_state:
     st.session_state.round_4_score = 0
 
-# Email draft
+# Email draft and score
 if "email_draft" not in st.session_state:
     st.session_state.email_draft = ""
+if "email_score" not in st.session_state:
+    st.session_state.email_score = 0
 
 # one-time defaults for resources/support
 if "defaults_initialized" not in st.session_state:
@@ -832,6 +863,13 @@ if "defaults_initialized" not in st.session_state:
     for k, v in defaults.items():
         st.session_state.setdefault(k, v)
     st.session_state.defaults_initialized = True
+
+# Skill self-ratings (stored when user rates themselves on page 11)
+if "skill_self_ratings" not in st.session_state:
+    st.session_state.skill_self_ratings = {}
+
+if "round_5_score" not in st.session_state:
+    st.session_state.round_5_score = 0
 
 
 def go_to(page_idx: int):
@@ -929,7 +967,7 @@ def render_character(name: str, emoji: str, dialogue: str):
     st.markdown(
         f"""<div class="character-box">
             <div class="char-name">{emoji} {name}</div>
-            <div class="char-dialogue">"{dialogue}"</div>
+            <div class="char-dialogue""{dialogue}"</div>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -945,17 +983,29 @@ def render_sidebar_metrics():
         st.markdown("### 🏢 Founder Dashboard")
         st.markdown("---")
 
+        # Format cash runway from numeric value
+        cash = st.session_state.dash_cash
+        weeks = cash // 4000 if isinstance(cash, (int, float)) else 12
+        cash_display = f"${cash:,} ({weeks} weeks)" if isinstance(cash, (int, float)) else cash
+
         st.markdown(f"""
 <div class="dashboard-metric">
     <div class="metric-label">Cash Runway</div>
-    <div class="metric-value">{st.session_state.dash_cash}</div>
+    <div class="metric-value">{cash_display}</div>
 </div>
 """, unsafe_allow_html=True)
+
+        # Format pipeline from numeric value
+        pipeline = st.session_state.dash_pipeline
+        if isinstance(pipeline, (int, float)):
+            pipeline_display = f"{pipeline} warm leads"
+        else:
+            pipeline_display = pipeline
 
         st.markdown(f"""
 <div class="dashboard-metric">
     <div class="metric-label">Pipeline</div>
-    <div class="metric-value">{st.session_state.dash_pipeline}</div>
+    <div class="metric-value">{pipeline_display}</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1104,7 +1154,7 @@ def readiness_label(total_score):
     elif total_score >= 50:
         return "🌱 Early-stage readiness — good time to build specific muscles through low-risk reps."
     else:
-        return "🧱 Foundation-building phase — focus on learning, testing, and stacking small wins."
+        return "🧠 Foundation-building phase — focus on learning, testing, and stacking small wins."
 
 
 def coaching_narrative(total_score, comp_scores, sub_scores):
@@ -1172,7 +1222,12 @@ def coaching_narrative(total_score, comp_scores, sub_scores):
 
 def get_round_1_consequence():
     """Generate Round 1 consequence narrative."""
-    score = compute_opportunity_score()
+    signal_score = compute_opportunity_score()
+    email_score = compute_email_quality_score(st.session_state.email_draft)
+    st.session_state.email_score = email_score
+
+    # Blend signal and email scores: 60% signal, 40% email
+    score = round(0.6 * signal_score + 0.4 * email_score, 2)
     st.session_state.round_1_score = score
 
     if score >= 4.0:
@@ -1203,30 +1258,43 @@ def get_round_2_consequence():
         if s is not None:
             resource_scores.append(s)
     score = sum(resource_scores) / len(resource_scores) if resource_scores else 1.0
+
+    # Apply Round 1 ripple effects bonus/penalty
+    bonus_note = ""
+    if st.session_state.round_1_score >= 4.0:
+        score = min(5.0, score + 0.3)
+        bonus_note = " (Your earlier decisions gave you a boost this round.)"
+    elif st.session_state.round_1_score < 2.5:
+        score = max(1.0, score - 0.3)
+        bonus_note = " (Your earlier decisions gave you a setback this round.)"
+
+    score = round(score, 2)
     st.session_state.round_2_score = score
 
-    # Check Round 1 ripple
+    # Check Round 1 ripple narrative
     ripple = ""
     if st.session_state.round_1_score >= 4.0:
         ripple = " The managers you flagged in Round 1 came through — they're giving you real feedback."
-    elif st.session_state.round_1_score < 2.5:
+    elif st.session_state.round_1_score >= 2.5:
+        ripple = " Your signal read from Round 1 was decent — some of those leads are real, though a few may be wishful thinking."
+    else:
         ripple = " The weak signals you chased last round bite you now — you're lacking real customer input."
 
     if score >= 4.0:
         return (
             f"Your scrappy moves paid off. You shipped a landing page using templates, interviewed customers "
             f"without fancy tools, and learned more in a week than you would have waiting for perfect conditions. "
-            f"Low-cost, high-signal decisions.{ripple}"
+            f"Low-cost, high-signal decisions.{ripple}{bonus_note}"
         )
     elif score >= 2.5:
         return (
             f"You made some smart cuts and some slower calls. A few of your resourceful moves clicked, but you "
-            f"also spent time waiting for better conditions that never came. Mixed results, but you're learning.{ripple}"
+            f"also spent time waiting for better conditions that never came. Mixed results, but you're learning.{ripple}{bonus_note}"
         )
     else:
         return (
             f"Waiting for perfect conditions cost you a week. You delayed launches, held off on interviews, "
-            f"and planned more than you shipped. The runway is ticking and you're barely further along.{ripple}"
+            f"and planned more than you shipped. The runway is ticking and you're barely further along.{ripple}{bonus_note}"
         )
 
 
@@ -1238,29 +1306,42 @@ def get_round_3_consequence():
         if s is not None:
             exec_scores.append(s)
     score = sum(exec_scores) / len(exec_scores) if exec_scores else 1.0
+
+    # Apply Round 2 ripple effects bonus/penalty
+    bonus_note = ""
+    if st.session_state.round_2_score >= 4.0:
+        score = min(5.0, score + 0.3)
+        bonus_note = " (Your earlier decisions gave you a boost this round.)"
+    elif st.session_state.round_2_score < 2.5:
+        score = max(1.0, score - 0.3)
+        bonus_note = " (Your earlier decisions gave you a setback this round.)"
+
+    score = round(score, 2)
     st.session_state.round_3_score = score
 
-    # Check Round 2 ripple
+    # Check Round 2 ripple narrative
     ripple = ""
     if st.session_state.round_2_score >= 4.0:
         ripple = " Your resourceful moves from Round 2 freed up time and budget for real execution now."
-    elif st.session_state.round_2_score < 2.5:
+    elif st.session_state.round_2_score >= 2.5:
+        ripple = " Your resourceful moves in Round 2 helped some, but you're still stretched thin."
+    else:
         ripple = " Your hesitation in Round 2 left you behind schedule. You're playing catch-up."
 
     if score >= 4.0:
         return (
             f"Your bias toward action generated real data. You ran tests, made decisions with 70% information, "
-            f"and iterated. Some bets failed, but fast failures mean fast learning. You've got hard-won insights.{ripple}"
+            f"and iterated. Some bets failed, but fast failures mean fast learning. You've got hard-won insights.{ripple}{bonus_note}"
         )
     elif score >= 2.5:
         return (
             f"You made progress, but some analysis paralysis crept in. You deliberated when you should have shipped, "
-            f"scheduled meetings instead of running quick tests. You're moving, but not as fast as the moment demands.{ripple}"
+            f"scheduled meetings instead of running quick tests. You're moving, but not as fast as the moment demands.{ripple}{bonus_note}"
         )
     else:
         return (
             f"Analysis paralysis set in. You spent the week modeling scenarios, asking advisors, and perfecting plans. "
-            f"You shipped nothing. The runway is getting thin and you're still in planning mode.{ripple}"
+            f"You shipped nothing. The runway is getting thin and you're still in planning mode.{ripple}{bonus_note}"
         )
 
 
@@ -1272,28 +1353,40 @@ def get_round_4_consequence():
         if s is not None:
             resilience_scores.append(s)
     score = sum(resilience_scores) / len(resilience_scores) if resilience_scores else 1.0
+
+    # Apply Round 1 ripple penalty (weak signals haunt you)
+    bonus_note = ""
+    if st.session_state.round_1_score < 2.5:
+        score = max(1.0, score - 0.5)
+        bonus_note = " (Your earlier decisions gave you a setback this round.)"
+
+    score = round(score, 2)
     st.session_state.round_4_score = score
 
-    # Check Round 1 ripple
+    # Check Round 1 ripple narrative
     ripple = ""
-    if st.session_state.round_1_score < 2.5:
+    if st.session_state.round_1_score >= 4.0:
+        ripple = " Those early customer signals you identified are holding up — barely. One prospect is losing interest."
+    elif st.session_state.round_1_score >= 2.5:
+        ripple = " Those early customer signals you identified are holding up — barely. One prospect is losing interest."
+    else:
         ripple = " Remember those 'maybe someday' prospects you chased in Round 1? One just signed with a competitor."
 
     if score >= 4.0:
         return (
             f"You absorbed the hits and came out sharper. When the contractor missed deadlines, you re-scoped. "
             f"When costs spiked, you found a workaround. When competition moved, you doubled down on your angle. "
-            f"Shocks happen — how you respond defines your trajectory.{ripple}"
+            f"Shocks happen — how you respond defines your trajectory.{ripple}{bonus_note}"
         )
     elif score >= 2.5:
         return (
             f"The shocks rattled you, but you're still standing. You made some good pivots, hesitated on others. "
-            f"You got through the week, but you're still processing what just happened.{ripple}"
+            f"You got through the week, but you're still processing what just happened.{ripple}{bonus_note}"
         )
     else:
         return (
             f"The shocks rattled you hard. You panicked, made reactive decisions, and burned through goodwill. "
-            f"You survived, but barely. The team is shaken and runway just got tighter.{ripple}"
+            f"You survived, but barely. The team is shaken and runway just got tighter.{ripple}{bonus_note}"
         )
 
 
@@ -1422,31 +1515,45 @@ elif page == 1:
 # ── Round 1 Transition ──
 elif page == 2:
     st.markdown("### Round 1: Consequence")
+
+    # Score display before narrative
+    score = st.session_state.round_1_score
+    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
+    score_pct = int((score / 5.0) * 100)
+    st.markdown(
+        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="font-weight: bold; margin-bottom: 8px;">Round 1 Score: {score:.1f} / 5.0</div>
+            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
+                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
     render_consequence(get_round_1_consequence())
 
-    # Dashboard update
-    score = st.session_state.round_1_score
+    # Dashboard update (Round 1: no cash change, pipeline changes based on score)
     old_pipeline = st.session_state.dash_pipeline
     if score >= 4.0:
-        st.session_state.dash_pipeline = "7 warm leads 📈"
+        st.session_state.dash_pipeline = 7
         st.session_state.dash_credibility = "Rising"
     elif score >= 2.5:
-        st.session_state.dash_pipeline = "6 warm leads"
+        st.session_state.dash_pipeline = 6
         st.session_state.dash_credibility = "Modest"
     else:
-        st.session_state.dash_pipeline = "3 leads (some cold) 📉"
+        st.session_state.dash_pipeline = 3
         st.session_state.dash_credibility = "Unclear"
 
     # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Pipeline: {old_pipeline} → {st.session_state.dash_pipeline}")
+    st.markdown(f"**📊 Dashboard Update:** Pipeline: {old_pipeline} → {st.session_state.dash_pipeline} warm leads")
 
     st.markdown("---")
 
-    # Character moment
+    # Character moment with personality-driven dialogue
     if st.session_state.email_draft and len(st.session_state.email_draft) > 20:
-        render_character("Sam", "💬", "Your email actually speaks to my problem. When can we talk?")
+        render_character("Sam", "💬", "I actually read your whole email — you clearly get the calibration headache. Let's get a pilot scheduled for Building 4.")
     else:
-        render_character("Sam", "💬", "You never reached out. Missed opportunity.")
+        render_character("Sam", "💬", "I never heard from you. My colleague mentioned ThermaLoop but I don't know what you actually do differently.")
 
     st.markdown("---")
     if st.button("Continue to Round 2 ▸", use_container_width=True):
@@ -1469,7 +1576,7 @@ elif page == 3:
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        if st.button("◂ Previous", disabled=(idx == 0)):
+        if st.button("◀ Previous", disabled=(idx == 0)):
             st.session_state.res_q_idx -= 1
             st.rerun()
     with c2:
@@ -1499,31 +1606,45 @@ elif page == 3:
 # ── Round 2 Transition ──
 elif page == 4:
     st.markdown("### Round 2: Consequence")
+
+    # Score display before narrative
+    score = st.session_state.round_2_score
+    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
+    score_pct = int((score / 5.0) * 100)
+    st.markdown(
+        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="font-weight: bold; margin-bottom: 8px;">Round 2 Score: {score:.1f} / 5.0</div>
+            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
+                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
     render_consequence(get_round_2_consequence())
 
-    # Dashboard update
-    score = st.session_state.round_2_score
+    # Dashboard update (cumulative cash based on Round 2 score)
     old_cash = st.session_state.dash_cash
     if score >= 4.0:
-        st.session_state.dash_cash = "$42,000 (10 weeks) 💰"
+        st.session_state.dash_cash = old_cash + 4000  # +$4k if score >= 4
         st.session_state.dash_morale = "Energized 🚀"
-    elif score >= 2.5:
-        st.session_state.dash_cash = "$40,000 (9-10 weeks)"
-        st.session_state.dash_morale = "Steady 😌"
-    else:
-        st.session_state.dash_cash = "$35,000 (8 weeks) ⚠️"
+    elif score < 2.5:
+        st.session_state.dash_cash = old_cash - 3000  # -$3k if score < 2.5
         st.session_state.dash_morale = "Fraying 😟"
+    else:
+        st.session_state.dash_cash = old_cash + 1000  # +$1k otherwise
+        st.session_state.dash_morale = "Steady 😌"
 
     # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Cash: {old_cash} → {st.session_state.dash_cash}")
+    st.markdown(f"**📊 Dashboard Update:** Cash: ${old_cash:,} → ${st.session_state.dash_cash:,}")
 
     st.markdown("---")
 
-    # Character moment
+    # Character moment with personality-driven dialogue
     if score >= 4.0:
-        render_character("Jordan", "⚙️", "Good call on the fake-door test. Saved us two weeks of engineering.")
+        render_character("Jordan", "⚙️", "The fake-door test was smart — saved me two weeks of building something nobody wants. Let's double down on what's working.")
     else:
-        render_character("Jordan", "⚙️", "We're burning cash without clear direction. We need to tighten up.")
+        render_character("Jordan", "⚙️", "We just burned $8k on features with zero validation. I didn't leave my job to build vaporware. We need to tighten up.")
 
     st.markdown("---")
     if st.button("Continue to Round 3 ▸", use_container_width=True):
@@ -1541,7 +1662,7 @@ elif page == 5:
 
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("◂ Back"):
+        if st.button("◀ Back"):
             go_to(3)
     with c2:
         if st.button("Continue to Transition ▸", use_container_width=True):
@@ -1560,30 +1681,48 @@ elif page == 5:
 # ── Round 3 Transition ──
 elif page == 6:
     st.markdown("### Round 3: Consequence")
+
+    # Score display before narrative
+    score = st.session_state.round_3_score
+    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
+    score_pct = int((score / 5.0) * 100)
+    st.markdown(
+        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="font-weight: bold; margin-bottom: 8px;">Round 3 Score: {score:.1f} / 5.0</div>
+            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
+                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
     render_consequence(get_round_3_consequence())
 
-    # Dashboard update
-    score = st.session_state.round_3_score
+    # Dashboard update (cumulative cash and pipeline based on Round 3 score)
+    old_cash = st.session_state.dash_cash
     old_morale = st.session_state.dash_morale
     if score >= 4.0:
+        st.session_state.dash_cash = old_cash + 2000  # +$2k if score >= 4
         st.session_state.dash_credibility = "Strong 🔥"
         st.session_state.dash_morale = "Inspired 💡"
-    elif score >= 2.5:
-        st.session_state.dash_morale = "Uncertain ❓"
-    else:
+    elif score < 2.5:
+        st.session_state.dash_cash = old_cash - 2000  # -$2k if score < 2.5
         st.session_state.dash_morale = "Deflated 😞"
         st.session_state.dash_credibility = "Wobbly"
+    else:
+        st.session_state.dash_cash = old_cash  # +$0 otherwise
+        st.session_state.dash_morale = "Uncertain ❓"
 
     # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Morale: {old_morale} → {st.session_state.dash_morale}")
+    st.markdown(f"**📊 Dashboard Update:** Cash: ${old_cash:,} → ${st.session_state.dash_cash:,} · Morale: {old_morale} → {st.session_state.dash_morale}")
 
     st.markdown("---")
 
-    # Character moment
+    # Character moment with personality-driven dialogue
     if score >= 4.0:
-        render_character("Maya", "🎓", "You're making the moves that matter — failing fast, learning faster. Keep that up.")
+        render_character("Maya", "🎓", "You're shipping, learning, adjusting. That's the cycle. Most founders I mentor are still stuck in planning mode at this stage.")
     else:
-        render_character("Maya", "🎓", "You've got a good idea, but ideas without action don't ship. Time to move.")
+        render_character("Maya", "🎓", "Alex, I've seen this pattern before — lots of strategic thinking, not enough doing. Ship something imperfect this week. Anything.")
 
     st.markdown("---")
     if st.button("Continue to Round 4 ▸", use_container_width=True):
@@ -1601,7 +1740,7 @@ elif page == 7:
 
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("◂ Back"):
+        if st.button("◀ Back"):
             go_to(5)
     with c2:
         if st.button("Continue to Transition ▸", use_container_width=True):
@@ -1618,28 +1757,46 @@ elif page == 7:
 # ── Round 4 Transition ──
 elif page == 8:
     st.markdown("### Round 4: Consequence")
+
+    # Score display before narrative
+    score = st.session_state.round_4_score
+    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
+    score_pct = int((score / 5.0) * 100)
+    st.markdown(
+        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="font-weight: bold; margin-bottom: 8px;">Round 4 Score: {score:.1f} / 5.0</div>
+            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
+                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
     render_consequence(get_round_4_consequence())
 
-    # Dashboard update
-    score = st.session_state.round_4_score
+    # Dashboard update (cumulative cash based on Round 4 score)
+    old_cash = st.session_state.dash_cash
     old_cred = st.session_state.dash_credibility
     if score >= 4.0:
+        st.session_state.dash_cash = old_cash + 3000  # +$3k if score >= 4
         st.session_state.dash_credibility = "Battle-tested ⚡"
-    elif score >= 2.5:
-        st.session_state.dash_credibility = "Tested"
-    else:
+    elif score < 2.5:
+        st.session_state.dash_cash = old_cash - 5000  # -$5k if score < 2.5
         st.session_state.dash_credibility = "Shaken"
+    else:
+        st.session_state.dash_cash = old_cash - 1000  # -$1k otherwise
+        st.session_state.dash_credibility = "Tested"
 
     # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Credibility: {old_cred} → {st.session_state.dash_credibility}")
+    st.markdown(f"**📊 Dashboard Update:** Cash: ${old_cash:,} → ${st.session_state.dash_cash:,} · Credibility: {old_cred} → {st.session_state.dash_credibility}")
 
     st.markdown("---")
 
-    # Character moment
+    # Character moment with personality-driven dialogue
     if score >= 4.0:
-        render_character("Sam", "💬", "You came through when things got tough. I trust you more now.")
+        render_character("Sam", "💬", "When that competitor announcement hit, you didn't panic — you called me directly. That's the kind of vendor relationship I want.")
     else:
-        render_character("Sam", "💬", "These bumps have me worried. Are you going to make it?")
+        render_character("Sam", "💬", "Look, I've got three other companies pitching me now. If you can't handle a bump in the road, how will you handle a 200-unit rollout?")
 
     st.markdown("---")
     if st.button("Continue to Round 5 ▸", use_container_width=True):
@@ -1678,7 +1835,7 @@ elif page == 9:
 
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("◂ Back"):
+        if st.button("◀ Back"):
             go_to(7)
     with c2:
         if st.button("Continue to Transition ▸", disabled=over_budget, use_container_width=True):
@@ -1687,31 +1844,46 @@ elif page == 9:
 # ── Round 5 Transition ──
 elif page == 10:
     st.markdown("### Round 5: Consequence")
+
+    # Score display before narrative
+    score = compute_value_creation_score()
+    st.session_state.round_5_score = score
+    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
+    score_pct = int((score / 5.0) * 100)
+    st.markdown(
+        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="font-weight: bold; margin-bottom: 8px;">Round 5 Score: {score:.1f} / 5.0</div>
+            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
+                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
     render_consequence(get_round_5_consequence())
 
-    # Dashboard update (final)
-    score = compute_value_creation_score()
+    # Dashboard update (final, cumulative cash based on Round 5 score)
     old_cash = st.session_state.dash_cash
     if score >= 4.0:
-        st.session_state.dash_cash = "$45,000 (11 weeks) 📈"
-        st.session_state.dash_pipeline = "10+ warm leads 🚀"
-    elif score >= 2.5:
-        st.session_state.dash_cash = "$42,000 (10 weeks)"
-        st.session_state.dash_pipeline = "8 warm leads"
+        st.session_state.dash_cash = old_cash + 5000  # +$5k if score >= 4
+        st.session_state.dash_pipeline = 10
+    elif score < 2.5:
+        st.session_state.dash_cash = old_cash - 2000  # -$2k if score < 2.5
+        st.session_state.dash_pipeline = 5
     else:
-        st.session_state.dash_cash = "$38,000 (9 weeks)"
-        st.session_state.dash_pipeline = "5 warm leads"
+        st.session_state.dash_cash = old_cash + 2000  # +$2k otherwise
+        st.session_state.dash_pipeline = 8
 
     # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Cash: {old_cash} → {st.session_state.dash_cash}")
+    st.markdown(f"**📊 Dashboard Update:** Cash: ${old_cash:,} → ${st.session_state.dash_cash:,} · Pipeline: {st.session_state.dash_pipeline} warm leads")
 
     st.markdown("---")
 
-    # Character moment
+    # Character moment with personality-driven dialogue
     if score >= 4.0:
-        render_character("Sam", "💬", "That update actually fixed my biggest headache. When's the next release?")
+        render_character("Sam", "💬", "That calibration fix alone saved my team 4 hours this week. Ship more of that.")
     else:
-        render_character("Sam", "💬", "The sprint didn't really move the needle for me. What's next?")
+        render_character("Sam", "💬", "Honestly? The update didn't change anything for my day-to-day. I need to see real progress next sprint.")
 
     st.markdown("---")
     if st.button("Continue to Skills Assessment ▸", use_container_width=True):
@@ -1763,7 +1935,7 @@ elif page == 11:
 
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("◂ Back"):
+        if st.button("◀ Back"):
             go_to(9)
     with c2:
         if st.button("Continue ▸", use_container_width=True):
@@ -1777,6 +1949,15 @@ elif page == 11:
                     f"You still have {len(missing)} scenario(s) to complete."
                 )
             else:
+                # Capture self-ratings before moving on
+                st.session_state.skill_self_ratings = {
+                    "Customer Finding": st.session_state.get("s_skill_mkt", 3),
+                    "Operations": st.session_state.get("s_skill_ops", 3),
+                    "Financial Management": st.session_state.get("s_skill_fin", 3),
+                    "Product Building": st.session_state.get("s_skill_prod", 3),
+                    "Sales & Relationships": st.session_state.get("s_skill_sales", 3),
+                    "Team Leadership": st.session_state.get("s_skill_team", 3),
+                }
                 go_to(12)
 
 # ── Resources ──
@@ -1879,7 +2060,7 @@ elif page == 12:
 
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("◂ Back"):
+        if st.button("◀ Back"):
             go_to(11)
     with c2:
         if st.button("Continue ▸", use_container_width=True):
@@ -1904,7 +2085,7 @@ elif page == 13:
 
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("◂ Back"):
+        if st.button("◀ Back"):
             go_to(12)
     with c2:
         if st.button(
@@ -1992,10 +2173,21 @@ elif page == 14:
         with st.expander("Entrepreneurial Skills", expanded=False):
             for sk in SKILL_AREAS:
                 score = sub_scores["skills"][sk]
+                self_rating = st.session_state.skill_self_ratings.get(sk, 3)
                 st.markdown(
                     f"**{sk}** — {score:.1f}/5 · {SKILL_DESCRIPTIONS[sk]}"
                 )
                 st.progress(int((score / 5) * 100) / 100)
+
+                # Skill-performance gap feedback
+                gap = score - self_rating
+                if gap > 0.5:
+                    feedback = "You're underselling yourself here — your instincts are stronger than you think."
+                elif gap < -0.5:
+                    feedback = "You rated yourself higher than your scenario performance suggests — consider seeking real-world practice."
+                else:
+                    feedback = "Your self-assessment aligns well with your demonstrated judgment."
+                st.caption(f"_Self-rated: {self_rating}/5. {feedback}_")
 
         with st.expander("Resource Availability", expanded=False):
             for rs in RESOURCE_SUBDIMS:
@@ -2014,5 +2206,5 @@ elif page == 14:
                 st.progress(int((score / 5) * 100) / 100)
 
         st.markdown("---")
-        if st.button("◂ Back to Business Knowledge"):
+        if st.button("◀ Back to Business Knowledge"):
             go_to(13)
