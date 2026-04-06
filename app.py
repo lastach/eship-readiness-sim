@@ -7,7 +7,7 @@ import re
 
 st.set_page_config(
     page_title="ThermaLoop | Entrepreneurial Readiness Simulation",
-    page_icon="🔥",a
+    page_icon="🔥",
     layout="wide",
 )
 
