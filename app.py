@@ -4,14 +4,14 @@ import altair as alt
 import re
 import math
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# ═══════════════════════════════════════════════════════════
 # ENTREPRENEURIAL READINESS SIMULATION
 # A narrative-driven, archetype-based assessment
-# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# ═══════════════════════════════════════════════════════════
 
 st.set_page_config(page_title="Entrepreneurial Readiness Simulation", layout="wide", initial_sidebar_state="collapsed")
 
-# ââââââââââââââââââ LIGHT THEME CSS ââââââââââââââââââ
+# ══════════════════ LIGHT THEME CSS ══════════════════
 
 st.markdown("""
 <style>
@@ -194,7 +194,7 @@ section[data-testid="stSidebar"] { display: none; }
 """, unsafe_allow_html=True)
 
 
-# ââââââââââââââââââ ARCHETYPE DEFINITIONS ââââââââââââââââââ
+# ══════════════════ ARCHETYPE DEFINITIONS ══════════════════
 
 ARCHETYPES = {
     "Visionary": {
@@ -209,7 +209,7 @@ ARCHETYPES = {
     "Builder": {
         "icon": "ð¨",
         "tagline": "You turn ideas into reality, brick by brick",
-        "desc": "You thrive on execution â taking something from concept to working product. You're happiest when you're building, shipping, and iterating. You have a natural sense for what's feasible and how to get things done with limited resources.",
+        "desc": "You thrive on execution — taking something from concept to working product. You're happiest when you're building, shipping, and iterating. You have a natural sense for what's feasible and how to get things done with limited resources.",
         "strengths": ["Execution speed", "Product development", "Resourcefulness", "Iterative improvement"],
         "gaps": ["Long-range strategic thinking", "Market positioning", "Delegation", "Networking and partnerships"],
         "complement": "The Visionary",
@@ -223,7 +223,7 @@ ARCHETYPES = {
         "gaps": ["Bias toward over-analysis", "Speed of decision-making", "Comfort with ambiguity", "Emotional persuasion"],
         "complement": "The Connector",
         "complement_why": "A Connector brings the relatiality, brick by brick",
-        "desc": "You thrive on execution â taking something from concept to working product. You're happiest when you're building, shipping, and iterating. You have a natural sense for what's feasible and how to get things done with limited resources.",
+        "desc": "You thrive on execution — taking something from concept to working product. You're happiest when you're building, shipping, and iterating. You have a natural sense for what's feasible and how to get things done with limited resources.",
         "strengths": ["Execution speed", "Product development", "Resourcefulness", "Iterative improvement"],
         "gaps": ["Long-range strategic thinking", "Market positioning", "Delegation", "Networking and partnerships"],
         "complement": "The Visionary",
@@ -236,7 +236,7 @@ ARCHETYPES = {
         "strengths": ["Data-driven decisions", "Risk assessment", "Financial modeling", "Critical thinking"],
         "gaps": ["Bias toward over-analysis", "Speed of decision-making", "Comfort with ambiguity", "Emotional persuasion"],
         "complement": "The Connector",
-        "complement_why": "A Connector brings the relationship intelligence and persuasion skills you need. While you ensure decisions are sound, they open doors, build partnerships, and rally people around the opportunity â turning your analysis into action.",
+        "complement_why": "A Connector brings the relationship intelligence and persuasion skills you need. While you ensure decisions are sound, they open doors, build partnerships, and rally people around the opportunity — turning your analysis into action.",
     },
     "Connector": {
         "icon": "ð¤",
@@ -245,24 +245,24 @@ ARCHETYPES = {
         "strengths": ["Relationship building", "Persuasion and sales", "Partnership development", "Team recruitment"],
         "gaps": ["Solo execution", "Technical depth", "Financial rigor", "Saying no to opportunities"],
         "complement": "The Analyst",
-        "complement_why": "An Analyst brings the rigor and data discipline to complement your people skills. While you open doors and close deals, they ensure the numbers work and the strategy is sound â preventing overcommitment and ensuring sustainable growth.",
+        "complement_why": "An Analyst brings the rigor and data discipline to complement your people skills. While you open doors and close deals, they ensure the numbers work and the strategy is sound — preventing overcommitment and ensuring sustainable growth.",
     },
     "Resilient Adapter": {
         "icon": "ð±",
         "tagline": "You bend without breaking and find a way through anything",
-        "desc": "You're defined by grit, flexibility, and an uncanny ability to pivot when plans fall apart. You don't just survive setbacks â you learn from them faster than anyone. Your superpower is maintaining momentum when everyone else wants to quit.",
+        "desc": "You're defined by grit, flexibility, and an uncanny ability to pivot when plans fall apart. You don't just survive setbacks — you learn from them faster than anyone. Your superpower is maintaining momentum when everyone else wants to quit.",
         "strengths": ["Resilience under pressure", "Rapid pivoting", "Learning from failure", "Emotional steadiness"],
         "gaps": ["Committing to one direction", "Proactive planning", "Leveraging early wins", "Delegating before crisis"],
         "complement": "The Builder",
-        "complement_why": "A Builder helps channel your adaptability into consistent forward progress. While you keep the team steady through storms, they ensure you're accumulating tangible results and not just surviving â but actually advancing.",
+        "complement_why": "A Builder helps channel your adaptability into consistent forward progress. While you keep the team steady through storms, they ensure you're accumulating tangible results and not just surviving — but actually advancing.",
     },
 }
 
 
-# ââââââââââââââââââ SCENARIO: THE FRESHLOOP STORY ââââââââââââââââââ
+# ══════════════════ SCENARIO: THE FRESHLOOP STORY ══════════════════
 # A single immersive narrative with 5 decision points (all on one page)
 
-STORY_INTRO = """You and two friends have been brainstorming a business idea for months: <strong>FreshLoop</strong> â a service
+STORY_INTRO = """You and two friends have been brainstorming a business idea for months: <strong>FreshLoop</strong> — a service
 that rescues unsold food from local restaurants and grocers, repackages it into affordable meal kits,
 and delivers them to budget-conscious families. You've been talking about it forever. Today, you just found out
 that a competing service launched in a neighboring city last week. The clock is ticking."""
@@ -272,25 +272,25 @@ SCENES = [
         "title": "ð¥ Scene 1: The Spark",
         "narrative": "Your group chat is blowing up. Your friend Maya says <em>\"We need to launch NOW before they expand here.\"</em> Your other friend Jordan says <em>\"We should study what they're doing first and learn from their mistakes.\"</em> You have a free Saturday coming up. What's your move?",
         "options": {
-            "Hit the streets â talk to 20 restaurant owners this Saturday and gauge real interest before anything else": {
+            "Hit the streets — talk to 20 restaurant owners this Saturday and gauge real interest before anything else": {
                 "scores": {"mindset": 3, "skills": 2, "resources": 1, "acumen": 2},
                 "archetype_weights": {"Builder": 2, "Connector": 3, "Resilient Adapter": 1},
-                "feedback": "**Customer-first instinct.** You're prioritizing real market signal over assumptions â a hallmark of founders who build things people actually want. This bias toward primary research over desk research is what separates builders from planners."
+                "feedback": "**Customer-first instinct.** You're prioritizing real market signal over assumptions — a hallmark of founders who build things people actually want. This bias toward primary research over desk research is what separates builders from planners."
             },
             "Draft a one-page business model and rough financial projection to see if the numbers even work": {
                 "scores": {"mindset": 2, "skills": 2, "resources": 2, "acumen": 3},
                 "archetype_weights": {"Analyst": 3, "Builder": 1, "Visionary": 1},
-                "feedback": "**Analytical foundation.** You want to validate the economics before investing time â smart. The risk is that spreadsheets can become a hiding place from the messiness of real customer feedback. Your instinct for financial rigor is strong; pair it with market testing."
+                "feedback": "**Analytical foundation.** You want to validate the economics before investing time — smart. The risk is that spreadsheets can become a hiding place from the messiness of real customer feedback. Your instinct for financial rigor is strong; pair it with market testing."
             },
             "Create a compelling pitch deck and start recruiting more people who could help make this real": {
                 "scores": {"mindset": 3, "skills": 1, "resources": 2, "acumen": 1},
                 "archetype_weights": {"Visionary": 3, "Connector": 2},
-                "feedback": "**Vision-led approach.** You're thinking about storytelling and team-building first â you instinctively know that great ventures need great people. Watch that you're not recruiting for a vision that hasn't been validated yet."
+                "feedback": "**Vision-led approach.** You're thinking about storytelling and team-building first — you instinctively know that great ventures need great people. Watch that you're not recruiting for a vision that hasn't been validated yet."
             },
-            "Research the competitor thoroughly â sign up for their service, read their reviews, map their strategy": {
+            "Research the competitor thoroughly — sign up for their service, read their reviews, map their strategy": {
                 "scores": {"mindset": 1, "skills": 2, "resources": 1, "acumen": 3},
                 "archetype_weights": {"Analyst": 3, "Resilient Adapter": 1},
-                "feedback": "**Strategic intelligence.** Studying the competition is wise â but it can become a form of productive procrastination. The best founders learn from competitors AND talk to customers simultaneously. Your analytical instinct is an asset if you set a time limit on research."
+                "feedback": "**Strategic intelligence.** Studying the competition is wise — but it can become a form of productive procrastination. The best founders learn from competitors AND talk to customers simultaneously. Your analytical instinct is an asset if you set a time limit on research."
             },
         },
     },
@@ -298,22 +298,22 @@ SCENES = [
         "title": "ð° Scene 2: The Reality Check",
         "narrative": "It's two weeks later. You've made some progress, but now you're facing a hard truth: to do a proper pilot, you need about $3,000 for packaging, a basic website, and initial food inventory. Between the three of you, you can scrape together $800. How do you handle this?",
         "options": {
-            "Bootstrap it â strip the pilot down to the absolute minimum that still tests the core idea with real customers": {
+            "Bootstrap it — strip the pilot down to the absolute minimum that still tests the core idea with real customers": {
                 "scores": {"mindset": 3, "skills": 2, "resources": 3, "acumen": 2},
                 "archetype_weights": {"Builder": 3, "Resilient Adapter": 2},
                 "feedback": "**Lean startup mentality.** You're willing to test ugly and learn fast rather than wait for perfect conditions. This scrappiness is one of the strongest predictors of startup survival. The founders who launch with duct tape and spreadsheets often outperform those who wait for funding."
             },
-            "Pitch local businesses for sponsorship â offer them featured placement in exchange for covering costs": {
+            "Pitch local businesses for sponsorship — offer them featured placement in exchange for covering costs": {
                 "scores": {"mindset": 2, "skills": 3, "resources": 2, "acumen": 2},
                 "archetype_weights": {"Connector": 3, "Visionary": 1, "Builder": 1},
-                "feedback": "**Creative deal-making.** You see partnerships where others see obstacles. This ability to create value exchanges (not just ask for money) is a powerful entrepreneurial skill. It also pre-validates demand â if businesses won't sponsor you, that's data."
+                "feedback": "**Creative deal-making.** You see partnerships where others see obstacles. This ability to create value exchanges (not just ask for money) is a powerful entrepreneurial skill. It also pre-validates demand — if businesses won't sponsor you, that's data."
             },
             "Apply for a small business grant or pitch a local angel investor / entrepreneurship competition": {
                 "scores": {"mindset": 2, "skills": 1, "resources": 2, "acumen": 2},
                 "archetype_weights": {"Visionary": 2, "Analyst": 2},
-                "feedback": "**External validation path.** Seeking formal funding forces you to articulate your value proposition clearly, which is valuable. The risk is timeline â grants and competitions take weeks or months, and your competitor isn't waiting."
+                "feedback": "**External validation path.** Seeking formal funding forces you to articulate your value proposition clearly, which is valuable. The risk is timeline — grants and competitions take weeks or months, and your competitor isn't waiting."
             },
-            "Put the idea on hold until you can save up enough to do it properly â you don't want to launch something half-baked": {
+            "Put the idea on hold until you can save up enough to do it properly — you don't want to launch something half-baked": {
                 "scores": {"mindset": 0, "skills": 1, "resources": 1, "acumen": 1},
                 "archetype_weights": {"Analyst": 1},
                 "feedback": "**Perfectionism risk.** The instinct to \"do it right\" is understandable, but in entrepreneurship, waiting for perfect conditions is often the biggest risk of all. Most successful startups launched with far less than they thought they needed. The market won't wait for you to be ready."
@@ -324,48 +324,48 @@ SCENES = [
         "title": "ð§ Scene 3: The First Failure",
         "narrative": "You launched a small pilot! But the first week is rough. Only 4 out of 30 meal kits sold. Your Instagram campaign got barely any engagement. Maya is frustrated and talking about quitting. Jordan says the whole concept might be flawed. You're sitting at your kitchen table on Sunday night staring at the numbers. What do you do?",
         "options": {
-            "Call every single person who DID buy and ask them why â then call people who didn't and ask what would change their mind": {
+            "Call every single person who DID buy and ask them why — then call people who didn't and ask what would change their mind": {
                 "scores": {"mindset": 3, "skills": 3, "resources": 1, "acumen": 3},
                 "archetype_weights": {"Builder": 2, "Analyst": 2, "Resilient Adapter": 2},
                 "feedback": "**Learn-from-failure reflex.** This is the response of someone who treats setbacks as data, not verdicts. Talking to actual customers (both buyers and non-buyers) is the fastest path to understanding what's broken. This instinct alone separates founders who iterate from founders who spiral."
             },
-            "Reframe the narrative for the team â remind everyone that most startups fail on their first try and this is just iteration": {
+            "Reframe the narrative for the team — remind everyone that most startups fail on their first try and this is just iteration": {
                 "scores": {"mindset": 3, "skills": 1, "resources": 1, "acumen": 1},
                 "archetype_weights": {"Visionary": 2, "Resilient Adapter": 2, "Connector": 1},
-                "feedback": "**Emotional leadership.** You instinctively protect team morale and reframe setbacks as learning. This is critical â most startups die from co-founder conflict, not bad ideas. But be careful that optimism doesn't substitute for diagnosis. Your team needs hope AND a concrete plan."
+                "feedback": "**Emotional leadership.** You instinctively protect team morale and reframe setbacks as learning. This is critical — most startups die from co-founder conflict, not bad ideas. But be careful that optimism doesn't substitute for diagnosis. Your team needs hope AND a concrete plan."
             },
-            "Dig into the data â analyze who saw the campaign, map the drop-off points, A/B test different messaging this week": {
+            "Dig into the data — analyze who saw the campaign, map the drop-off points, A/B test different messaging this week": {
                 "scores": {"mindset": 2, "skills": 3, "resources": 1, "acumen": 3},
                 "archetype_weights": {"Analyst": 3, "Builder": 1},
                 "feedback": "**Data-driven pivot.** You go to the metrics first, which is smart. Understanding WHERE the funnel breaks is essential to fixing it. The risk is getting lost in dashboards instead of having real conversations with real humans about why they didn't buy."
             },
-            "Pivot the model â maybe meal kits aren't right, but the food rescue relationships are valuable. Brainstorm completely different approaches": {
+            "Pivot the model — maybe meal kits aren't right, but the food rescue relationships are valuable. Brainstorm completely different approaches": {
                 "scores": {"mindset": 2, "skills": 1, "resources": 2, "acumen": 2},
                 "archetype_weights": {"Visionary": 3, "Resilient Adapter": 2},
-                "feedback": "**Pivot instinct.** You're willing to let go of the original form while keeping the core value. This is a powerful entrepreneurial trait â but be cautious about pivoting too fast. One bad week isn't always a signal to change direction entirely. Sometimes the idea is right but the execution needs tuning."
+                "feedback": "**Pivot instinct.** You're willing to let go of the original form while keeping the core value. This is a powerful entrepreneurial trait — but be cautious about pivoting too fast. One bad week isn't always a signal to change direction entirely. Sometimes the idea is right but the execution needs tuning."
             },
         },
     },
     {
         "title": "ð¥ Scene 4: The Team Fracture",
-        "narrative": "After three months of grinding, things are picking up â you're now selling 50+ kits per week. But tension is rising. Maya has been doing most of the delivery logistics and feels overworked. Jordan has been handling social media but wants to focus on strategy. You've been managing restaurant relationships. Nobody formally agreed on roles, equity, or decision-making authority. A big argument erupts over whether to hire a part-time driver. How do you handle this?",
+        "narrative": "After three months of grinding, things are picking up — you're now selling 50+ kits per week. But tension is rising. Maya has been doing most of the delivery logistics and feels overworked. Jordan has been handling social media but wants to focus on strategy. You've been managing restaurant relationships. Nobody formally agreed on roles, equity, or decision-making authority. A big argument erupts over whether to hire a part-time driver. How do you handle this?",
         "options": {
-            "Call a formal meeting â put roles, equity, and decision-making process in writing before making any more operational decisions": {
+            "Call a formal meeting — put roles, equity, and decision-making process in writing before making any more operational decisions": {
                 "scores": {"mindset": 2, "skills": 3, "resources": 2, "acumen": 3},
                 "archetype_weights": {"Analyst": 2, "Builder": 2, "Connector": 1},
-                "feedback": "**Structural maturity.** You recognize that the informal startup phase needs to evolve into something more structured. Getting roles and equity in writing now â while relationships are strained but not broken â is exactly the right instinct. Most co-founder blowups happen because this conversation was delayed too long."
+                "feedback": "**Structural maturity.** You recognize that the informal startup phase needs to evolve into something more structured. Getting roles and equity in writing now — while relationships are strained but not broken — is exactly the right instinct. Most co-founder blowups happen because this conversation was delayed too long."
             },
-            "Focus on Maya's burnout first â she's the most at risk of leaving, and without her the logistics fall apart": {
+            "Focus on Maya's burnout first — she's the most at risk of leaving, and without her the logistics fall apart": {
                 "scores": {"mindset": 3, "skills": 2, "resources": 1, "acumen": 2},
                 "archetype_weights": {"Connector": 3, "Resilient Adapter": 2},
                 "feedback": "**People-first leadership.** You triage the human problem before the structural one. Retaining Maya is existentially important, and you see that. The risk is that fixing one person's frustration without addressing the systemic issue means you'll be putting out fires forever."
             },
-            "Just hire the driver â the argument is really about everyone being overworked, and reducing the workload will reduce the tension": {
+            "Just hire the driver — the argument is really about everyone being overworked, and reducing the workload will reduce the tension": {
                 "scores": {"mindset": 1, "skills": 1, "resources": 2, "acumen": 1},
                 "archetype_weights": {"Builder": 2, "Resilient Adapter": 1},
-                "feedback": "**Action bias.** You want to solve the symptom quickly and keep moving. Sometimes this works â but the argument about the driver is really about power, equity, and roles. Hiring without resolving those deeper issues just adds another person to an unclear structure."
+                "feedback": "**Action bias.** You want to solve the symptom quickly and keep moving. Sometimes this works — but the argument about the driver is really about power, equity, and roles. Hiring without resolving those deeper issues just adds another person to an unclear structure."
             },
-            "Bring in an outside mentor or advisor to mediate â you're too close to this to be objective": {
+            "Bring in an outside mentor or advisor to mediate — you're too close to this to be objective": {
                 "scores": {"mindset": 2, "skills": 2, "resources": 3, "acumen": 2},
                 "archetype_weights": {"Analyst": 1, "Connector": 2, "Visionary": 1},
                 "feedback": "**Self-awareness and resourcefulness.** Knowing when you're too close to a problem and need outside perspective is a sign of maturity. Mentors can see patterns you can't. The key is finding someone who's navigated co-founder dynamics before, not just a general business advisor."
@@ -374,67 +374,67 @@ SCENES = [
     },
     {
         "title": "ð Scene 5: The Big Opportunity",
-        "narrative": "Six months in, FreshLoop is growing steadily. Then a regional grocery chain approaches you: they want to partner exclusively â they'll give you all their unsold food for free, but you can't work with any other grocers in the area. They also want you to use their branding on the meal kits. It would 3x your supply instantly but fundamentally change the business. Your team is split.",
+        "narrative": "Six months in, FreshLoop is growing steadily. Then a regional grocery chain approaches you: they want to partner exclusively — they'll give you all their unsold food for free, but you can't work with any other grocers in the area. They also want you to use their branding on the meal kits. It would 3x your supply instantly but fundamentally change the business. Your team is split.",
         "options": {
-            "Take the deal but negotiate hard â remove the exclusivity clause and the branding requirement, even if it means less supply": {
+            "Take the deal but negotiate hard — remove the exclusivity clause and the branding requirement, even if it means less supply": {
                 "scores": {"mindset": 3, "skills": 3, "resources": 2, "acumen": 3},
                 "archetype_weights": {"Analyst": 2, "Connector": 2, "Builder": 1},
                 "feedback": "**Strategic negotiation.** You see the value but refuse to give up independence. Negotiating to keep your brand and supplier diversity shows you're thinking about long-term positioning, not just short-term growth. This is the instinct that separates businesses that scale from ones that get absorbed."
             },
-            "Take it as-is â this kind of opportunity doesn't come twice, and you can always renegotiate later when you have more leverage": {
+            "Take it as-is — this kind of opportunity doesn't come twice, and you can always renegotiate later when you have more leverage": {
                 "scores": {"mindset": 2, "skills": 1, "resources": 3, "acumen": 1},
                 "archetype_weights": {"Builder": 2, "Resilient Adapter": 2},
-                "feedback": "**Growth-at-all-costs instinct.** Speed and scale are tempting, but exclusivity and branding concessions are extremely hard to undo later. 'We'll renegotiate when we're bigger' rarely works â the power dynamic often gets worse, not better. Your boldness is an asset, but this needs more guardrails."
+                "feedback": "**Growth-at-all-costs instinct.** Speed and scale are tempting, but exclusivity and branding concessions are extremely hard to undo later. 'We'll renegotiate when we're bigger' rarely works — the power dynamic often gets worse, not better. Your boldness is an asset, but this needs more guardrails."
             },
-            "Decline â your independence and brand are more valuable than free supply. Find a way to grow on your own terms": {
+            "Decline — your independence and brand are more valuable than free supply. Find a way to grow on your own terms": {
                 "scores": {"mindset": 2, "skills": 1, "resources": 1, "acumen": 2},
                 "archetype_weights": {"Visionary": 3, "Resilient Adapter": 1},
-                "feedback": "**Brand-protective instinct.** You value autonomy and long-term brand equity over short-term growth. This can be the right call â but walking away from free supply when you're still early-stage is a significant risk. Consider whether your principles are well-timed or premature."
+                "feedback": "**Brand-protective instinct.** You value autonomy and long-term brand equity over short-term growth. This can be the right call — but walking away from free supply when you're still early-stage is a significant risk. Consider whether your principles are well-timed or premature."
             },
-            "Ask for a 90-day trial period â test the partnership with clear metrics before committing to anything long-term": {
+            "Ask for a 90-day trial period — test the partnership with clear metrics before committing to anything long-term": {
                 "scores": {"mindset": 2, "skills": 2, "resources": 2, "acumen": 3},
                 "archetype_weights": {"Analyst": 3, "Builder": 1, "Resilient Adapter": 1},
-                "feedback": "**Test-and-learn approach.** You want data before committing, which reduces risk. A trial period is a genuinely creative middle path. The question is whether the grocery chain will agree â big companies often want commitment, not experiments. But it's worth asking."
+                "feedback": "**Test-and-learn approach.** You want data before committing, which reduces risk. A trial period is a genuinely creative middle path. The question is whether the grocery chain will agree — big companies often want commitment, not experiments. But it's worth asking."
             },
         },
     },
 ]
 
 
-# ââââââââââââââââââ REFLECTION PROMPTS & AI ANALYSIS ââââââââââââââââââ
+# ══════════════════ REFLECTION PROMPTS & AI ANALYSIS ══════════════════
 
 REFLECTIONS = {
     "motivation": {
-        "prompt": "What draws you to entrepreneurship? What's the deeper reason you'd want to build something of your own â beyond money?",
+        "prompt": "What draws you to entrepreneurship? What's the deeper reason you'd want to build something of your own — beyond money?",
         "analysis_map": {
             "impact|change|difference|help|community|world|better|social|people": {
                 "trait": "Impact-Driven",
-                "insight": "Your motivation is rooted in making a difference. Impact-driven founders often build the most enduring companies because their 'why' sustains them through the inevitable hard times. Channel this into a clear mission statement early â it becomes your north star when decisions get tough.",
+                "insight": "Your motivation is rooted in making a difference. Impact-driven founders often build the most enduring companies because their 'why' sustains them through the inevitable hard times. Channel this into a clear mission statement early — it becomes your north star when decisions get tough.",
                 "archetype_boost": {"Visionary": 2, "Connector": 1},
             },
             "freedom|independence|autonomy|own boss|control|flexibility|schedule": {
                 "trait": "Autonomy-Seeking",
-                "insight": "You crave independence and self-determination. This is a powerful motivator, but be aware: early-stage entrepreneurship often means LESS freedom, not more â you answer to customers, investors, partners, and deadlines. The freedom comes later. Founders who understand this paradox persevere longer.",
+                "insight": "You crave independence and self-determination. This is a powerful motivator, but be aware: early-stage entrepreneurship often means LESS freedom, not more — you answer to customers, investors, partners, and deadlines. The freedom comes later. Founders who understand this paradox persevere longer.",
                 "archetype_boost": {"Builder": 1, "Resilient Adapter": 1},
             },
             "create|build|make|invent|design|product|ship|solve": {
                 "trait": "Creator-Builder",
-                "insight": "You're driven by the act of creation itself. This builder energy is one of the most reliable entrepreneurial motivators because the reward is intrinsic â you'll keep going even when external validation is scarce. Make sure you balance building what excites you with building what the market wants.",
+                "insight": "You're driven by the act of creation itself. This builder energy is one of the most reliable entrepreneurial motivators because the reward is intrinsic — you'll keep going even when external validation is scarce. Make sure you balance building what excites you with building what the market wants.",
                 "archetype_boost": {"Builder": 2, "Visionary": 1},
             },
             "learn|grow|challenge|push|stretch|develop|skill|master": {
                 "trait": "Growth-Oriented",
-                "insight": "You see entrepreneurship as a vehicle for personal growth. This learning orientation is correlated with resilience â founders who frame setbacks as learning opportunities recover faster. Your growth mindset is an asset; pair it with a specific domain you want to master.",
+                "insight": "You see entrepreneurship as a vehicle for personal growth. This learning orientation is correlated with resilience — founders who frame setbacks as learning opportunities recover faster. Your growth mindset is an asset; pair it with a specific domain you want to master.",
                 "archetype_boost": {"Resilient Adapter": 2, "Analyst": 1},
             },
             "opportunity|gap|market|problem|need|inefficiency|broken|fix": {
                 "trait": "Opportunity-Spotter",
-                "insight": "You see gaps and inefficiencies that others miss â and you want to fix them. This problem-solution orientation is classic entrepreneurial thinking. The key is validating that others experience the problem as acutely as you do. Your instinct for market gaps is strong; pair it with customer evidence.",
+                "insight": "You see gaps and inefficiencies that others miss — and you want to fix them. This problem-solution orientation is classic entrepreneurial thinking. The key is validating that others experience the problem as acutely as you do. Your instinct for market gaps is strong; pair it with customer evidence.",
                 "archetype_boost": {"Analyst": 2, "Visionary": 1},
             },
             "team|together|people|collaborate|lead|culture|hire": {
                 "trait": "Team-Builder",
-                "insight": "You're drawn to the human side of building â assembling and leading a team. This relational motivation is especially valuable because most startups succeed or fail based on the founding team, not the idea. Your instinct to think about people first is a genuine competitive advantage.",
+                "insight": "You're drawn to the human side of building — assembling and leading a team. This relational motivation is especially valuable because most startups succeed or fail based on the founding team, not the idea. Your instinct to think about people first is a genuine competitive advantage.",
                 "archetype_boost": {"Connector": 2, "Builder": 1},
             },
         },
@@ -444,27 +444,27 @@ REFLECTIONS = {
         "analysis_map": {
             "learned|lesson|realized|understood|discovered|takeaway|insight": {
                 "trait": "Reflective Learner",
-                "insight": "You extract lessons from adversity â that's the hallmark of a resilient founder. Research shows that entrepreneurs who reflect on failures (rather than just powering through them) make better decisions in subsequent ventures. Your reflective capacity is a genuine strength.",
+                "insight": "You extract lessons from adversity — that's the hallmark of a resilient founder. Research shows that entrepreneurs who reflect on failures (rather than just powering through them) make better decisions in subsequent ventures. Your reflective capacity is a genuine strength.",
                 "archetype_boost": {"Analyst": 1, "Resilient Adapter": 2},
             },
             "pivot|change|adapt|adjust|different|new approach|shifted|tried again": {
                 "trait": "Adaptive Responder",
-                "insight": "You respond to setbacks by changing course rather than doubling down on what isn't working. This adaptability is crucial in entrepreneurship where the original plan almost never survives contact with reality. Your flexibility is a superpower â just make sure pivots are driven by data, not just discomfort.",
+                "insight": "You respond to setbacks by changing course rather than doubling down on what isn't working. This adaptability is crucial in entrepreneurship where the original plan almost never survives contact with reality. Your flexibility is a superpower — just make sure pivots are driven by data, not just discomfort.",
                 "archetype_boost": {"Resilient Adapter": 2, "Builder": 1},
             },
             "kept going|persisted|didn't give up|pushed through|stayed|committed|persevered|grit": {
                 "trait": "Persistent Grinder",
-                "insight": "Your instinct is to persist through difficulty â to outlast the problem. This grit is one of the most studied and validated entrepreneurial traits. The nuance is knowing when persistence becomes stubbornness. The best founders combine your persistence with strategic flexibility.",
+                "insight": "Your instinct is to persist through difficulty — to outlast the problem. This grit is one of the most studied and validated entrepreneurial traits. The nuance is knowing when persistence becomes stubbornness. The best founders combine your persistence with strategic flexibility.",
                 "archetype_boost": {"Builder": 2, "Resilient Adapter": 1},
             },
             "help|support|talked|mentor|advice|team|friend|family|asked": {
                 "trait": "Support-Seeker",
-                "insight": "You reach out to others when you're struggling â this is actually a sign of strength, not weakness. Founders who build support networks recover from setbacks faster and make better decisions under stress. Your willingness to be vulnerable and ask for help is a genuine competitive advantage.",
+                "insight": "You reach out to others when you're struggling — this is actually a sign of strength, not weakness. Founders who build support networks recover from setbacks faster and make better decisions under stress. Your willingness to be vulnerable and ask for help is a genuine competitive advantage.",
                 "archetype_boost": {"Connector": 2, "Resilient Adapter": 1},
             },
             "plan|strategy|analyze|figured|research|understand|studied|systematic": {
                 "trait": "Strategic Processor",
-                "insight": "You respond to setbacks by stepping back and analyzing what went wrong. This systematic approach to failure is valuable â it means you're less likely to repeat mistakes. Pair this analytical response with speed; the best founders analyze quickly and act on their findings immediately.",
+                "insight": "You respond to setbacks by stepping back and analyzing what went wrong. This systematic approach to failure is valuable — it means you're less likely to repeat mistakes. Pair this analytical response with speed; the best founders analyze quickly and act on their findings immediately.",
                 "archetype_boost": {"Analyst": 2, "Visionary": 1},
             },
         },
@@ -474,17 +474,17 @@ REFLECTIONS = {
         "analysis_map": {
             "team|employees|hire|culture|office|people|staff|co-founder": {
                 "trait": "Organization Builder",
-                "insight": "Your vision centers on people and team â you're building a company, not just a product. Founders who think about culture and team from day one tend to build more sustainable organizations. Your instinct for the human side of business is a genuine differentiator.",
+                "insight": "Your vision centers on people and team — you're building a company, not just a product. Founders who think about culture and team from day one tend to build more sustainable organizations. Your instinct for the human side of business is a genuine differentiator.",
                 "archetype_boost": {"Connector": 2, "Builder": 1},
             },
             "product|customers|users|build|ship|create|platform|technology|app": {
                 "trait": "Product Visionary",
-                "insight": "Your future revolves around what you're building and who's using it. This product-centric vision is the engine of most successful startups. Make sure the people who use your product stay at the center of your vision â the best products come from deep empathy, not just technical ambition.",
+                "insight": "Your future revolves around what you're building and who's using it. This product-centric vision is the engine of most successful startups. Make sure the people who use your product stay at the center of your vision — the best products come from deep empathy, not just technical ambition.",
                 "archetype_boost": {"Builder": 2, "Visionary": 1},
             },
             "impact|community|social|change|better|mission|purpose|meaningful": {
                 "trait": "Mission-Driven Leader",
-                "insight": "Your 5-year vision is anchored in impact and meaning. Mission-driven founders attract purpose-driven talent and loyal customers. Your challenge will be balancing mission with financial sustainability â the most impactful companies find where purpose and profit overlap.",
+                "insight": "Your 5-year vision is anchored in impact and meaning. Mission-driven founders attract purpose-driven talent and loyal customers. Your challenge will be balancing mission with financial sustainability — the most impactful companies find where purpose and profit overlap.",
                 "archetype_boost": {"Visionary": 2, "Connector": 1},
             },
             "freedom|travel|flexible|lifestyle|balance|remote|family|enjoy": {
@@ -494,12 +494,12 @@ REFLECTIONS = {
             },
             "revenue|profit|scale|grow|expand|million|funding|investor|IPO|exit": {
                 "trait": "Scale-Oriented",
-                "insight": "Your vision is ambitious â you're thinking about scale, growth, and significant financial outcomes. This ambition is the fuel that drives high-growth companies. Pair it with deep customer empathy so that your growth is built on real value, not just metrics.",
+                "insight": "Your vision is ambitious — you're thinking about scale, growth, and significant financial outcomes. This ambition is the fuel that drives high-growth companies. Pair it with deep customer empathy so that your growth is built on real value, not just metrics.",
                 "archetype_boost": {"Visionary": 1, "Analyst": 2},
             },
             "learn|expert|master|known for|thought leader|speak|write|teach": {
                 "trait": "Expertise Builder",
-                "insight": "Your vision includes becoming a recognized expert in your domain. This reputation-building instinct can be a powerful flywheel â expertise attracts opportunities, talent, and customers. Many successful founders built their company on the back of personal credibility in their field.",
+                "insight": "Your vision includes becoming a recognized expert in your domain. This reputation-building instinct can be a powerful flywheel — expertise attracts opportunities, talent, and customers. Many successful founders built their company on the back of personal credibility in their field.",
                 "archetype_boost": {"Analyst": 1, "Visionary": 1, "Connector": 1},
             },
         },
@@ -507,7 +507,7 @@ REFLECTIONS = {
 }
 
 
-# ââââââââââââââââââ SELF-ASSESSMENT DIMENSIONS ââââââââââââââââââ
+# ══════════════════ SELF-ASSESSMENT DIMENSIONS ══════════════════
 
 SELF_ASSESS_DIMS = [
     {"key": "risk_tolerance", "label": "Risk Tolerance", "low": "I prefer certainty and proven paths", "high": "I'm comfortable betting on uncertain outcomes", "category": "mindset"},
@@ -521,7 +521,7 @@ SELF_ASSESS_DIMS = [
 ]
 
 
-# ââââââââââââââââââ ANALYSIS & SCORING FUNCTIONS ââââââââââââââââââ
+# ══════════════════ ANALYSIS & SCORING FUNCTIONS ══════════════════
 
 def analyze_text(text, analysis_map):
     """Analyze free-text response against keyword patterns and return matched traits."""
@@ -608,13 +608,13 @@ def overall_readiness(dim_scores):
 
 def readiness_label(score):
     if score >= 80:
-        return "Ready to Launch", "#22c55e", "You have strong entrepreneurial foundations across the board. You're not just ready â you're likely already acting like a founder."
+        return "Ready to Launch", "#22c55e", "You have strong entrepreneurial foundations across the board. You're not just ready — you're likely already acting like a founder."
     elif score >= 60:
         return "Almost There", "#f59e0b", "You have solid foundations with some specific areas to develop. Targeted growth in your gap areas could make a significant difference."
     elif score >= 40:
         return "Building Momentum", "#f97316", "You're developing real entrepreneurial instincts. Focus on your strengths while actively building skills in your gap areas."
     else:
-        return "Early Explorer", "#3b82f6", "You're at the beginning of your entrepreneurial journey â and that's a great place to be. Everyone starts here. Your awareness of where you stand is itself a strength."
+        return "Early Explorer", "#3b82f6", "You're at the beginning of your entrepreneurial journey — and that's a great place to be. Everyone starts here. Your awareness of where you stand is itself a strength."
 
 
 def generate_coaching(primary_arch, dim_scores, overall):
@@ -627,10 +627,10 @@ def generate_coaching(primary_arch, dim_scores, overall):
     weakest = sorted_dims[0]
 
     dim_coaching = {
-        "mindset": "**Strengthen your entrepreneurial mindset** by putting yourself in low-stakes situations that require tolerating ambiguity â like volunteering to lead an unfamiliar project or making small bets on uncertain outcomes. Mindset is a muscle, not a trait.",
+        "mindset": "**Strengthen your entrepreneurial mindset** by putting yourself in low-stakes situations that require tolerating ambiguity — like volunteering to lead an unfamiliar project or making small bets on uncertain outcomes. Mindset is a muscle, not a trait.",
         "skills": "**Build your skill toolkit** by focusing on the skill you use least: if it's selling, practice pitching one idea per week to a friend. If it's building, try shipping a tiny project in a weekend. Skills compound faster than you think.",
-        "resources": "**Expand your resource network** by mapping the assets you already have access to (people, skills, spaces, tools) and the gaps. Often the resources exist â they're just not yet connected to your goal. Start by telling 10 people what you're building.",
-        "acumen": "**Sharpen your business acumen** by studying one business model per week â not just what companies do, but HOW they make money. Understanding unit economics and customer acquisition costs will transform your decision-making.",
+        "resources": "**Expand your resource network** by mapping the assets you already have access to (people, skills, spaces, tools) and the gaps. Often the resources exist — they're just not yet connected to your goal. Start by telling 10 people what you're building.",
+        "acumen": "**Sharpen your business acumen** by studying one business model per week — not just what companies do, but HOW they make money. Understanding unit economics and customer acquisition costs will transform your decision-making.",
     }
 
     recs.append(dim_coaching.get(weakest[0], ""))
@@ -638,12 +638,12 @@ def generate_coaching(primary_arch, dim_scores, overall):
     # Based on archetype gaps
     if arch_data["gaps"]:
         top_gaps = arch_data["gaps"][:2]
-        recs.append(f"**As a {primary_arch}, watch for:** {' and '.join(top_gaps).lower()}. These are your natural blind spots. You don't need to become great at them â but you need someone on your team who is.")
+        recs.append(f"**As a {primary_arch}, watch for:** {' and '.join(top_gaps).lower()}. These are your natural blind spots. You don't need to become great at them — but you need someone on your team who is.")
 
     return recs
 
 
-# ââââââââââââââââââ SESSION STATE ââââââââââââââââââ
+# ══════════════════ SESSION STATE ══════════════════
 
 if "page" not in st.session_state:
     st.session_state.page = 0
@@ -661,7 +661,7 @@ def go_to(p):
     st.session_state.page = p
 
 
-# ââââââââââââââââââ PROGRESS INDICATOR ââââââââââââââââââ
+# ══════════════════ PROGRESS INDICATOR ══════════════════
 
 def render_progress(current, total=4):
     labels = ["Welcome", "Scenario", "About You", "Results"]
@@ -672,12 +672,12 @@ def render_progress(current, total=4):
     st.markdown(f'<div class="progress-dots">{dots_html}</div>', unsafe_allow_html=True)
 
 
-# ââââââââââââââââââ PAGE RENDERING ââââââââââââââââââ
+# ══════════════════ PAGE RENDERING ══════════════════
 
 page = st.session_state.page
 
 
-# ââ PAGE 0: WELCOME ââ
+# ── PAGE 0: WELCOME ──
 if page == 0:
     st.markdown("""
     <div class="hero-card">
@@ -690,16 +690,16 @@ if page == 0:
     <div class="content-card">
         <p class="section-header">What You'll Discover</p>
         <p style="color: #374151; line-height: 1.8;">
-        This isn't a quiz â it's a simulation. You'll navigate a realistic startup story, making decisions that reveal
+        This isn't a quiz — it's a simulation. You'll navigate a realistic startup story, making decisions that reveal
         your natural instincts as a founder. Along the way, you'll reflect on your motivations and assess your skills.
         At the end, you'll get a personalized profile including:</p>
         <p style="color: #374151; line-height: 1.8; margin-top: 0.75rem;">
-        <strong style="color: #6366f1;">&#9670;</strong> Your <strong>Entrepreneurial Archetype</strong> â which of 5 founder types fits you best<br>
+        <strong style="color: #6366f1;">&#9670;</strong> Your <strong>Entrepreneurial Archetype</strong> — which of 5 founder types fits you best<br>
         <strong style="color: #22c55e;">&#9670;</strong> Your <strong>Readiness Score</strong> across 4 dimensions<br>
         <strong style="color: #f59e0b;">&#9670;</strong> <strong>AI-powered analysis</strong> of your written reflections<br>
-        <strong style="color: #3b82f6;">&#9670;</strong> Your <strong>complementary profile</strong> â who you need on your team
+        <strong style="color: #3b82f6;">&#9670;</strong> Your <strong>complementary profile</strong> — who you need on your team
         </p>
-        <p style="color: #6b7280; margin-top: 1rem; font-size: 0.9rem;"><em>Takes about 10-12 minutes. There are no right answers â only YOUR answers.</em></p>
+        <p style="color: #6b7280; margin-top: 1rem; font-size: 0.9rem;"><em>Takes about 10-12 minutes. There are no right answers — only YOUR answers.</em></p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -710,7 +710,7 @@ if page == 0:
         st.rerun()
 
 
-# ââ PAGE 1: THE FRESHLOOP SCENARIO (all 5 scenes on one scrolling page) ââ
+# ── PAGE 1: THE FRESHLOOP SCENARIO (all 5 scenes on one scrolling page) ──
 elif page == 1:
     render_progress(1)
 
@@ -761,14 +761,14 @@ elif page == 1:
         st.info("Make a choice for each scene to continue")
 
 
-# ââ PAGE 2: SELF-ASSESSMENT + REFLECTIONS (combined) ââ
+# ── PAGE 2: SELF-ASSESSMENT + REFLECTIONS (combined) ──
 elif page == 2:
     render_progress(2)
 
     st.markdown("""
     <div class="content-card">
         <p class="section-header">Quick Self-Assessment</p>
-        <p style="color: #6b7280;">Rate yourself on each dimension. Be honest â this isn't about scoring high, it's about accuracy.</p>
+        <p style="color: #6b7280;">Rate yourself on each dimension. Be honest — this isn't about scoring high, it's about accuracy.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -825,7 +825,7 @@ elif page == 2:
         st.info("Write at least a sentence or two for each reflection to continue")
 
 
-# ââ PAGE 3: RESULTS DASHBOARD ââ
+# ── PAGE 3: RESULTS DASHBOARD ──
 elif page == 3:
     render_progress(3)
 
@@ -843,7 +843,7 @@ elif page == 3:
     overall = overall_readiness(dim_scores)
     label, color, label_desc = readiness_label(overall)
 
-    # ââ Overall Score ââ
+    # ── Overall Score ──
     st.markdown(f"""
     <div class="content-card" style="text-align: center;">
         <p class="section-header" style="justify-content: center;">Your Entrepreneurial Readiness</p>
@@ -855,7 +855,7 @@ elif page == 3:
     </div>
     """, unsafe_allow_html=True)
 
-    # ââ Archetype ââ
+    # ── Archetype ──
     arch_data = ARCHETYPES[primary]
     st.markdown(f"""
     <div class="archetype-badge">
@@ -873,7 +873,7 @@ elif page == 3:
         </div>
         """, unsafe_allow_html=True)
 
-    # ââ Dimension Scores ââ
+    # ── Dimension Scores ──
     st.markdown('<p class="section-header">Your Four Dimensions</p>', unsafe_allow_html=True)
 
     dim_labels = {
@@ -897,7 +897,7 @@ elif page == 3:
         </div>
         """, unsafe_allow_html=True)
 
-    # ââ Strengths & Gaps ââ
+    # ── Strengths & Gaps ──
     col1, col2 = st.columns(2)
     with col1:
         strengths_html = "<br>".join("&#8226; " + s for s in arch_data['strengths'])
@@ -916,7 +916,7 @@ elif page == 3:
         </div>
         """, unsafe_allow_html=True)
 
-    # ââ Who You Need Around You ââ
+    # ── Who You Need Around You ──
     complement = arch_data["complement"]
     comp_data = ARCHETYPES[complement.replace("The ", "")]
     st.markdown(f"""
@@ -926,7 +926,7 @@ elif page == 3:
     </div>
     """, unsafe_allow_html=True)
 
-    # ââ Self-Assessment Radar ââ
+    # ── Self-Assessment Radar ──
     st.markdown('<p class="section-header">Self-Assessment Profile</p>', unsafe_allow_html=True)
 
     sa_data = pd.DataFrame([
@@ -951,7 +951,7 @@ elif page == 3:
 
     st.altair_chart(chart, use_container_width=True)
 
-    # ââ Reflection Insights Recap ââ
+    # ── Reflection Insights Recap ──
     st.markdown('<p class="section-header">What Your Reflections Reveal</p>', unsafe_allow_html=True)
 
     ref_labels = {"motivation": "Motivation", "failure_response": "Failure Response", "vision": "Future Vision"}
@@ -978,11 +978,11 @@ elif page == 3:
             st.markdown(f"""
             <div class="content-card">
                 <p style="font-weight: 600; color: #1e1b4b; margin-bottom: 0.5rem;">{ref_labels[key]}</p>
-                <p style="color: #6b7280;">Your response was unique â it didn't match common patterns, which may indicate a distinctive perspective. Consider discussing your entrepreneurial motivations with a mentor to uncover insights that automated analysis might miss.</p>
+                <p style="color: #6b7280;">Your response was unique — it didn't match common patterns, which may indicate a distinctive perspective. Consider discussing your entrepreneurial motivations with a mentor to uncover insights that automated analysis might miss.</p>
             </div>
             """, unsafe_allow_html=True)
 
-    # ââ Coaching Recommendations ââ
+    # ── Coaching Recommendations ──
     st.markdown('<p class="section-header">Your Next Steps</p>', unsafe_allow_html=True)
     coaching = generate_coaching(primary, dim_scores, overall)
     for rec in coaching:
@@ -993,7 +993,7 @@ elif page == 3:
             </div>
             """, unsafe_allow_html=True)
 
-    # ââ Archetype Breakdown Chart ââ
+    # ── Archetype Breakdown Chart ──
     st.markdown('<p class="section-header">Archetype Breakdown</p>', unsafe_allow_html=True)
 
     arch_df = pd.DataFrame([
