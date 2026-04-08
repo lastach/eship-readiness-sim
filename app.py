@@ -1,2210 +1,1029 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-import random
-import time
 import re
+import math
 
-st.set_page_config(
-    page_title="ThermaLoop | Entrepreneurial Readiness Simulation",
-    page_icon="🔥",
-    layout="wide",
-)
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# ENTREPRENEURIAL READINESS SIMULATION
+# A narrative-driven, archetype-based assessment
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-# ============== CUSTOM CSS FOR GAME-LIKE FEEL ==============
+st.set_page_config(page_title="Entrepreneurial Readiness Simulation", layout="wide", initial_sidebar_state="collapsed")
+
+# ââââââââââââââââââ LIGHT THEME CSS ââââââââââââââââââ
+
 st.markdown("""
 <style>
-/* ─── Global ─── */
-[data-testid="stAppViewContainer"] {
-    background: linear-gradient(170deg, #0d1117 0%, #161b22 100%);
-    color: #e6edf3;
-}
-[data-testid="stHeader"] { background: transparent; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ─── Sidebar ─── */
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
-    border-right: 1px solid #30363d;
+/* Global light background */
+.stApp {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 50%, #faf8ff 100%);
+    font-family: 'Inter', sans-serif;
 }
 
-/* ─── Typography ─── */
-h1, h2, h3 { color: #58a6ff !important; }
-h1 { font-size: 2.2rem !important; letter-spacing: -0.5px; }
+/* Hide default Streamlit elements */
+#MainMenu, footer, header, .stDeployButton { display: none !important; }
+div[data-testid="stSidebarNav"] { display: none; }
 
-/* ─── Progress bar ─── */
-.progress-outer {
-    background: #21262d; border-radius: 12px; height: 18px;
-    margin: 0.8rem 0 1.6rem 0; overflow: hidden;
-    border: 1px solid #30363d;
-}
-.progress-inner {
-    height: 100%; border-radius: 12px;
-    background: linear-gradient(90deg, #238636 0%, #2ea043 50%, #56d364 100%);
-    transition: width 0.6s ease;
-    display: flex; align-items: center; justify-content: flex-end;
-    padding-right: 8px; font-size: 11px; color: #fff; font-weight: 600;
+/* Main container */
+.block-container {
+    max-width: 900px;
+    padding: 2rem 1rem 3rem 1rem;
 }
 
-/* ─── Narrative box ─── */
-.narrative-box {
-    background: #161b22; border-left: 4px solid #58a6ff;
-    border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1rem 0 1.6rem 0;
-    font-size: 1.05rem; line-height: 1.6; color: #c9d1d9;
+/* Hero card */
+.hero-card {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    color: white;
+    text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.25);
 }
-.narrative-box em { color: #79c0ff; }
-
-/* ─── Consequence box (transition pages) ─── */
-.consequence-box {
-    background: #161b22; border-left: 4px solid #f0883e;
-    border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1rem 0 1.6rem 0;
-    font-size: 1rem; line-height: 1.6; color: #c9d1d9;
+.hero-card h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
 }
-
-/* ─── Character dialogue box ─── */
-.character-box {
-    background: #161b22; border-left: 4px solid #f0883e;
-    border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1rem 0 1.2rem 0;
-    font-size: 0.95rem; line-height: 1.5; color: #c9d1d9;
-}
-.char-name {
-    font-weight: 600; color: #79c0ff; margin-bottom: 0.4rem;
-}
-.char-dialogue {
-    font-style: italic; color: #c9d1d9;
+.hero-card p {
+    font-size: 1.1rem;
+    opacity: 0.92;
+    line-height: 1.6;
+    color: white;
 }
 
-/* ─── Dashboard metric ─── */
-.dashboard-metric {
-    background: #0d1117; border: 1px solid #30363d;
-    border-radius: 8px; padding: 0.8rem 1rem; margin: 0.6rem 0;
-    font-size: 0.9rem; color: #c9d1d9;
-}
-.metric-label {
-    color: #8b949e; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;
-}
-.metric-value {
-    font-weight: 600; color: #58a6ff; font-size: 1.1rem; margin-top: 0.2rem;
-}
-
-/* ─── Scenario card ─── */
-.scenario-card {
-    background: #0d1117; border: 1px solid #30363d;
-    border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.8rem;
-    font-size: 0.95rem; color: #c9d1d9;
-}
-.scenario-card strong { color: #58a6ff; }
-
-/* ─── Game header badge ─── */
-.game-badge {
-    display: inline-block; background: #238636; color: #fff;
-    font-weight: 700; font-size: 0.75rem; letter-spacing: 1.2px;
-    padding: 4px 12px; border-radius: 20px; margin-bottom: 0.6rem;
-    text-transform: uppercase;
-}
-
-/* ─── Score card (results) ─── */
-.score-big {
-    text-align: center; padding: 2rem;
-    background: linear-gradient(135deg, #161b22, #0d1117);
-    border: 2px solid #30363d; border-radius: 16px;
+/* Content cards */
+.content-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
     margin-bottom: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e8e8f0;
 }
-.score-big .number { font-size: 4rem; font-weight: 800; color: #58a6ff; }
-.score-big .label { font-size: 1.1rem; color: #8b949e; margin-top: 0.4rem; }
 
-/* ─── Coaching box ─── */
+/* Scenario card */
+.scenario-card {
+    background: linear-gradient(135deg, #fefce8 0%, #fff7ed 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #f59e0b;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.scenario-card h3 {
+    color: #92400e;
+    margin-bottom: 0.5rem;
+}
+.scenario-card p {
+    color: #78350f;
+    line-height: 1.7;
+}
+
+/* Insight boxes */
+.insight-box {
+    background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    border-left: 4px solid #22c55e;
+}
+.insight-box p { color: #166534; margin: 0; line-height: 1.6; }
+
 .coaching-box {
-    background: #0d1117; border: 1px solid #238636;
-    border-radius: 10px; padding: 1.2rem 1.4rem; margin: 1rem 0;
-    font-size: 1rem; line-height: 1.6; color: #c9d1d9;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    border-left: 4px solid #f59e0b;
 }
-.coaching-box strong { color: #56d364; }
+.coaching-box p { color: #92400e; margin: 0; line-height: 1.6; }
 
-/* ─── Button styling ─── */
-.stButton > button {
-    border-radius: 8px !important; font-weight: 600 !important;
-    transition: all 0.2s ease !important;
-    color: #c9d1d9 !important;
-    background-color: #161b22 !important;
-    border: 1px solid #30363d !important;
+.complement-box {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    border-left: 4px solid #3b82f6;
 }
-.stButton > button:hover {
-    background-color: #21262d !important;
-    border-color: #58a6ff !important;
-    color: #e6edf3 !important;
+.complement-box p { color: #1e40af; margin: 0; line-height: 1.6; }
+
+/* Score display */
+.score-ring {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 
-/* ─── Step counter ─── */
-.step-counter {
-    color: #8b949e; font-size: 0.85rem; margin-bottom: 0.3rem;
+/* Archetype badge */
+.archetype-badge {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    margin: 1rem 0;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
 }
+.archetype-badge h2 {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-size: 1.6rem;
+}
+.archetype-badge p { color: rgba(255,255,255,0.9); line-height: 1.5; }
+
+/* Dim bar container */
+.dim-bar-container {
+    margin: 0.75rem 0;
+}
+.dim-bar-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+}
+.dim-bar-track {
+    background: #e5e7eb;
+    border-radius: 8px;
+    height: 14px;
+    overflow: hidden;
+}
+.dim-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.6s ease;
+}
+
+/* Progress indicator */
+.progress-dots {
+    display: flex;
+    justify-content: center;
+    gaay: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Reflection analysis */
+.analysis-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin: 0.75rem 0;
+    border: 1px solid #e8e8f0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* Hide sidebar */
+section[data-testid="stSidebar"] { display: none; }
+
 </style>
 """, unsafe_allow_html=True)
 
 
-# ============== GLOBAL CONSTANTS ==============
-COMPONENTS = [
-    "Entrepreneurial Mindset",
-    "Entrepreneurial Skills",
-    "Resource Availability",
-    "Entrepreneurship / Business Acumen",
-]
-COMP_WEIGHTS = {c: 25 for c in COMPONENTS}
+# ââââââââââââââââââ ARCHETYPE DEFINITIONS ââââââââââââââââââ
 
-MINDSET_SUBDIMS = [
-    "Opportunity Recognition",
-    "Resourcefulness",
-    "Execution Bias",
-    "Resilience & Adaptability",
-    "Value Creation Focus",
-]
-
-MINDSET_DESCRIPTIONS = {
-    "Opportunity Recognition": "Seeing unmet needs, behavior gaps, and potential value before others.",
-    "Resourcefulness": "Creatively acquiring, leveraging, and recombining limited resources.",
-    "Execution Bias": "Moving quickly, testing, iterating, and deciding with incomplete information.",
-    "Resilience & Adaptability": "Staying steady and adjusting intelligently when conditions change.",
-    "Value Creation Focus": "Prioritizing customers, real problems, and business impact over ego or ideas.",
-}
-
-# ============== NARRATIVE CONTEXT ==============
-THERMALOOP_INTRO = """
-You're **Alex**, the founder of **ThermaLoop** — a smart ventilation retrofit kit that cuts
-building energy costs by up to 30% without ripping out existing HVAC systems.
-
-You left your job six weeks ago. You have a working prototype, a handful of interested
-building managers, and a shrinking savings account. Every decision from here shapes whether
-ThermaLoop becomes a real business — or a good idea that never quite made it.
-
-**This simulation puts you in the founder's seat.** You'll face real startup decisions across
-five rounds, then assess your skills, resources, and business knowledge. At the end, you'll
-get an honest readiness profile — not a grade, but a map of where you're strong and where
-to focus next.
-"""
-
-GAME_NARRATIVES = {
-    1: """*Week 3. Your inbox is full of mixed signals.* Building managers say different things.
-Some love the concept. Others are polite but vague. A few are already hacking together their
-own solutions. **Your job: separate real demand from noise.** Flag only the signals that
-suggest genuine, actionable market opportunity.""",
-
-    2: """*Week 5. Reality check.* You've got no budget for user research, no designer on call,
-and limited engineering time. Welcome to startup life. **For each constraint, pick the move
-you'd actually make** — not the textbook answer, the real one.""",
-
-    3: """*Week 7. Time is ticking.* You've got limited runway and too many possible next steps.
-The difference between founders who make it and those who don't often comes down to what they
-do *next* — not what they plan. **Pick what you'd actually do in each situation.**""",
-
-    4: """*Week 9. Things just went sideways.* A contractor missed a deadline. Your costs spiked.
-A competitor made a move. Shocks like these are normal — how you respond defines your trajectory.
-**Choose your real reaction, not the one that sounds best.**""",
-
-    5: """*Week 11. Sprint planning.* You've got a budget of **{budget} cost units** and a list of
-possible changes. Some are high-impact. Some feel productive but aren't. You can't do everything.
-**Pick the features you'd actually ship this sprint** — stay within budget.""",
-
-    6: """*Self-assessment checkpoint.* Before the next phase, rate yourself honestly on six core
-startup skills. Then prove it — scenario rounds will test how you'd actually operate in each area.
-**The gap between self-rating and scenario performance is often where the real insight lives.**""",
-
-    7: """*Resource inventory.* Building a venture isn't just about hustle — it's about what you
-can realistically tap into. Money, tools, people, connections, time, and support all matter.
-**Answer based on what's actually available to you in the next 3–6 months.**""",
-
-    8: """*Final round: Venture-building knowledge.* These questions test how you think about
-problems, markets, business models, and growth. There are no trick questions — just real
-tradeoffs that founders face every day.""",
-}
-
-# ============== GAME 1: CUSTOMER SIGNAL CARDS ==============
-OPP_SCENARIOS = [
-    {
-        "key": "opp_1",
-        "text": "20% of building managers export HVAC data weekly to fix errors via a manual spreadsheet workaround.",
-        "is_opportunity": True,
+ARCHETYPES = {
+    "Visionary": {
+        "icon": "ð­",
+        "tagline": "You see futures others can't imagine",
+        "desc": "You're energized by big ideas, new possibilities, and paradigm shifts. You naturally spot trends before they're obvious and love painting a compelling picture of what could be. Your superpower is inspiring others to believe in a vision that doesn't exist yet.",
+        "strengths": ["Big-picture thinking", "Trend spotting", "Inspiring storytelling", "Creative ideation"],
+        "gaps": ["Operational follow-through", "Detail management", "Financial planning", "Patience with incremental progress"],
+        "complement": "The Builder",
+        "complement_why": "A Builder grounds your vision into executable plans, handles the operational details you find draining, and turns your big ideas into tangible milestones. Together you dream big AND deliver.",
     },
-    {
-        "key": "opp_2",
-        "text": "Several building managers mention they'd like a mobile app dashboard 'someday.'",
-        "is_opportunity": False,
+    "Builder": {
+        "icon": "ð¨",
+        "tagline": "You turn ideas into reality, brick by brick",
+        "desc": "You thrive on execution â taking something from concept to working product. You're happiest when you're building, shipping, and iterating. You have a natural sense for what's feasible and how to get things done with limited resources.",
+        "strengths": ["Execution speed", "Product development", "Resourcefulness", "Iterative improvement"],
+        "gaps": ["Long-range strategic thinking", "Market positioning", "Delegation", "Networking and partnerships"],
+        "complement": "The Visionary",
+        "complement_why": "A Visionary helps you lift your head from the build and see where the market is heading. They bring the storytelling and big-picture strategy that ensures you're building the right thing, not just building things right.",
     },
-    {
-        "key": "opp_3",
-        "text": "40% of prospects start your demo workflow but never finish it.",
-        "is_opportunity": True,
+    "Analyst": {
+        "icon": "ð",
+        "tagline": "You find truth in the data others overlook",
+        "desc": "You're driven by evidence, patterns, and rigorous thinking. You naturally question assumptions and dig into data before making decisions. Your superpower is reducing risk through thorough analysis and spotting flaws before they become costly.",
+        "strengths": ["Data-driven decisions", "Risk assessment", "Financial modeling", "Critical thinking"],
+        "gaps": ["Bias toward over-analysis", "Speed of decision-making", "Comfort with ambiguity", "Emotional persuasion"],
+        "complement": "The Connector",
+        "complement_why": "A Connector brings the relatiality, brick by brick",
+        "desc": "You thrive on execution â taking something from concept to working product. You're happiest when you're building, shipping, and iterating. You have a natural sense for what's feasible and how to get things done with limited resources.",
+        "strengths": ["Execution speed", "Product development", "Resourcefulness", "Iterative improvement"],
+        "gaps": ["Long-range strategic thinking", "Market positioning", "Delegation", "Networking and partnerships"],
+        "complement": "The Visionary",
+        "complement_why": "A Visionary helps you lift your head from the build and see where the market is heading. They bring the storytelling and big-picture strategy that ensures you're building the right thing, not just building things right.",
     },
-    {
-        "key": "opp_4",
-        "text": "Your LinkedIn posts about smart ventilation get lots of likes but modest demo signups.",
-        "is_opportunity": False,
+    "Analyst": {
+        "icon": "ð",
+        "tagline": "You find truth in the data others overlook",
+        "desc": "You're driven by evidence, patterns, and rigorous thinking. You naturally question assumptions and dig into data before making decisions. Your superpower is reducing risk through thorough analysis and spotting flaws before they become costly.",
+        "strengths": ["Data-driven decisions", "Risk assessment", "Financial modeling", "Critical thinking"],
+        "gaps": ["Bias toward over-analysis", "Speed of decision-making", "Comfort with ambiguity", "Emotional persuasion"],
+        "complement": "The Connector",
+        "complement_why": "A Connector brings the relationship intelligence and persuasion skills you need. While you ensure decisions are sound, they open doors, build partnerships, and rally people around the opportunity â turning your analysis into action.",
     },
-    {
-        "key": "opp_5",
-        "text": "Prospects say they'd 'maybe try a retrofit kit like this in the future.'",
-        "is_opportunity": False,
+    "Connector": {
+        "icon": "ð¤",
+        "tagline": "You build bridges between people, ideas, and opportunities",
+        "desc": "You're a natural relationship builder who sees opportunities in the spaces between people. You intuitively understand what motivates others and can bring diverse groups together around a common goal. Your network IS your net worth.",
+        "strengths": ["Relationship building", "Persuasion and sales", "Partnership development", "Team recruitment"],
+        "gaps": ["Solo execution", "Technical depth", "Financial rigor", "Saying no to opportunities"],
+        "complement": "The Analyst",
+        "complement_why": "An Analyst brings the rigor and data discipline to complement your people skills. While you open doors and close deals, they ensure the numbers work and the strategy is sound â preventing overcommitment and ensuring sustainable growth.",
     },
-    {
-        "key": "opp_6",
-        "text": "Support emails repeatedly mention the same calibration bug that forces managers to redo setups.",
-        "is_opportunity": True,
-    },
-    {
-        "key": "opp_7",
-        "text": "Several building managers have rigged their own sensor workarounds to get data ThermaLoop should provide.",
-        "is_opportunity": True,
-    },
-    {
-        "key": "opp_8",
-        "text": "An industry blog post about smart ventilation trends gets traffic, but almost nobody requests a demo.",
-        "is_opportunity": False,
-    },
-    {
-        "key": "opp_9",
-        "text": "You have a growing waitlist of building managers regularly following up asking when they can get access.",
-        "is_opportunity": True,
-    },
-    {
-        "key": "opp_10",
-        "text": "Conference attendees say your booth was 'interesting,' but few accept a follow-up call.",
-        "is_opportunity": False,
-    },
-]
-
-
-def compute_opportunity_score():
-    tp = fp = fn = 0
-    for sc in OPP_SCENARIOS:
-        selected = st.session_state.get(sc["key"], False)
-        if sc["is_opportunity"]:
-            if selected:
-                tp += 1
-            else:
-                fn += 1
-        else:
-            if selected:
-                fp += 1
-    total_true = sum(1 for s in OPP_SCENARIOS if s["is_opportunity"])
-    if total_true == 0:
-        return 1.0
-    raw = tp - 0.5 * fp - fn
-    max_raw = total_true
-    norm = max(0.0, min(1.0, raw / max_raw))
-    return round(1 + 4 * norm, 2)
-
-
-# ============== GAME 5: FEATURE BUDGET ==============
-FEATURE_BUDGET = 20
-
-VALUE_FEATURES = [
-    {
-        "key": "feat_a",
-        "name": "Fix a calibration bug causing 25% of new installs to fail on first setup.",
-        "cost": 7,
-        "ideal_points": 5,
-    },
-    {
-        "key": "feat_b",
-        "name": "Add a dashboard color theme option.",
-        "cost": 3,
-        "ideal_points": 1,
-    },
-    {
-        "key": "feat_c",
-        "name": "Build a guided setup wizard that walks managers through their first retrofit in under 15 minutes.",
-        "cost": 6,
-        "ideal_points": 4,
-    },
-    {
-        "key": "feat_d",
-        "name": "Ship an experimental 'air quality mood ring' feature with no demand signals yet.",
-        "cost": 5,
-        "ideal_points": 1,
-    },
-    {
-        "key": "feat_e",
-        "name": "Run a small pilot with 10 ideal building managers, including onboarding and follow-up.",
-        "cost": 6,
-        "ideal_points": 4,
-    },
-    {
-        "key": "feat_f",
-        "name": "Polish minor dashboard details that only power users occasionally notice.",
-        "cost": 2,
-        "ideal_points": 2,
-    },
-    {
-        "key": "feat_g",
-        "name": "Add instrumentation to capture where managers drop off during setup.",
-        "cost": 4,
-        "ideal_points": 5,
-    },
-]
-
-
-def compute_value_creation_score():
-    selected = [
-        f for f in VALUE_FEATURES if st.session_state.get(f["key"], False)
-    ]
-    if not selected:
-        return 1.0
-    selected_value = sum(f["ideal_points"] for f in selected)
-    max_possible = sum(f["ideal_points"] for f in VALUE_FEATURES)
-    norm = max(0.0, min(1.0, selected_value / max_possible))
-    return round(1 + 4 * norm, 2)
-
-
-def compute_email_quality_score(email_text: str) -> float:
-    """Score an email draft on key quality indicators (1-5 scale)."""
-    if not email_text or len(email_text) < 20:
-        return 1.0
-
-    score = 1.0  # Base point for > 20 chars
-
-    # Keywords for pain point/problem
-    pain_keywords = ["energy", "cost", "HVAC", "calibration", "retrofit", "savings", "efficiency"]
-    if any(kw.lower() in email_text.lower() for kw in pain_keywords):
-        score += 1.0
-
-    # Keywords for clear ask/CTA
-    cta_keywords = ["call", "meet", "demo", "chat", "schedule", "discuss", "15 minutes"]
-    if any(kw.lower() in email_text.lower() for kw in cta_keywords):
-        score += 1.0
-
-    # Keywords for specific data/situation
-    data_keywords = ["30%", "building", "manager", "ventilation", "%", "week", "day", "hours"]
-    if any(kw.lower() in email_text.lower() for kw in data_keywords):
-        score += 1.0
-
-    # Personalized / not generic (length > 50 chars)
-    if len(email_text) > 50:
-        score += 1.0
-
-    return min(5.0, score)
-
-
-# ============== MINDSET GAMES 2–4 ==============
-MINDSET_QUESTIONS = {
-    # Resourcefulness – Game 2
-    "ms_res_1": {
-        "subdim": "Resourcefulness",
-        "prompt": "You need to understand why building managers drop ThermaLoop after install, but you have zero budget for research. What do you actually do first?",
-        "options": [
-            "Use existing signals (support tickets, cancellation emails) and talk directly to a few churned managers.",
-            "Wait until you have budget for a formal study.",
-            "Ask friends what they think about churn in general.",
-            "Search online for articles about HVAC customer retention before talking to anyone.",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    "ms_res_2": {
-        "subdim": "Resourcefulness",
-        "prompt": "You need to launch a landing page for ThermaLoop today, but your designer just quit.",
-        "options": [
-            "Use a no-code template tool and ship something basic that communicates the value prop.",
-            "Wait for a new designer so it looks polished.",
-            "Write copy now and wait for design time later.",
-            "Mock it up in a slide deck and send screenshots to prospects.",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    "ms_res_3": {
-        "subdim": "Resourcefulness",
-        "prompt": "You want to test a new 'predictive maintenance alert' feature but have no engineering time this month.",
-        "options": [
-            "Create a simple clickable mockup or fake-door test to gauge interest.",
-            "Wait until engineers have time to build it properly.",
-            "Write a long spec and share internally for feedback.",
-            "Look at similar IoT tools and treat the idea as validated if they have it.",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    "ms_res_4": {
-        "subdim": "Resourcefulness",
-        "prompt": "You only have access to 10 building managers for early testing of ThermaLoop.",
-        "options": [
-            "Run deep interviews and observe their actual workflows and pain points.",
-            "Run a big quantitative survey with them.",
-            "Don't test until you have a bigger audience.",
-            "Read industry reports about smart buildings instead of talking to them.",
-        ],
-        "scores": [5, 3, 1, 2],
-    },
-    # Execution bias – Game 3
-    "ms_exec_1": {
-        "subdim": "Execution Bias",
-        "prompt": "You have one afternoon to de-risk the ThermaLoop concept before a potential investor meeting. What do you actually do?",
-        "options": [
-            "Run 5 quick calls with building managers or set up a simple landing page test.",
-            "Write a 20-page strategy doc mapping the next 2 years.",
-            "Brainstorm product names and design a new logo.",
-            "Search online for competitor examples and save them into a doc without contacting anyone.",
-        ],
-        "scores": [5, 1, 2, 2],
-    },
-    "ms_exec_2": {
-        "subdim": "Execution Bias",
-        "prompt": "You want to test interest in a 'multi-zone control' upgrade for ThermaLoop. What's your next step?",
-        "options": [
-            "Add a 'coming soon' button in the dashboard and track clicks plus follow-up interest.",
-            "Build the full feature and launch quietly.",
-            "Survey friends who don't manage buildings.",
-            "Look at competitor feature lists and treat that as enough validation.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "ms_exec_3": {
-        "subdim": "Execution Bias",
-        "prompt": "You're torn between targeting small office buildings vs. large residential complexes. How do you proceed?",
-        "options": [
-            "Run two tiny tests in parallel — different landing pages — and compare response rates.",
-            "Pick one based purely on your intuition.",
-            "Wait until you can do a full market study.",
-            "Ask a mentor which segment sounds more promising and go with that.",
-        ],
-        "scores": [5, 2, 1, 3],
-    },
-    "ms_exec_4": {
-        "subdim": "Execution Bias",
-        "prompt": "You ran a pilot with 10 buildings. Results are noisy but lean positive. What do you do?",
-        "options": [
-            "Make a small decision in the direction of the signal and keep testing.",
-            "Ignore it and wait for perfectly clear data.",
-            "Restart from scratch with a totally different approach.",
-            "Ask an advisor whether they think you should trust the pilot data.",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    "ms_exec_5": {
-        "subdim": "Execution Bias",
-        "prompt": "Your co-founder suggests a quick test that could disprove your core assumption about energy savings. Your move?",
-        "options": [
-            "Run the test and be ready to pivot if it fails.",
-            "Avoid the test; you don't want to undermine the pitch.",
-            "Delay the test until after the funding round.",
-            "Ask an advisor whether it's worth testing at all.",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    # Resilience & adaptability – Game 4
-    "ms_resil_1": {
-        "subdim": "Resilience & Adaptability",
-        "prompt": "⚡ SHOCK: Your hardware contractor delays a critical sensor shipment by 3 weeks — right before your pilot launch.",
-        "options": [
-            "Do nothing and simply push the pilot timeline back.",
-            "Replace the contractor entirely.",
-            "Re-scope the pilot, adjust dependent work, and communicate proactively with pilot customers.",
-        ],
-        "scores": [1, 2, 5],
-    },
-    "ms_resil_2": {
-        "subdim": "Resilience & Adaptability",
-        "prompt": "⚡ SHOCK: Your customer acquisition cost jumps 40% overnight after a platform changes its ad algorithm.",
-        "options": [
-            "Keep campaigns running and see what happens.",
-            "Kill all paid channels immediately.",
-            "Shift spend, test new creatives, explore organic channels, and review funnel quality.",
-        ],
-        "scores": [1, 2, 5],
-    },
-    "ms_resil_3": {
-        "subdim": "Resilience & Adaptability",
-        "prompt": "⚡ SHOCK: A well-funded competitor suddenly launches a 'free tier' smart ventilation product in your space.",
-        "options": [
-            "Keep your current pricing and ignore them.",
-            "Lower your price significantly and hope to keep up.",
-            "Refocus on a segment or offer where you compete on value, service, and outcomes — not price.",
-        ],
-        "scores": [1, 2, 5],
+    "Resilient Adapter": {
+        "icon": "ð±",
+        "tagline": "You bend without breaking and find a way through anything",
+        "desc": "You're defined by grit, flexibility, and an uncanny ability to pivot when plans fall apart. You don't just survive setbacks â you learn from them faster than anyone. Your superpower is maintaining momentum when everyone else wants to quit.",
+        "strengths": ["Resilience under pressure", "Rapid pivoting", "Learning from failure", "Emotional steadiness"],
+        "gaps": ["Committing to one direction", "Proactive planning", "Leveraging early wins", "Delegating before crisis"],
+        "complement": "The Builder",
+        "complement_why": "A Builder helps channel your adaptability into consistent forward progress. While you keep the team steady through storms, they ensure you're accumulating tangible results and not just surviving â but actually advancing.",
     },
 }
 
-RESOURCEFULNESS_QIDS = ["ms_res_1", "ms_res_2", "ms_res_3", "ms_res_4"]
-EXEC_QIDS = [
-    qid
-    for qid, q in MINDSET_QUESTIONS.items()
-    if q["subdim"] == "Execution Bias"
-]
-RESIL_QIDS = ["ms_resil_1", "ms_resil_2", "ms_resil_3"]
 
-# ============== SKILLS GAME ==============
-SKILL_AREAS = [
-    "Market Research & Marketing",
-    "Operations",
-    "Financial Management",
-    "Product & Technical",
-    "Sales & Networking",
-    "Team & Strategy",
+# ââââââââââââââââââ SCENARIO: THE FRESHLOOP STORY ââââââââââââââââââ
+# A single immersive narrative with 5 decision points (all on one page)
+
+STORY_INTRO = """You and two friends have been brainstorming a business idea for months: <strong>FreshLoop</strong> â a service
+that rescues unsold food from local restaurants and grocers, repackages it into affordable meal kits,
+and delivers them to budget-conscious families. You've been talking about it forever. Today, you just found out
+that a competing service launched in a neighboring city last week. The clock is ticking."""
+
+SCENES = [
+    {
+        "title": "ð¥ Scene 1: The Spark",
+        "narrative": "Your group chat is blowing up. Your friend Maya says <em>\"We need to launch NOW before they expand here.\"</em> Your other friend Jordan says <em>\"We should study what they're doing first and learn from their mistakes.\"</em> You have a free Saturday coming up. What's your move?",
+        "options": {
+            "Hit the streets â talk to 20 restaurant owners this Saturday and gauge real interest before anything else": {
+                "scores": {"mindset": 3, "skills": 2, "resources": 1, "acumen": 2},
+                "archetype_weights": {"Builder": 2, "Connector": 3, "Resilient Adapter": 1},
+                "feedback": "**Customer-first instinct.** You're prioritizing real market signal over assumptions â a hallmark of founders who build things people actually want. This bias toward primary research over desk research is what separates builders from planners."
+            },
+            "Draft a one-page business model and rough financial projection to see if the numbers even work": {
+                "scores": {"mindset": 2, "skills": 2, "resources": 2, "acumen": 3},
+                "archetype_weights": {"Analyst": 3, "Builder": 1, "Visionary": 1},
+                "feedback": "**Analytical foundation.** You want to validate the economics before investing time â smart. The risk is that spreadsheets can become a hiding place from the messiness of real customer feedback. Your instinct for financial rigor is strong; pair it with market testing."
+            },
+            "Create a compelling pitch deck and start recruiting more people who could help make this real": {
+                "scores": {"mindset": 3, "skills": 1, "resources": 2, "acumen": 1},
+                "archetype_weights": {"Visionary": 3, "Connector": 2},
+                "feedback": "**Vision-led approach.** You're thinking about storytelling and team-building first â you instinctively know that great ventures need great people. Watch that you're not recruiting for a vision that hasn't been validated yet."
+            },
+            "Research the competitor thoroughly â sign up for their service, read their reviews, map their strategy": {
+                "scores": {"mindset": 1, "skills": 2, "resources": 1, "acumen": 3},
+                "archetype_weights": {"Analyst": 3, "Resilient Adapter": 1},
+                "feedback": "**Strategic intelligence.** Studying the competition is wise â but it can become a form of productive procrastination. The best founders learn from competitors AND talk to customers simultaneously. Your analytical instinct is an asset if you set a time limit on research."
+            },
+        },
+    },
+    {
+        "title": "ð° Scene 2: The Reality Check",
+        "narrative": "It's two weeks later. You've made some progress, but now you're facing a hard truth: to do a proper pilot, you need about $3,000 for packaging, a basic website, and initial food inventory. Between the three of you, you can scrape together $800. How do you handle this?",
+        "options": {
+            "Bootstrap it â strip the pilot down to the absolute minimum that still tests the core idea with real customers": {
+                "scores": {"mindset": 3, "skills": 2, "resources": 3, "acumen": 2},
+                "archetype_weights": {"Builder": 3, "Resilient Adapter": 2},
+                "feedback": "**Lean startup mentality.** You're willing to test ugly and learn fast rather than wait for perfect conditions. This scrappiness is one of the strongest predictors of startup survival. The founders who launch with duct tape and spreadsheets often outperform those who wait for funding."
+            },
+            "Pitch local businesses for sponsorship â offer them featured placement in exchange for covering costs": {
+                "scores": {"mindset": 2, "skills": 3, "resources": 2, "acumen": 2},
+                "archetype_weights": {"Connector": 3, "Visionary": 1, "Builder": 1},
+                "feedback": "**Creative deal-making.** You see partnerships where others see obstacles. This ability to create value exchanges (not just ask for money) is a powerful entrepreneurial skill. It also pre-validates demand â if businesses won't sponsor you, that's data."
+            },
+            "Apply for a small business grant or pitch a local angel investor / entrepreneurship competition": {
+                "scores": {"mindset": 2, "skills": 1, "resources": 2, "acumen": 2},
+                "archetype_weights": {"Visionary": 2, "Analyst": 2},
+                "feedback": "**External validation path.** Seeking formal funding forces you to articulate your value proposition clearly, which is valuable. The risk is timeline â grants and competitions take weeks or months, and your competitor isn't waiting."
+            },
+            "Put the idea on hold until you can save up enough to do it properly â you don't want to launch something half-baked": {
+                "scores": {"mindset": 0, "skills": 1, "resources": 1, "acumen": 1},
+                "archetype_weights": {"Analyst": 1},
+                "feedback": "**Perfectionism risk.** The instinct to \"do it right\" is understandable, but in entrepreneurship, waiting for perfect conditions is often the biggest risk of all. Most successful startups launched with far less than they thought they needed. The market won't wait for you to be ready."
+            },
+        },
+    },
+    {
+        "title": "ð§ Scene 3: The First Failure",
+        "narrative": "You launched a small pilot! But the first week is rough. Only 4 out of 30 meal kits sold. Your Instagram campaign got barely any engagement. Maya is frustrated and talking about quitting. Jordan says the whole concept might be flawed. You're sitting at your kitchen table on Sunday night staring at the numbers. What do you do?",
+        "options": {
+            "Call every single person who DID buy and ask them why â then call people who didn't and ask what would change their mind": {
+                "scores": {"mindset": 3, "skills": 3, "resources": 1, "acumen": 3},
+                "archetype_weights": {"Builder": 2, "Analyst": 2, "Resilient Adapter": 2},
+                "feedback": "**Learn-from-failure reflex.** This is the response of someone who treats setbacks as data, not verdicts. Talking to actual customers (both buyers and non-buyers) is the fastest path to understanding what's broken. This instinct alone separates founders who iterate from founders who spiral."
+            },
+            "Reframe the narrative for the team â remind everyone that most startups fail on their first try and this is just iteration": {
+                "scores": {"mindset": 3, "skills": 1, "resources": 1, "acumen": 1},
+                "archetype_weights": {"Visionary": 2, "Resilient Adapter": 2, "Connector": 1},
+                "feedback": "**Emotional leadership.** You instinctively protect team morale and reframe setbacks as learning. This is critical â most startups die from co-founder conflict, not bad ideas. But be careful that optimism doesn't substitute for diagnosis. Your team needs hope AND a concrete plan."
+            },
+            "Dig into the data â analyze who saw the campaign, map the drop-off points, A/B test different messaging this week": {
+                "scores": {"mindset": 2, "skills": 3, "resources": 1, "acumen": 3},
+                "archetype_weights": {"Analyst": 3, "Builder": 1},
+                "feedback": "**Data-driven pivot.** You go to the metrics first, which is smart. Understanding WHERE the funnel breaks is essential to fixing it. The risk is getting lost in dashboards instead of having real conversations with real humans about why they didn't buy."
+            },
+            "Pivot the model â maybe meal kits aren't right, but the food rescue relationships are valuable. Brainstorm completely different approaches": {
+                "scores": {"mindset": 2, "skills": 1, "resources": 2, "acumen": 2},
+                "archetype_weights": {"Visionary": 3, "Resilient Adapter": 2},
+                "feedback": "**Pivot instinct.** You're willing to let go of the original form while keeping the core value. This is a powerful entrepreneurial trait â but be cautious about pivoting too fast. One bad week isn't always a signal to change direction entirely. Sometimes the idea is right but the execution needs tuning."
+            },
+        },
+    },
+    {
+        "title": "ð¥ Scene 4: The Team Fracture",
+        "narrative": "After three months of grinding, things are picking up â you're now selling 50+ kits per week. But tension is rising. Maya has been doing most of the delivery logistics and feels overworked. Jordan has been handling social media but wants to focus on strategy. You've been managing restaurant relationships. Nobody formally agreed on roles, equity, or decision-making authority. A big argument erupts over whether to hire a part-time driver. How do you handle this?",
+        "options": {
+            "Call a formal meeting â put roles, equity, and decision-making process in writing before making any more operational decisions": {
+                "scores": {"mindset": 2, "skills": 3, "resources": 2, "acumen": 3},
+                "archetype_weights": {"Analyst": 2, "Builder": 2, "Connector": 1},
+                "feedback": "**Structural maturity.** You recognize that the informal startup phase needs to evolve into something more structured. Getting roles and equity in writing now â while relationships are strained but not broken â is exactly the right instinct. Most co-founder blowups happen because this conversation was delayed too long."
+            },
+            "Focus on Maya's burnout first â she's the most at risk of leaving, and without her the logistics fall apart": {
+                "scores": {"mindset": 3, "skills": 2, "resources": 1, "acumen": 2},
+                "archetype_weights": {"Connector": 3, "Resilient Adapter": 2},
+                "feedback": "**People-first leadership.** You triage the human problem before the structural one. Retaining Maya is existentially important, and you see that. The risk is that fixing one person's frustration without addressing the systemic issue means you'll be putting out fires forever."
+            },
+            "Just hire the driver â the argument is really about everyone being overworked, and reducing the workload will reduce the tension": {
+                "scores": {"mindset": 1, "skills": 1, "resources": 2, "acumen": 1},
+                "archetype_weights": {"Builder": 2, "Resilient Adapter": 1},
+                "feedback": "**Action bias.** You want to solve the symptom quickly and keep moving. Sometimes this works â but the argument about the driver is really about power, equity, and roles. Hiring without resolving those deeper issues just adds another person to an unclear structure."
+            },
+            "Bring in an outside mentor or advisor to mediate â you're too close to this to be objective": {
+                "scores": {"mindset": 2, "skills": 2, "resources": 3, "acumen": 2},
+                "archetype_weights": {"Analyst": 1, "Connector": 2, "Visionary": 1},
+                "feedback": "**Self-awareness and resourcefulness.** Knowing when you're too close to a problem and need outside perspective is a sign of maturity. Mentors can see patterns you can't. The key is finding someone who's navigated co-founder dynamics before, not just a general business advisor."
+            },
+        },
+    },
+    {
+        "title": "ð Scene 5: The Big Opportunity",
+        "narrative": "Six months in, FreshLoop is growing steadily. Then a regional grocery chain approaches you: they want to partner exclusively â they'll give you all their unsold food for free, but you can't work with any other grocers in the area. They also want you to use their branding on the meal kits. It would 3x your supply instantly but fundamentally change the business. Your team is split.",
+        "options": {
+            "Take the deal but negotiate hard â remove the exclusivity clause and the branding requirement, even if it means less supply": {
+                "scores": {"mindset": 3, "skills": 3, "resources": 2, "acumen": 3},
+                "archetype_weights": {"Analyst": 2, "Connector": 2, "Builder": 1},
+                "feedback": "**Strategic negotiation.** You see the value but refuse to give up independence. Negotiating to keep your brand and supplier diversity shows you're thinking about long-term positioning, not just short-term growth. This is the instinct that separates businesses that scale from ones that get absorbed."
+            },
+            "Take it as-is â this kind of opportunity doesn't come twice, and you can always renegotiate later when you have more leverage": {
+                "scores": {"mindset": 2, "skills": 1, "resources": 3, "acumen": 1},
+                "archetype_weights": {"Builder": 2, "Resilient Adapter": 2},
+                "feedback": "**Growth-at-all-costs instinct.** Speed and scale are tempting, but exclusivity and branding concessions are extremely hard to undo later. 'We'll renegotiate when we're bigger' rarely works â the power dynamic often gets worse, not better. Your boldness is an asset, but this needs more guardrails."
+            },
+            "Decline â your independence and brand are more valuable than free supply. Find a way to grow on your own terms": {
+                "scores": {"mindset": 2, "skills": 1, "resources": 1, "acumen": 2},
+                "archetype_weights": {"Visionary": 3, "Resilient Adapter": 1},
+                "feedback": "**Brand-protective instinct.** You value autonomy and long-term brand equity over short-term growth. This can be the right call â but walking away from free supply when you're still early-stage is a significant risk. Consider whether your principles are well-timed or premature."
+            },
+            "Ask for a 90-day trial period â test the partnership with clear metrics before committing to anything long-term": {
+                "scores": {"mindset": 2, "skills": 2, "resources": 2, "acumen": 3},
+                "archetype_weights": {"Analyst": 3, "Builder": 1, "Resilient Adapter": 1},
+                "feedback": "**Test-and-learn approach.** You want data before committing, which reduces risk. A trial period is a genuinely creative middle path. The question is whether the grocery chain will agree â big companies often want commitment, not experiments. But it's worth asking."
+            },
+        },
+    },
 ]
 
-SKILL_DESCRIPTIONS = {
-    "Market Research & Marketing": "Finding, understanding, and reaching the right customers.",
-    "Operations": "Designing and running reliable processes and delivery.",
-    "Financial Management": "Budgeting, runway, unit economics, and trade-offs.",
-    "Product & Technical": "Designing and building solutions users can actually use.",
-    "Sales & Networking": "Selling value and building relationships that move things forward.",
-    "Team & Strategy": "Aligning people and priorities toward a coherent direction.",
-}
 
-SKILL_QUESTIONS = {
-    "sk_mkt_1": {
-        "skill": "Market Research & Marketing",
-        "prompt": "ThermaLoop trial users aren't converting to paid. What do you do first?",
-        "options": [
-            "Interview 5–10 recent trial users about their decision.",
-            "Run a broad online survey with anyone you can find.",
-            "Change the homepage headline based on your intuition.",
-            "Read marketing articles instead of talking to actual prospects.",
-        ],
-        "scores": [5, 2, 1, 2],
+# ââââââââââââââââââ REFLECTION PROMPTS & AI ANALYSIS ââââââââââââââââââ
+
+REFLECTIONS = {
+    "motivation": {
+        "prompt": "What draws you to entrepreneurship? What's the deeper reason you'd want to build something of your own â beyond money?",
+        "analysis_map": {
+            "impact|change|difference|help|community|world|better|social|people": {
+                "trait": "Impact-Driven",
+                "insight": "Your motivation is rooted in making a difference. Impact-driven founders often build the most enduring companies because their 'why' sustains them through the inevitable hard times. Channel this into a clear mission statement early â it becomes your north star when decisions get tough.",
+                "archetype_boost": {"Visionary": 2, "Connector": 1},
+            },
+            "freedom|independence|autonomy|own boss|control|flexibility|schedule": {
+                "trait": "Autonomy-Seeking",
+                "insight": "You crave independence and self-determination. This is a powerful motivator, but be aware: early-stage entrepreneurship often means LESS freedom, not more â you answer to customers, investors, partners, and deadlines. The freedom comes later. Founders who understand this paradox persevere longer.",
+                "archetype_boost": {"Builder": 1, "Resilient Adapter": 1},
+            },
+            "create|build|make|invent|design|product|ship|solve": {
+                "trait": "Creator-Builder",
+                "insight": "You're driven by the act of creation itself. This builder energy is one of the most reliable entrepreneurial motivators because the reward is intrinsic â you'll keep going even when external validation is scarce. Make sure you balance building what excites you with building what the market wants.",
+                "archetype_boost": {"Builder": 2, "Visionary": 1},
+            },
+            "learn|grow|challenge|push|stretch|develop|skill|master": {
+                "trait": "Growth-Oriented",
+                "insight": "You see entrepreneurship as a vehicle for personal growth. This learning orientation is correlated with resilience â founders who frame setbacks as learning opportunities recover faster. Your growth mindset is an asset; pair it with a specific domain you want to master.",
+                "archetype_boost": {"Resilient Adapter": 2, "Analyst": 1},
+            },
+            "opportunity|gap|market|problem|need|inefficiency|broken|fix": {
+                "trait": "Opportunity-Spotter",
+                "insight": "You see gaps and inefficiencies that others miss â and you want to fix them. This problem-solution orientation is classic entrepreneurial thinking. The key is validating that others experience the problem as acutely as you do. Your instinct for market gaps is strong; pair it with customer evidence.",
+                "archetype_boost": {"Analyst": 2, "Visionary": 1},
+            },
+            "team|together|people|collaborate|lead|culture|hire": {
+                "trait": "Team-Builder",
+                "insight": "You're drawn to the human side of building â assembling and leading a team. This relational motivation is especially valuable because most startups succeed or fail based on the founding team, not the idea. Your instinct to think about people first is a genuine competitive advantage.",
+                "archetype_boost": {"Connector": 2, "Builder": 1},
+            },
+        },
     },
-    "sk_mkt_2": {
-        "skill": "Market Research & Marketing",
-        "prompt": "You want to identify the best early adopters for ThermaLoop. What's your move?",
-        "options": [
-            "Find a niche where the energy pain is sharpest and design messaging just for them.",
-            "Target every building type with the same message.",
-            "Copy a competitor's positioning.",
-            "Ask a mentor who they think sounds like the right customer.",
-        ],
-        "scores": [5, 1, 2, 3],
+    "failure_response": {
+        "prompt": "Describe a time you faced a significant setback or failure. How did you respond, and what did you take away from it?",
+        "analysis_map": {
+            "learned|lesson|realized|understood|discovered|takeaway|insight": {
+                "trait": "Reflective Learner",
+                "insight": "You extract lessons from adversity â that's the hallmark of a resilient founder. Research shows that entrepreneurs who reflect on failures (rather than just powering through them) make better decisions in subsequent ventures. Your reflective capacity is a genuine strength.",
+                "archetype_boost": {"Analyst": 1, "Resilient Adapter": 2},
+            },
+            "pivot|change|adapt|adjust|different|new approach|shifted|tried again": {
+                "trait": "Adaptive Responder",
+                "insight": "You respond to setbacks by changing course rather than doubling down on what isn't working. This adaptability is crucial in entrepreneurship where the original plan almost never survives contact with reality. Your flexibility is a superpower â just make sure pivots are driven by data, not just discomfort.",
+                "archetype_boost": {"Resilient Adapter": 2, "Builder": 1},
+            },
+            "kept going|persisted|didn't give up|pushed through|stayed|committed|persevered|grit": {
+                "trait": "Persistent Grinder",
+                "insight": "Your instinct is to persist through difficulty â to outlast the problem. This grit is one of the most studied and validated entrepreneurial traits. The nuance is knowing when persistence becomes stubbornness. The best founders combine your persistence with strategic flexibility.",
+                "archetype_boost": {"Builder": 2, "Resilient Adapter": 1},
+            },
+            "help|support|talked|mentor|advice|team|friend|family|asked": {
+                "trait": "Support-Seeker",
+                "insight": "You reach out to others when you're struggling â this is actually a sign of strength, not weakness. Founders who build support networks recover from setbacks faster and make better decisions under stress. Your willingness to be vulnerable and ask for help is a genuine competitive advantage.",
+                "archetype_boost": {"Connector": 2, "Resilient Adapter": 1},
+            },
+            "plan|strategy|analyze|figured|research|understand|studied|systematic": {
+                "trait": "Strategic Processor",
+                "insight": "You respond to setbacks by stepping back and analyzing what went wrong. This systematic approach to failure is valuable â it means you're less likely to repeat mistakes. Pair this analytical response with speed; the best founders analyze quickly and act on their findings immediately.",
+                "archetype_boost": {"Analyst": 2, "Visionary": 1},
+            },
+        },
     },
-    "sk_prod_1": {
-        "skill": "Product & Technical",
-        "prompt": "You can only ship one change to ThermaLoop this sprint. Which do you choose?",
-        "options": [
-            "A fix for a calibration bug that blocks first-time setup.",
-            "A 'nice to have' dashboard widget a few users casually mentioned.",
-            "A flashy new visualization that will look good in demos.",
-            "Ask an advisor for ideas and wait.",
-        ],
-        "scores": [5, 2, 3, 1],
-    },
-    "sk_prod_2": {
-        "skill": "Product & Technical",
-        "prompt": "You're unsure whether the ThermaLoop setup flow is intuitive. What do you do?",
-        "options": [
-            "Do 5 quick usability tests with target building managers.",
-            "Ship it now; you'll hear complaints if it's bad.",
-            "Ask your team what they think is confusing.",
-            "Search for UX patterns and copy one without testing.",
-        ],
-        "scores": [5, 1, 3, 2],
-    },
-    "sk_sales_1": {
-        "skill": "Sales & Networking",
-        "prompt": "You have 10 warm leads from a building management conference and limited time. What's your approach?",
-        "options": [
-            "Send tailored messages referencing your conversation and schedule 1:1 demos.",
-            "Send a broad email blast and hope some respond.",
-            "Post about ThermaLoop on LinkedIn instead.",
-            "Ask a mentor which lead to start with but delay outreach.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "sk_sales_2": {
-        "skill": "Sales & Networking",
-        "prompt": "You meet someone at a conference who manages 50 buildings. They seem interested. What's your next step?",
-        "options": [
-            "Suggest a concrete next step — a small pilot in one of their buildings.",
-            "Ask for a purchase commitment immediately.",
-            "Wait to see if they reach out to you.",
-            "Send them a deck without a clear ask or next step.",
-        ],
-        "scores": [5, 1, 2, 2],
-    },
-    "sk_fin_1": {
-        "skill": "Financial Management",
-        "prompt": "ThermaLoop has 3 months of runway left. What do you prioritize?",
-        "options": [
-            "Identify and cut low-ROI spend while doubling down on what's driving pipeline.",
-            "Cut all spending, including things that fuel growth.",
-            "Ignore runway and focus purely on perfecting the product.",
-            "Ask a mentor if they think you should be worried yet.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "sk_fin_2": {
-        "skill": "Financial Management",
-        "prompt": "Your cost to acquire a building manager is higher than expected, but those who convert stay for years.",
-        "options": [
-            "Check payback period and LTV, then decide how much you can afford to spend per customer.",
-            "Shut off acquisition until the cost comes down.",
-            "Ignore the numbers and focus on top-line growth.",
-            "Search benchmarks and treat them as an exact template without checking your own data.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "sk_ops_1": {
-        "skill": "Operations",
-        "prompt": "ThermaLoop support tickets are piling up. What's your first move?",
-        "options": [
-            "Look for patterns and fix the top root causes generating tickets.",
-            "Hire more support staff immediately.",
-            "Tell the team to 'work harder' this week.",
-            "Ask a mentor if they think you need more staff.",
-        ],
-        "scores": [5, 2, 1, 2],
-    },
-    "sk_ops_2": {
-        "skill": "Operations",
-        "prompt": "The ThermaLoop install process works, but only you know how to do it. What now?",
-        "options": [
-            "Document it and train someone else so it's repeatable and you're not a bottleneck.",
-            "Keep doing it yourself — it's faster.",
-            "Pause installs while you figure out a better system.",
-            "Record a quick video and hope people figure it out.",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    "sk_team_1": {
-        "skill": "Team & Strategy",
-        "prompt": "Overall traction is flat, but one segment — mid-size office buildings — loves ThermaLoop. What now?",
-        "options": [
-            "Focus your roadmap and messaging on the segment that's working.",
-            "Keep trying to serve every building type equally.",
-            "Pause all changes while you think about pivoting.",
-            "Ask a mentor whether the niche is 'big enough.'",
-        ],
-        "scores": [5, 1, 2, 3],
-    },
-    "sk_team_2": {
-        "skill": "Team & Strategy",
-        "prompt": "Your small ThermaLoop team is busy, but progress on key metrics is slow.",
-        "options": [
-            "Narrow focus to a small number of high-leverage bets tied to your top metric.",
-            "Add more projects so nobody is idle.",
-            "Let each person pick whatever they want to work on.",
-            "Share a productivity framework and hope habits shift.",
-        ],
-        "scores": [5, 1, 2, 3],
+    "vision": {
+        "prompt": "Imagine your ideal entrepreneurial life 5 years from now. What does your day look like? What kind of company are you running? Who's around you?",
+        "analysis_map": {
+            "team|employees|hire|culture|office|people|staff|co-founder": {
+                "trait": "Organization Builder",
+                "insight": "Your vision centers on people and team â you're building a company, not just a product. Founders who think about culture and team from day one tend to build more sustainable organizations. Your instinct for the human side of business is a genuine differentiator.",
+                "archetype_boost": {"Connector": 2, "Builder": 1},
+            },
+            "product|customers|users|build|ship|create|platform|technology|app": {
+                "trait": "Product Visionary",
+                "insight": "Your future revolves around what you're building and who's using it. This product-centric vision is the engine of most successful startups. Make sure the people who use your product stay at the center of your vision â the best products come from deep empathy, not just technical ambition.",
+                "archetype_boost": {"Builder": 2, "Visionary": 1},
+            },
+            "impact|community|social|change|better|mission|purpose|meaningful": {
+                "trait": "Mission-Driven Leader",
+                "insight": "Your 5-year vision is anchored in impact and meaning. Mission-driven founders attract purpose-driven talent and loyal customers. Your challenge will be balancing mission with financial sustainability â the most impactful companies find where purpose and profit overlap.",
+                "archetype_boost": {"Visionary": 2, "Connector": 1},
+            },
+            "freedom|travel|flexible|lifestyle|balance|remote|family|enjoy": {
+                "trait": "Lifestyle Designer",
+                "insight": "You're building a business that serves your life, not the other way around. This clarity about what you actually want is surprisingly rare and valuable. Just know that lifestyle-optimized businesses usually require intense upfront investment of time before they deliver the freedom you envision.",
+                "archetype_boost": {"Resilient Adapter": 1, "Builder": 1},
+            },
+            "revenue|profit|scale|grow|expand|million|funding|investor|IPO|exit": {
+                "trait": "Scale-Oriented",
+                "insight": "Your vision is ambitious â you're thinking about scale, growth, and significant financial outcomes. This ambition is the fuel that drives high-growth companies. Pair it with deep customer empathy so that your growth is built on real value, not just metrics.",
+                "archetype_boost": {"Visionary": 1, "Analyst": 2},
+            },
+            "learn|expert|master|known for|thought leader|speak|write|teach": {
+                "trait": "Expertise Builder",
+                "insight": "Your vision includes becoming a recognized expert in your domain. This reputation-building instinct can be a powerful flywheel â expertise attracts opportunities, talent, and customers. Many successful founders built their company on the back of personal credibility in their field.",
+                "archetype_boost": {"Analyst": 1, "Visionary": 1, "Connector": 1},
+            },
+        },
     },
 }
 
-SKILL_SLIDER_MAP = {
-    "Market Research & Marketing": "s_skill_mkt",
-    "Operations": "s_skill_ops",
-    "Financial Management": "s_skill_fin",
-    "Product & Technical": "s_skill_prod",
-    "Sales & Networking": "s_skill_sales",
-    "Team & Strategy": "s_skill_team",
-}
 
-SKILL_SCENARIO_MAP = {
-    "Market Research & Marketing": ["sk_mkt_1", "sk_mkt_2"],
-    "Operations": ["sk_ops_1", "sk_ops_2"],
-    "Financial Management": ["sk_fin_1", "sk_fin_2"],
-    "Product & Technical": ["sk_prod_1", "sk_prod_2"],
-    "Sales & Networking": ["sk_sales_1", "sk_sales_2"],
-    "Team & Strategy": ["sk_team_1", "sk_team_2"],
-}
+# ââââââââââââââââââ SELF-ASSESSMENT DIMENSIONS ââââââââââââââââââ
 
-# ============== RESOURCES ==============
-RESOURCE_SUBDIMS = [
-    "Financial Resources",
-    "Technology & Infrastructure",
-    "Talent / Team",
-    "Network",
-    "Time",
-    "Support",
+SELF_ASSESS_DIMS = [
+    {"key": "risk_tolerance", "label": "Risk Tolerance", "low": "I prefer certainty and proven paths", "high": "I'm comfortable betting on uncertain outcomes", "category": "mindset"},
+    {"key": "resourcefulness", "label": "Resourcefulness", "low": "I need proper resources before starting", "high": "I can make something from almost nothing", "category": "skills"},
+    {"key": "persuasion", "label": "Selling & Persuasion", "low": "I find it hard to pitch or sell ideas", "high": "I can get almost anyone excited about my ideas", "category": "skills"},
+    {"key": "financial_intuition", "label": "Financial Intuition", "low": "Numbers and finances stress me out", "high": "I naturally think in terms of costs, margins, and ROI", "category": "acumen"},
+    {"key": "resilience", "label": "Resilience", "low": "Setbacks shake my confidence significantly", "high": "I bounce back quickly and use setbacks as fuel", "category": "mindset"},
+    {"key": "leadership", "label": "Leadership", "low": "I prefer to follow or contribute individually", "high": "I naturally step into leadership roles", "category": "skills"},
+    {"key": "adaptability", "label": "Adaptability", "low": "I like sticking to the plan once it's set", "high": "I thrive when plans change and I need to improvise", "category": "mindset"},
+    {"key": "customer_empathy", "label": "Customer Empathy", "low": "I build what I think is best", "high": "I obsess over understanding what people actually need", "category": "acumen"},
 ]
 
-RESOURCE_DESCRIPTIONS = {
-    "Financial Resources": "Cash, savings, or funding you could realistically apply to a venture.",
-    "Technology & Infrastructure": "Access to tools, platforms, or infrastructure to build and deliver.",
-    "Talent / Team": "People you could involve: co-founders, employees, freelancers, or advisors.",
-    "Network": "Connections to customers, partners, mentors, or gatekeepers.",
-    "Time": "Hours per week you can reliably invest.",
-    "Support": "Emotional and practical support for ambitious goals.",
-}
 
-# ============== ACUMEN QUIZ ==============
-ACUMEN_SUBDIMS = [
-    "Problem–Solution Fit",
-    "Market Viability",
-    "Business Model Soundness",
-    "Go-to-Market Readiness",
-    "Operational Feasibility",
-    "Scalability Potential",
-]
+# ââââââââââââââââââ ANALYSIS & SCORING FUNCTIONS ââââââââââââââââââ
 
-ACUMEN_DESCRIPTIONS = {
-    "Problem–Solution Fit": "Real, urgent customer problem + clear solution that addresses it.",
-    "Market Viability": "Defined target segment, reachable customers, credible demand, differentiation.",
-    "Business Model Soundness": "Pricing, unit economics, cost structure, and path to profitability.",
-    "Go-to-Market Readiness": "Validated channels, messaging, acquisition strategy.",
-    "Operational Feasibility": "Ability to deliver reliably given tech, supply, and processes.",
-    "Scalability Potential": "Model, market, and operations can grow without breaking.",
-}
+def analyze_text(text, analysis_map):
+    """Analyze free-text response against keyword patterns and return matched traits."""
+    if not text or len(text.strip()) < 10:
+        return []
+    text_lower = text.lower()
+    matches = []
+    for pattern, data in analysis_map.items():
+        keywords = pattern.split("|")
+        match_count = sum(1 for kw in keywords if kw in text_lower)
+        if match_count > 0:
+            matches.append({**data, "match_strength": match_count})
+    matches.sort(key=lambda x: x["match_strength"], reverse=True)
+    return matches[:3]  # Top 3 matches
 
-ACUMEN_QUESTIONS = {
-    "ac_ps_fit": {
-        "subdim": "Problem–Solution Fit",
-        "prompt": "Which signal shows the strongest evidence that ThermaLoop solves a real problem?",
-        "options": [
-            "People say the concept is 'cool' in casual conversation.",
-            "A segment of building managers repeatedly describes the same painful problem ThermaLoop addresses.",
-            "Your landing page has a high click-through rate from ads.",
-        ],
-        "scores": [2, 5, 3],
-    },
-    "ac_ps_fit_2": {
-        "subdim": "Problem–Solution Fit",
-        "prompt": "You hear different problems from different types of buildings. What's your next step?",
-        "options": [
-            "Pick the problem you personally find most interesting.",
-            "Cluster buildings by similar needs and pains, and focus on one tight group first.",
-            "Try to build a product that solves all of them at once.",
-        ],
-        "scores": [2, 5, 1],
-    },
-    "ac_market": {
-        "subdim": "Market Viability",
-        "prompt": "Which of these market situations is most promising for ThermaLoop?",
-        "options": [
-            "Huge possible market (all commercial buildings), but you don't know who to target first.",
-            "A smaller, clearly defined group (mid-size offices in the Northeast) you can reliably reach.",
-            "A big market with many HVAC competitors and no clear angle.",
-        ],
-        "scores": [3, 5, 2],
-    },
-    "ac_model": {
-        "subdim": "Business Model Soundness",
-        "prompt": "Which business model is healthiest over time?",
-        "options": [
-            "High price point, but each install costs more to deliver than the customer pays.",
-            "Moderate price, high margin, and a clear path to recurring monitoring revenue.",
-            "Low price, unclear costs, and no idea how many buildings you need to break even.",
-        ],
-        "scores": [1, 5, 2],
-    },
-    "ac_gtm": {
-        "subdim": "Go-to-Market Readiness",
-        "prompt": "Which description sounds most ready to scale customer acquisition?",
-        "options": [
-            "You plan to grow through word-of-mouth, but have no path to your first 10 customers.",
-            "You've tested a few channels and have one that reliably brings qualified building manager leads.",
-            "You plan to 'go viral' at a trade show but have no follow-up process mapped.",
-        ],
-        "scores": [1, 5, 1],
-    },
-    "ac_ops": {
-        "subdim": "Operational Feasibility",
-        "prompt": "Which setup is most likely to deliver ThermaLoop installs consistently?",
-        "options": [
-            "You rely on a manual process only you understand.",
-            "You have documented install procedures and can train technicians to deliver.",
-            "You plan to figure out delivery logistics after demand shows up.",
-        ],
-        "scores": [2, 5, 1],
-    },
-    "ac_scale": {
-        "subdim": "Scalability Potential",
-        "prompt": "Which of these ThermaLoop approaches scales best?",
-        "options": [
-            "Each install requires extensive custom engineering from you personally.",
-            "Most of the value is delivered through standardized hardware + software, with minimal custom work.",
-            "You depend on rare, highly specialized HVAC engineers for every installation.",
-        ],
-        "scores": [2, 5, 1],
-    },
-}
 
-# ============== SESSION STATE ==============
+def compute_archetype(scene_choices, reflection_matches, self_assess_values):
+    """Compute primary and secondary archetypes from all inputs."""
+    scores = {a: 0 for a in ARCHETYPES}
+
+    # From scenario choices (40% weight)
+    for choice_data in scene_choices:
+        if choice_data:
+            for arch, weight in choice_data.get("archetype_weights", {}).items():
+                scores[arch] += weight * 1.5
+
+    # From reflection analysis (35% weight)
+    for matches in reflection_matches:
+        for m in matches:
+            for arch, boost in m.get("archetype_boost", {}).items():
+                scores[arch] += boost * 1.2
+
+    # From self-assessment (25% weight)
+    if self_assess_values:
+        # Map slider values to archetype tendencies
+        sa = self_assess_values
+        scores["Builder"] += sa.get("resourcefulness", 5) * 0.15 + sa.get("leadership", 5) * 0.1
+        scores["Visionary"] += sa.get("risk_tolerance", 5) * 0.15 + sa.get("persuasion", 5) * 0.1
+        scores["Analyst"] += sa.get("financial_intuition", 5) * 0.15 + sa.get("customer_empathy", 5) * 0.1
+        scores["Connector"] += sa.get("persuasion", 5) * 0.15 + sa.get("leadership", 5) * 0.1
+        scores["Resilient Adapter"] += sa.get("resilience", 5) * 0.15 + sa.get("adaptability", 5) * 0.1
+
+    sorted_archs = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    primary = sorted_archs[0][0]
+    secondary = sorted_archs[1][0] if len(sorted_archs) > 1 else None
+    return primary, secondary, scores
+
+
+def compute_dimension_scores(scene_choices, self_assess_values):
+    """Compute scores across the 4 dimensions."""
+    dims = {"mindset": 0, "skills": 0, "resources": 0, "acumen": 0}
+    max_per_dim = {"mindset": 0, "skills": 0, "resources": 0, "acumen": 0}
+
+    # Scene contributions
+    for choice_data in scene_choices:
+        if choice_data:
+            for dim in dims:
+                dims[dim] += choice_data["scores"].get(dim, 0)
+                max_per_dim[dim] += 3
+
+    # Self-assessment contributions
+    if self_assess_values:
+        for item in SELF_ASSESS_DIMS:
+            cat = item["category"]
+            val = self_assess_values.get(item["key"], 5)
+            dims[cat] += val * 0.3
+            max_per_dim[cat] += 3
+
+    # Normalize to 0-100
+    result = {}
+    for dim in dims:
+        mx = max(max_per_dim[dim], 1)
+        result[dim] = min(100, int((dims[dim] / mx) * 100))
+
+    return result
+
+
+def overall_readiness(dim_scores):
+    """Weighted overall readiness score."""
+    weights = {"mindset": 0.30, "skills": 0.25, "resources": 0.20, "acumen": 0.25}
+    total = sum(dim_scores.get(d, 0) * w for d, w in weights.items())
+    return int(total)
+
+
+def readiness_label(score):
+    if score >= 80:
+        return "Ready to Launch", "#22c55e", "You have strong entrepreneurial foundations across the board. You're not just ready â you're likely already acting like a founder."
+    elif score >= 60:
+        return "Almost There", "#f59e0b", "You have solid foundations with some specific areas to develop. Targeted growth in your gap areas could make a significant difference."
+    elif score >= 40:
+        return "Building Momentum", "#f97316", "You're developing real entrepreneurial instincts. Focus on your strengths while actively building skills in your gap areas."
+    else:
+        return "Early Explorer", "#3b82f6", "You're at the beginning of your entrepreneurial journey â and that's a great place to be. Everyone starts here. Your awareness of where you stand is itself a strength."
+
+
+def generate_coaching(primary_arch, dim_scores, overall):
+    """Generate personalized coaching recommendations."""
+    arch_data = ARCHETYPES[primary_arch]
+    recs = []
+
+    # Based on lowest dimension
+    sorted_dims = sorted(dim_scores.items(), key=lambda x: x[1])
+    weakest = sorted_dims[0]
+
+    dim_coaching = {
+        "mindset": "**Strengthen your entrepreneurial mindset** by putting yourself in low-stakes situations that require tolerating ambiguity â like volunteering to lead an unfamiliar project or making small bets on uncertain outcomes. Mindset is a muscle, not a trait.",
+        "skills": "**Build your skill toolkit** by focusing on the skill you use least: if it's selling, practice pitching one idea per week to a friend. If it's building, try shipping a tiny project in a weekend. Skills compound faster than you think.",
+        "resources": "**Expand your resource network** by mapping the assets you already have access to (people, skills, spaces, tools) and the gaps. Often the resources exist â they're just not yet connected to your goal. Start by telling 10 people what you're building.",
+        "acumen": "**Sharpen your business acumen** by studying one business model per week â not just what companies do, but HOW they make money. Understanding unit economics and customer acquisition costs will transform your decision-making.",
+    }
+
+    recs.append(dim_coaching.get(weakest[0], ""))
+
+    # Based on archetype gaps
+    if arch_data["gaps"]:
+        top_gaps = arch_data["gaps"][:2]
+        recs.append(f"**As a {primary_arch}, watch for:** {' and '.join(top_gaps).lower()}. These are your natural blind spots. You don't need to become great at them â but you need someone on your team who is.")
+
+    return recs
+
+
+# ââââââââââââââââââ SESSION STATE ââââââââââââââââââ
+
 if "page" not in st.session_state:
     st.session_state.page = 0
-if "max_page" not in st.session_state:
-    st.session_state.max_page = 0
-if "submitted" not in st.session_state:
-    st.session_state.submitted = False
-if "res_q_idx" not in st.session_state:
-    st.session_state.res_q_idx = 0
 
-# Dashboard metrics initialization (now numeric for cumulative tracking)
-if "dash_cash" not in st.session_state:
-    st.session_state.dash_cash = 48000
-if "dash_pipeline" not in st.session_state:
-    st.session_state.dash_pipeline = 5
-if "dash_morale" not in st.session_state:
-    st.session_state.dash_morale = "Steady 😌"
-if "dash_credibility" not in st.session_state:
-    st.session_state.dash_credibility = "Unknown"
+if "scene_choices" not in st.session_state:
+    st.session_state.scene_choices = [None] * 5
 
-# Round scores for ripple tracking
-if "round_1_score" not in st.session_state:
-    st.session_state.round_1_score = 0
-if "round_2_score" not in st.session_state:
-    st.session_state.round_2_score = 0
-if "round_3_score" not in st.session_state:
-    st.session_state.round_3_score = 0
-if "round_4_score" not in st.session_state:
-    st.session_state.round_4_score = 0
+if "self_assess" not in st.session_state:
+    st.session_state.self_assess = {}
 
-# Email draft and score
-if "email_draft" not in st.session_state:
-    st.session_state.email_draft = ""
-if "email_score" not in st.session_state:
-    st.session_state.email_score = 0
+if "reflections" not in st.session_state:
+    st.session_state.reflections = {"motivation": "", "failure_response": "", "vision": ""}
 
-# one-time defaults for resources/support
-if "defaults_initialized" not in st.session_state:
-    defaults = {
-        "res_fin_level": 3,
-        "res_tech_level": 3,
-        "res_talent_level": 3,
-        "res_network_level": 3,
-        "res_time_pattern": None,
-        "sup_brainstorm": False,
-        "sup_tactical": False,
-        "sup_emotional": False,
-        "sup_intros": False,
-        "sup_reaction": None,
-    }
-    for k, v in defaults.items():
-        st.session_state.setdefault(k, v)
-    st.session_state.defaults_initialized = True
+def go_to(p):
+    st.session_state.page = p
 
-# Skill self-ratings (stored when user rates themselves on page 11)
-if "skill_self_ratings" not in st.session_state:
-    st.session_state.skill_self_ratings = {}
 
-if "round_5_score" not in st.session_state:
-    st.session_state.round_5_score = 0
+# ââââââââââââââââââ PROGRESS INDICATOR ââââââââââââââââââ
 
+def render_progress(current, total=4):
+    labels = ["Welcome", "Scenario", "About You", "Results"]
+    dots_html = ""
+    for i in range(total):
+        cls = "done" if i < current else ("active" if i == current else "")
+        dots_html += f'<div class="dot {cls}" title="{labels[i]}"></div>'
+    st.markdown(f'<div class="progress-dots">{dots_html}</div>', unsafe_allow_html=True)
 
-def go_to(page_idx: int):
-    st.session_state.page = page_idx
-    if page_idx > st.session_state.max_page:
-        st.session_state.max_page = page_idx
-    st.rerun()
 
-
-# ============== UI HELPERS ==============
-def toggle_flag(state_key: str):
-    st.session_state[state_key] = not st.session_state.get(state_key, False)
-
-
-def set_choice(state_key: str, value):
-    st.session_state[state_key] = value
-
-
-def ensure_order(order_key: str, n: int):
-    if order_key not in st.session_state:
-        order = list(range(n))
-        random.shuffle(order)
-        st.session_state[order_key] = order
-    return st.session_state[order_key]
-
-
-def render_toggle_card_multi(state_key: str, text: str, suffix: str = ""):
-    selected = st.session_state.get(state_key, False)
-    label_text = text + (f" \n_{suffix}_" if suffix else "")
-    label = f"✅ {label_text}" if selected else label_text
-    st.button(
-        label,
-        key=f"btn_{state_key}",
-        use_container_width=True,
-        on_click=toggle_flag,
-        args=(state_key,),
-    )
-
-
-def render_choice_cards(qid: str, prompt: str, options: list):
-    st.markdown(f"**{prompt}**")
-    order = ensure_order(f"{qid}_order", len(options))
-    current = st.session_state.get(f"{qid}_choice", None)
-    for pos, opt_idx in enumerate(order):
-        opt = options[opt_idx]
-        selected = current == opt_idx
-        label = f"✅ {opt}" if selected else opt
-        st.button(
-            label,
-            key=f"{qid}_opt_{pos}",
-            use_container_width=True,
-            on_click=set_choice,
-            args=(f"{qid}_choice", opt_idx),
-        )
-    st.markdown("---")
-
-
-def get_mc_score(qdict, qid: str):
-    q = qdict[qid]
-    idx = st.session_state.get(f"{qid}_choice", None)
-    if idx is None:
-        return None
-    if 0 <= idx < len(q["scores"]):
-        return float(q["scores"][idx])
-    return None
-
-
-def render_progress_bar(current_page, total_pages):
-    pct = int((current_page / (total_pages - 1)) * 100) if total_pages > 1 else 0
-    st.markdown(
-        f"""<div class="progress-outer">
-            <div class="progress-inner" style="width:{pct}%">{pct}%</div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
-
-def render_narrative(text):
-    html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
-    html = re.sub(r'\*(.+?)\*', r'<em>\1</em>', html)
-    html = html.replace('\n', '<br>')
-    st.markdown(f'<div class="narrative-box">{html}</div>', unsafe_allow_html=True)
-
-
-def render_consequence(text):
-    """Render consequence/transition narrative."""
-    html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
-    html = re.sub(r'\*(.+?)\*', r'<em>\1</em>', html)
-    html = html.replace('\n', '<br>')
-    st.markdown(f'<div class="consequence-box">{html}</div>', unsafe_allow_html=True)
-
-
-def render_character(name: str, emoji: str, dialogue: str):
-    """Render character dialogue."""
-    st.markdown(
-        f"""<div class="character-box">
-            <div class="char-name">{emoji} {name}</div>
-            <div class="char-dialogue""{dialogue}"</div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
-
-def render_game_badge(label):
-    st.markdown(f'<div class="game-badge">{label}</div>', unsafe_allow_html=True)
-
-
-def render_sidebar_metrics():
-    """Render dashboard metrics in sidebar."""
-    with st.sidebar:
-        st.markdown("### 🏢 Founder Dashboard")
-        st.markdown("---")
-
-        # Format cash runway from numeric value
-        cash = st.session_state.dash_cash
-        weeks = cash // 4000 if isinstance(cash, (int, float)) else 12
-        cash_display = f"${cash:,} ({weeks} weeks)" if isinstance(cash, (int, float)) else cash
-
-        st.markdown(f"""
-<div class="dashboard-metric">
-    <div class="metric-label">Cash Runway</div>
-    <div class="metric-value">{cash_display}</div>
-</div>
-""", unsafe_allow_html=True)
-
-        # Format pipeline from numeric value
-        pipeline = st.session_state.dash_pipeline
-        if isinstance(pipeline, (int, float)):
-            pipeline_display = f"{pipeline} warm leads"
-        else:
-            pipeline_display = pipeline
-
-        st.markdown(f"""
-<div class="dashboard-metric">
-    <div class="metric-label">Pipeline</div>
-    <div class="metric-value">{pipeline_display}</div>
-</div>
-""", unsafe_allow_html=True)
-
-        st.markdown(f"""
-<div class="dashboard-metric">
-    <div class="metric-label">Team Morale</div>
-    <div class="metric-value">{st.session_state.dash_morale}</div>
-</div>
-""", unsafe_allow_html=True)
-
-        st.markdown(f"""
-<div class="dashboard-metric">
-    <div class="metric-label">Credibility</div>
-    <div class="metric-value">{st.session_state.dash_credibility}</div>
-</div>
-""", unsafe_allow_html=True)
-
-        st.markdown("---")
-
-
-# ============== SCORING FUNCTIONS ==============
-def compute_mindset_scores():
-    values = {s: [] for s in MINDSET_SUBDIMS}
-    values["Opportunity Recognition"].append(compute_opportunity_score())
-    values["Value Creation Focus"].append(compute_value_creation_score())
-    for qid, q in MINDSET_QUESTIONS.items():
-        s = get_mc_score(MINDSET_QUESTIONS, qid)
-        if s is None:
-            continue
-        values[q["subdim"]].append(s)
-    sub_scores = {}
-    for sd in MINDSET_SUBDIMS:
-        sub_scores[sd] = (
-            round(sum(values[sd]) / len(values[sd]), 2) if values[sd] else 1.0
-        )
-    overall = round(sum(sub_scores.values()) / len(MINDSET_SUBDIMS), 2)
-    return overall, sub_scores
-
-
-def compute_skill_scores():
-    skill_scores = {}
-    for skill in SKILL_AREAS:
-        vals = []
-        slider_key = SKILL_SLIDER_MAP.get(skill)
-        if slider_key is not None:
-            v = st.session_state.get(slider_key)
-            if v is not None:
-                vals.append(float(v))
-        for sid in SKILL_SCENARIO_MAP.get(skill, []):
-            s = get_mc_score(SKILL_QUESTIONS, sid)
-            if s is not None:
-                vals.append(s)
-        skill_scores[skill] = (
-            round(sum(vals) / len(vals), 2) if vals else 1.0
-        )
-    overall = round(sum(skill_scores.values()) / len(SKILL_AREAS), 2)
-    return overall, skill_scores
-
-
-def compute_resource_scores():
-    fin = float(st.session_state.get("res_fin_level", 3))
-    tech = float(st.session_state.get("res_tech_level", 3))
-    talent = float(st.session_state.get("res_talent_level", 3))
-    network = float(st.session_state.get("res_network_level", 3))
-    time_choice = st.session_state.get("res_time_pattern")
-    time_map = {
-        "25+ hours most weeks": 5,
-        "10–25 hours most weeks": 4,
-        "5–10 hours in irregular pockets": 3,
-        "Rarely have focused time": 1,
-    }
-    time_score = float(time_map.get(time_choice, 2))
-    support_count = 0
-    for key in ["sup_brainstorm", "sup_emotional", "sup_tactical", "sup_intros"]:
-        if st.session_state.get(key, False):
-            support_count += 1
-    support_react = st.session_state.get("sup_reaction")
-    react_map = {
-        "Mostly encouraging and try to help": 5,
-        "Neutral or politely interested": 3,
-        "Often skeptical or discouraging": 1,
-    }
-    react_score = float(react_map.get(support_react, 3))
-    support_base = 1 + (support_count / 4.0) * 4
-    support_score = round((support_base + react_score) / 2.0, 2)
-    sub_scores = {
-        "Financial Resources": fin,
-        "Technology & Infrastructure": tech,
-        "Talent / Team": talent,
-        "Network": network,
-        "Time": time_score,
-        "Support": support_score,
-    }
-    overall = round(sum(sub_scores.values()) / len(sub_scores), 2)
-    return overall, sub_scores
-
-
-def compute_acumen_scores():
-    values = {s: [] for s in ACUMEN_SUBDIMS}
-    for qid, q in ACUMEN_QUESTIONS.items():
-        s = get_mc_score(ACUMEN_QUESTIONS, qid)
-        if s is None:
-            continue
-        values[q["subdim"]].append(s)
-    sub_scores = {}
-    for sd in ACUMEN_SUBDIMS:
-        sub_scores[sd] = (
-            round(sum(values[sd]) / len(values[sd]), 2) if values[sd] else 1.0
-        )
-    overall = round(sum(sub_scores.values()) / len(ACUMEN_SUBDIMS), 2)
-    return overall, sub_scores
-
-
-def compute_overall_scores():
-    mindset_overall, mindset_sub = compute_mindset_scores()
-    skills_overall, skills_sub = compute_skill_scores()
-    res_overall, res_sub = compute_resource_scores()
-    ac_overall, ac_sub = compute_acumen_scores()
-    comp_scores = {
-        "Entrepreneurial Mindset": mindset_overall,
-        "Entrepreneurial Skills": skills_overall,
-        "Resource Availability": res_overall,
-        "Entrepreneurship / Business Acumen": ac_overall,
-    }
-    total = 0.0
-    for comp, score in comp_scores.items():
-        total += (score / 5.0) * COMP_WEIGHTS[comp]
-    total = round(total, 1)
-    return (
-        total,
-        comp_scores,
-        {
-            "mindset": mindset_sub,
-            "skills": skills_sub,
-            "resources": res_sub,
-            "acumen": ac_sub,
-        },
-    )
-
-
-def readiness_label(total_score):
-    if total_score >= 85:
-        return "🚀 High readiness — you're positioned to pursue or accelerate a venture."
-    elif total_score >= 70:
-        return "💪 Strong potential — ready for more serious experiments and real-world traction."
-    elif total_score >= 50:
-        return "🌱 Early-stage readiness — good time to build specific muscles through low-risk reps."
-    else:
-        return "🧠 Foundation-building phase — focus on learning, testing, and stacking small wins."
-
-
-def coaching_narrative(total_score, comp_scores, sub_scores):
-    """Generate personalized coaching narrative based on scores."""
-    sorted_comps = sorted(COMPONENTS, key=lambda c: comp_scores[c])
-    weakest = sorted_comps[0]
-    strongest = sorted_comps[-1]
-
-    # Find weakest subdimension across all categories
-    all_subs = []
-    sub_labels = {
-        "mindset": "Mindset",
-        "skills": "Skills",
-        "resources": "Resources",
-        "acumen": "Business Acumen",
-    }
-    for cat, subs in sub_scores.items():
-        for name, score in subs.items():
-            all_subs.append((name, score, sub_labels[cat]))
-    all_subs.sort(key=lambda x: x[1])
-    weakest_sub = all_subs[0] if all_subs else None
-    strongest_sub = all_subs[-1] if all_subs else None
-
-    lines = []
-
-    if total_score >= 85:
-        lines.append(
-            f"You're showing strong readiness across the board. Your top area is **{strongest}** "
-            f"— lean into that as your competitive edge."
-        )
-    elif total_score >= 70:
-        lines.append(
-            f"You've got a solid foundation. **{strongest}** is clearly a strength for you. "
-            f"The biggest unlock right now is probably in **{weakest}** — that's where focused "
-            f"attention will compound fastest."
-        )
-    elif total_score >= 50:
-        lines.append(
-            f"You're in early-stage territory, which is exactly where most founders start. "
-            f"Your strongest area is **{strongest}**, which gives you something real to build from. "
-            f"**{weakest}** is your biggest gap — and addressing it doesn't require a huge leap, "
-            f"just deliberate practice."
-        )
-    else:
-        lines.append(
-            f"You're in foundation-building mode. That's not a verdict — it's a starting point. "
-            f"**{strongest}** shows you have genuine capacity. Start there and use it as a "
-            f"launchpad to build **{weakest}** through small, low-risk experiments."
-        )
-
-    if weakest_sub:
-        lines.append(
-            f"\n\nYour thinnest specific area is **{weakest_sub[0]}** ({weakest_sub[1]:.1f}/5, "
-            f"under {weakest_sub[2]}). That's your highest-leverage development target."
-        )
-
-    if strongest_sub:
-        lines.append(
-            f"Your strongest specific area is **{strongest_sub[0]}** ({strongest_sub[1]:.1f}/5) "
-            f"— protect and leverage that."
-        )
-
-    return "\n\n".join(lines)
-
-
-def get_round_1_consequence():
-    """Generate Round 1 consequence narrative."""
-    signal_score = compute_opportunity_score()
-    email_score = compute_email_quality_score(st.session_state.email_draft)
-    st.session_state.email_score = email_score
-
-    # Blend signal and email scores: 60% signal, 40% email
-    score = round(0.6 * signal_score + 0.4 * email_score, 2)
-    st.session_state.round_1_score = score
-
-    if score >= 4.0:
-        return (
-            "Your signal radar is sharp. You cut through the noise and identified the *real* "
-            "pain points. Two of the building managers you flagged respond to your follow-up within hours. "
-            "They're ready to talk more. You've got momentum."
-        )
-    elif score >= 2.5:
-        return (
-            "You caught some real signals mixed with a bit of noise. The managers you flagged are interested, "
-            "but not uniformly excited. You'll need to dig deeper with a few of them to understand what "
-            "actually matters. The week wasn't wasted, but clarity is still pending."
-        )
-    else:
-        return (
-            "You spent the week chasing vanity metrics and polite interest. The signals you flagged turned out "
-            "to be enthusiasm without urgency. The managers said 'interesting' but never followed up. You learned "
-            "an expensive lesson: interest isn't intent."
-        )
-
-
-def get_round_2_consequence():
-    """Generate Round 2 consequence narrative."""
-    resource_scores = []
-    for qid in RESOURCEFULNESS_QIDS:
-        s = get_mc_score(MINDSET_QUESTIONS, qid)
-        if s is not None:
-            resource_scores.append(s)
-    score = sum(resource_scores) / len(resource_scores) if resource_scores else 1.0
-
-    # Apply Round 1 ripple effects bonus/penalty
-    bonus_note = ""
-    if st.session_state.round_1_score >= 4.0:
-        score = min(5.0, score + 0.3)
-        bonus_note = " (Your earlier decisions gave you a boost this round.)"
-    elif st.session_state.round_1_score < 2.5:
-        score = max(1.0, score - 0.3)
-        bonus_note = " (Your earlier decisions gave you a setback this round.)"
-
-    score = round(score, 2)
-    st.session_state.round_2_score = score
-
-    # Check Round 1 ripple narrative
-    ripple = ""
-    if st.session_state.round_1_score >= 4.0:
-        ripple = " The managers you flagged in Round 1 came through — they're giving you real feedback."
-    elif st.session_state.round_1_score >= 2.5:
-        ripple = " Your signal read from Round 1 was decent — some of those leads are real, though a few may be wishful thinking."
-    else:
-        ripple = " The weak signals you chased last round bite you now — you're lacking real customer input."
-
-    if score >= 4.0:
-        return (
-            f"Your scrappy moves paid off. You shipped a landing page using templates, interviewed customers "
-            f"without fancy tools, and learned more in a week than you would have waiting for perfect conditions. "
-            f"Low-cost, high-signal decisions.{ripple}{bonus_note}"
-        )
-    elif score >= 2.5:
-        return (
-            f"You made some smart cuts and some slower calls. A few of your resourceful moves clicked, but you "
-            f"also spent time waiting for better conditions that never came. Mixed results, but you're learning.{ripple}{bonus_note}"
-        )
-    else:
-        return (
-            f"Waiting for perfect conditions cost you a week. You delayed launches, held off on interviews, "
-            f"and planned more than you shipped. The runway is ticking and you're barely further along.{ripple}{bonus_note}"
-        )
-
-
-def get_round_3_consequence():
-    """Generate Round 3 consequence narrative."""
-    exec_scores = []
-    for qid in EXEC_QIDS:
-        s = get_mc_score(MINDSET_QUESTIONS, qid)
-        if s is not None:
-            exec_scores.append(s)
-    score = sum(exec_scores) / len(exec_scores) if exec_scores else 1.0
-
-    # Apply Round 2 ripple effects bonus/penalty
-    bonus_note = ""
-    if st.session_state.round_2_score >= 4.0:
-        score = min(5.0, score + 0.3)
-        bonus_note = " (Your earlier decisions gave you a boost this round.)"
-    elif st.session_state.round_2_score < 2.5:
-        score = max(1.0, score - 0.3)
-        bonus_note = " (Your earlier decisions gave you a setback this round.)"
-
-    score = round(score, 2)
-    st.session_state.round_3_score = score
-
-    # Check Round 2 ripple narrative
-    ripple = ""
-    if st.session_state.round_2_score >= 4.0:
-        ripple = " Your resourceful moves from Round 2 freed up time and budget for real execution now."
-    elif st.session_state.round_2_score >= 2.5:
-        ripple = " Your resourceful moves in Round 2 helped some, but you're still stretched thin."
-    else:
-        ripple = " Your hesitation in Round 2 left you behind schedule. You're playing catch-up."
-
-    if score >= 4.0:
-        return (
-            f"Your bias toward action generated real data. You ran tests, made decisions with 70% information, "
-            f"and iterated. Some bets failed, but fast failures mean fast learning. You've got hard-won insights.{ripple}{bonus_note}"
-        )
-    elif score >= 2.5:
-        return (
-            f"You made progress, but some analysis paralysis crept in. You deliberated when you should have shipped, "
-            f"scheduled meetings instead of running quick tests. You're moving, but not as fast as the moment demands.{ripple}{bonus_note}"
-        )
-    else:
-        return (
-            f"Analysis paralysis set in. You spent the week modeling scenarios, asking advisors, and perfecting plans. "
-            f"You shipped nothing. The runway is getting thin and you're still in planning mode.{ripple}{bonus_note}"
-        )
-
-
-def get_round_4_consequence():
-    """Generate Round 4 consequence narrative."""
-    resilience_scores = []
-    for qid in RESIL_QIDS:
-        s = get_mc_score(MINDSET_QUESTIONS, qid)
-        if s is not None:
-            resilience_scores.append(s)
-    score = sum(resilience_scores) / len(resilience_scores) if resilience_scores else 1.0
-
-    # Apply Round 1 ripple penalty (weak signals haunt you)
-    bonus_note = ""
-    if st.session_state.round_1_score < 2.5:
-        score = max(1.0, score - 0.5)
-        bonus_note = " (Your earlier decisions gave you a setback this round.)"
-
-    score = round(score, 2)
-    st.session_state.round_4_score = score
-
-    # Check Round 1 ripple narrative
-    ripple = ""
-    if st.session_state.round_1_score >= 4.0:
-        ripple = " Those early customer signals you identified are holding up — barely. One prospect is losing interest."
-    elif st.session_state.round_1_score >= 2.5:
-        ripple = " Those early customer signals you identified are holding up — barely. One prospect is losing interest."
-    else:
-        ripple = " Remember those 'maybe someday' prospects you chased in Round 1? One just signed with a competitor."
-
-    if score >= 4.0:
-        return (
-            f"You absorbed the hits and came out sharper. When the contractor missed deadlines, you re-scoped. "
-            f"When costs spiked, you found a workaround. When competition moved, you doubled down on your angle. "
-            f"Shocks happen — how you respond defines your trajectory.{ripple}{bonus_note}"
-        )
-    elif score >= 2.5:
-        return (
-            f"The shocks rattled you, but you're still standing. You made some good pivots, hesitated on others. "
-            f"You got through the week, but you're still processing what just happened.{ripple}{bonus_note}"
-        )
-    else:
-        return (
-            f"The shocks rattled you hard. You panicked, made reactive decisions, and burned through goodwill. "
-            f"You survived, but barely. The team is shaken and runway just got tighter.{ripple}{bonus_note}"
-        )
-
-
-def get_round_5_consequence():
-    """Generate Round 5 consequence narrative."""
-    value_score = compute_value_creation_score()
-
-    if value_score >= 4.0:
-        return (
-            "High-impact sprint. You focused on fixes and features customers actually need. Your conversion rate "
-            "ticks up. Customers notice. You ship value, not busywork. This is what product velocity should feel like."
-        )
-    elif value_score >= 2.5:
-        return (
-            "Mixed sprint. You shipped some real wins mixed with a few 'nice to haves.' The core value got through, "
-            "but you also spent budget on things that moved the needle less. Solid work, but could've been sharper."
-        )
-    else:
-        return (
-            "The sprint felt busy but moved no needles. You shipped cosmetic features, got distracted by shiny projects, "
-            "and left the critical bugs unfixed. You burned budget without moving key metrics. Ouch."
-        )
-
-
-# ============== NAVIGATION ==============
-PAGE_LABELS = [
-    "Intro",
-    "Round 1: Customer Signals",
-    "Round 1 Transition",
-    "Round 2: Constraints",
-    "Round 2 Transition",
-    "Round 3: Execution",
-    "Round 3 Transition",
-    "Round 4: Shocks",
-    "Round 4 Transition",
-    "Round 5: Sprint Planning",
-    "Round 5 Transition",
-    "Skills Assessment",
-    "Resources",
-    "Business Knowledge",
-    "Readiness Profile",
-]
-
-TOTAL_PAGES = len(PAGE_LABELS)
-
-# ── Render sidebar metrics ──
-render_sidebar_metrics()
-
-# ── Header ──
-st.markdown("## 🔥 ThermaLoop | Entrepreneurial Readiness Simulation")
-render_progress_bar(st.session_state.page, TOTAL_PAGES)
-
-# ── Minimal nav (step counter only) ──
-st.markdown(
-    f'<div class="step-counter">{PAGE_LABELS[st.session_state.page]} &nbsp;·&nbsp; '
-    f"Step {st.session_state.page + 1} of {TOTAL_PAGES}</div>",
-    unsafe_allow_html=True,
-)
+# ââââââââââââââââââ PAGE RENDERING ââââââââââââââââââ
 
 page = st.session_state.page
 
-# ============== PAGES ==============
 
-# ── Intro ──
+# ââ PAGE 0: WELCOME ââ
 if page == 0:
-    st.markdown("### The Setup")
-    render_narrative(THERMALOOP_INTRO)
+    st.markdown("""
+    <div class="hero-card">
+        <h1>Entrepreneurial Readiness Simulation</h1>
+        <p>An interactive experience that reveals your entrepreneurial strengths, your natural founder archetype, and who you need around you to succeed.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("#### What you'll do:")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("""
-**5 Decision Rounds** testing your entrepreneurial mindset:
-1. Spot real customer signals vs. noise
-2. Navigate real constraints with zero budget
-3. Make fast calls with incomplete info
-4. React to unexpected shocks
-5. Prioritize a sprint under budget pressure
-""")
-    with col2:
-        st.markdown("""
-**3 Assessment Sections** mapping your readiness:
-- Skills self-rating + scenario proof
-- Resource inventory
-- Venture-building knowledge check
+    st.markdown("""
+    <div class="content-card">
+        <p class="section-header">What You'll Discover</p>
+        <p style="color: #374151; line-height: 1.8;">
+        This isn't a quiz â it's a simulation. You'll navigate a realistic startup story, making decisions that reveal
+        your natural instincts as a founder. Along the way, you'll reflect on your motivations and assess your skills.
+        At the end, you'll get a personalized profile including:</p>
+        <p style="color: #374151; line-height: 1.8; margin-top: 0.75rem;">
+        <strong style="color: #6366f1;">&#9670;</strong> Your <strong>Entrepreneurial Archetype</strong> â which of 5 founder types fits you best<br>
+        <strong style="color: #22c55e;">&#9670;</strong> Your <strong>Readiness Score</strong> across 4 dimensions<br>
+        <strong style="color: #f59e0b;">&#9670;</strong> <strong>AI-powered analysis</strong> of your written reflections<br>
+        <strong style="color: #3b82f6;">&#9670;</strong> Your <strong>complementary profile</strong> â who you need on your team
+        </p>
+        <p style="color: #6b7280; margin-top: 1rem; font-size: 0.9rem;"><em>Takes about 10-12 minutes. There are no right answers â only YOUR answers.</em></p>
+    </div>
+    """, unsafe_allow_html=True)
 
-Then: your **Readiness Profile** — an honest map, not a grade.
-""")
+    render_progress(0)
 
-    st.markdown("---")
-    if st.button("🎮  Begin Simulation", use_container_width=True):
+    if st.button("Begin the Simulation", key="start"):
         go_to(1)
+        st.rerun()
 
-# ── Game 1: Customer Signals ──
+
+# ââ PAGE 1: THE FRESHLOOP SCENARIO (all 5 scenes on one scrolling page) ââ
 elif page == 1:
-    render_game_badge("Round 1 of 5 — Mindset")
-    st.markdown("### Customer Signals")
-    render_narrative(GAME_NARRATIVES[1])
+    render_progress(1)
 
-    st.markdown("**Tap each card you believe represents a strong signal of real, fixable demand.**")
-    cols = st.columns(2)
-    for idx, sc in enumerate(OPP_SCENARIOS):
-        with cols[idx % 2]:
-            render_toggle_card_multi(sc["key"], sc["text"])
+    st.markdown("""
+    <div class="content-card">
+        <p class="section-header">The FreshLoop Story</p>
+        <p style="color: #374151; line-height: 1.7;">""" + STORY_INTRO + """</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    flagged = sum(1 for sc in OPP_SCENARIOS if st.session_state.get(sc["key"], False))
-    st.caption(f"{flagged} signal(s) flagged")
+    all_answered = True
 
-    st.markdown("---")
-    st.markdown("#### Draft a Cold Email")
-    st.markdown("Based on the signals you flagged, write a short cold email to a building manager. What would you actually say to get a meeting?")
-    email_text = st.text_area(
-        "Your email (2-3 sentences):",
-        value=st.session_state.email_draft,
-        key="email_input",
-        height=100,
-        placeholder="Example: Hi [Name], I noticed your team is manually managing HVAC data each week. We built a retrofit that cuts that down to hours. Can we grab 15 min?"
-    )
-    st.session_state.email_draft = email_text
+    for i, scene in enumerate(SCENES):
+        st.markdown(f"""
+        <div class="scenario-card">
+            <h3>{scene['title']}</h3>
+            <p>{scene['narrative']}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    col1, col2 = st.columns([1, 1])
-    with col2:
-        if st.button("Continue ▸", use_container_width=True):
+        options = list(scene["options"].keys())
+        choice = st.radio(
+            f"Your decision:",
+            options=options,
+            key=f"scene_{i}",
+            index=None,
+            label_visibility="collapsed",
+        )
+
+        if choice:
+            choice_data = scene["options"][choice]
+            st.session_state.scene_choices[i] = choice_data
+            st.markdown(f"""
+            <div class="insight-box">
+                <p>{choice_data['feedback']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            all_answered = False
+
+        st.markdown("---")
+
+    if all_answered:
+        if st.button("Continue to Self-Assessment", key="to_assess"):
             go_to(2)
-
-# ── Round 1 Transition ──
-elif page == 2:
-    st.markdown("### Round 1: Consequence")
-
-    # Score display before narrative
-    score = st.session_state.round_1_score
-    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
-    score_pct = int((score / 5.0) * 100)
-    st.markdown(
-        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
-            <div style="font-weight: bold; margin-bottom: 8px;">Round 1 Score: {score:.1f} / 5.0</div>
-            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
-                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
-            </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
-    render_consequence(get_round_1_consequence())
-
-    # Dashboard update (Round 1: no cash change, pipeline changes based on score)
-    old_pipeline = st.session_state.dash_pipeline
-    if score >= 4.0:
-        st.session_state.dash_pipeline = 7
-        st.session_state.dash_credibility = "Rising"
-    elif score >= 2.5:
-        st.session_state.dash_pipeline = 6
-        st.session_state.dash_credibility = "Modest"
-    else:
-        st.session_state.dash_pipeline = 3
-        st.session_state.dash_credibility = "Unclear"
-
-    # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Pipeline: {old_pipeline} → {st.session_state.dash_pipeline} warm leads")
-
-    st.markdown("---")
-
-    # Character moment with personality-driven dialogue
-    if st.session_state.email_draft and len(st.session_state.email_draft) > 20:
-        render_character("Sam", "💬", "I actually read your whole email — you clearly get the calibration headache. Let's get a pilot scheduled for Building 4.")
-    else:
-        render_character("Sam", "💬", "I never heard from you. My colleague mentioned ThermaLoop but I don't know what you actually do differently.")
-
-    st.markdown("---")
-    if st.button("Continue to Round 2 ▸", use_container_width=True):
-        go_to(3)
-
-# ── Game 2: Constraint Cards ──
-elif page == 3:
-    render_game_badge("Round 2 of 5 — Mindset")
-    st.markdown("### Constraint Cards")
-    render_narrative(GAME_NARRATIVES[2])
-
-    idx = st.session_state.res_q_idx
-    idx = max(0, min(idx, len(RESOURCEFULNESS_QIDS) - 1))
-    st.session_state.res_q_idx = idx
-    current_qid = RESOURCEFULNESS_QIDS[idx]
-    q = MINDSET_QUESTIONS[current_qid]
-
-    st.markdown(f"**Decision {idx + 1} of {len(RESOURCEFULNESS_QIDS)}**")
-    render_choice_cards(current_qid, q["prompt"], q["options"])
-
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        if st.button("◀ Previous", disabled=(idx == 0)):
-            st.session_state.res_q_idx -= 1
             st.rerun()
-    with c2:
-        if st.button(
-            "Next decision ▸",
-            disabled=(idx == len(RESOURCEFULNESS_QIDS) - 1),
-        ):
-            if st.session_state.get(f"{current_qid}_choice") is None:
-                st.error("Make a choice before moving on.")
-            else:
-                st.session_state.res_q_idx += 1
-                st.rerun()
-    with c3:
-        if st.button("Continue to Transition ▸"):
-            missing = [
-                qid
-                for qid in RESOURCEFULNESS_QIDS
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error(
-                    f"You still have {len(missing)} decision(s) to make before continuing."
-                )
-            else:
-                go_to(4)
-
-# ── Round 2 Transition ──
-elif page == 4:
-    st.markdown("### Round 2: Consequence")
-
-    # Score display before narrative
-    score = st.session_state.round_2_score
-    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
-    score_pct = int((score / 5.0) * 100)
-    st.markdown(
-        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
-            <div style="font-weight: bold; margin-bottom: 8px;">Round 2 Score: {score:.1f} / 5.0</div>
-            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
-                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
-            </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
-    render_consequence(get_round_2_consequence())
-
-    # Dashboard update (cumulative cash based on Round 2 score)
-    old_cash = st.session_state.dash_cash
-    if score >= 4.0:
-        st.session_state.dash_cash = old_cash + 4000  # +$4k if score >= 4
-        st.session_state.dash_morale = "Energized 🚀"
-    elif score < 2.5:
-        st.session_state.dash_cash = old_cash - 3000  # -$3k if score < 2.5
-        st.session_state.dash_morale = "Fraying 😟"
     else:
-        st.session_state.dash_cash = old_cash + 1000  # +$1k otherwise
-        st.session_state.dash_morale = "Steady 😌"
+        st.info("Make a choice for each scene to continue")
 
-    # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Cash: ${old_cash:,} → ${st.session_state.dash_cash:,}")
+
+# ââ PAGE 2: SELF-ASSESSMENT + REFLECTIONS (combined) ââ
+elif page == 2:
+    render_progress(2)
+
+    st.markdown("""
+    <div class="content-card">
+        <p class="section-header">Quick Self-Assessment</p>
+        <p style="color: #6b7280;">Rate yourself on each dimension. Be honest â this isn't about scoring high, it's about accuracy.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    for item in SELF_ASSESS_DIMS:
+        val = st.slider(
+            item["label"],
+            min_value=1, max_value=10, value=st.session_state.self_assess.get(item["key"], 5),
+            help=f"1 = {item['low']}  |  10 = {item['high']}",
+            key=f"sa_{item['key']}",
+        )
+        st.session_state.self_assess[item["key"]] = val
 
     st.markdown("---")
 
-    # Character moment with personality-driven dialogue
-    if score >= 4.0:
-        render_character("Jordan", "⚙️", "The fake-door test was smart — saved me two weeks of building something nobody wants. Let's double down on what's working.")
-    else:
-        render_character("Jordan", "⚙️", "We just burned $8k on features with zero validation. I didn't leave my job to build vaporware. We need to tighten up.")
+    st.markdown("""
+    <div class="content-card">
+        <p class="section-header">Reflections</p>
+        <p style="color: #6b7280;">Share your thoughts in a few sentences. The more you write, the richer your analysis will be.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("---")
-    if st.button("Continue to Round 3 ▸", use_container_width=True):
-        go_to(5)
+    for key, ref_data in REFLECTIONS.items():
+        st.markdown(f"**{ref_data['prompt']}**")
+        text = st.text_area(
+            "Your response:",
+            value=st.session_state.reflections.get(key, ""),
+            height=120,
+            key=f"ref_{key}",
+            label_visibility="collapsed",
+        )
+        st.session_state.reflections[key] = text
 
-# ── Game 3: Execution Bias ──
-elif page == 5:
-    render_game_badge("Round 3 of 5 — Mindset")
-    st.markdown("### Next-Step Choices")
-    render_narrative(GAME_NARRATIVES[3])
+        # Show live analysis preview if they've written enough
+        if text and len(text.strip()) > 20:
+            matches = analyze_text(text, ref_data["analysis_map"])
+            if matches:
+                top = matches[0]
+                st.markdown(f"""
+                <div class="analysis-card">
+                    <p style="color: #6366f1; font-weight: 600; margin-bottom: 0.25rem;">Detected pattern: {top['trait']}</p>
+                    <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">{top['insight'][:150]}...</p>
+                </div>
+                """, unsafe_allow_html=True)
 
-    for qid in EXEC_QIDS:
-        q = MINDSET_QUESTIONS[qid]
-        render_choice_cards(qid, q["prompt"], q["options"])
+        st.markdown("")
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("◀ Back"):
+    can_continue = all(len(st.session_state.reflections.get(k, "").strip()) > 10 for k in REFLECTIONS)
+
+    if can_continue:
+        if st.button("See My Results", key="to_results"):
             go_to(3)
-    with c2:
-        if st.button("Continue to Transition ▸", use_container_width=True):
-            missing = [
-                qid
-                for qid in EXEC_QIDS
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error(
-                    f"You still have {len(missing)} situation(s) to respond to."
-                )
-            else:
-                go_to(6)
+            st.rerun()
+    else:
+        st.info("Write at least a sentence or two for each reflection to continue")
 
-# ── Round 3 Transition ──
-elif page == 6:
-    st.markdown("### Round 3: Consequence")
 
-    # Score display before narrative
-    score = st.session_state.round_3_score
-    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
-    score_pct = int((score / 5.0) * 100)
-    st.markdown(
-        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
-            <div style="font-weight: bold; margin-bottom: 8px;">Round 3 Score: {score:.1f} / 5.0</div>
-            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
-                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
+# ââ PAGE 3: RESULTS DASHBOARD ââ
+elif page == 3:
+    render_progress(3)
+
+    # Compute everything
+    reflection_matches = []
+    for key, ref_data in REFLECTIONS.items():
+        text = st.session_state.reflections.get(key, "")
+        matches = analyze_text(text, ref_data["analysis_map"])
+        reflection_matches.append(matches)
+
+    primary, secondary, arch_scores = compute_archetype(
+        st.session_state.scene_choices, reflection_matches, st.session_state.self_assess
+    )
+    dim_scores = compute_dimension_scores(st.session_state.scene_choices, st.session_state.self_assess)
+    overall = overall_readiness(dim_scores)
+    label, color, label_desc = readiness_label(overall)
+
+    # ââ Overall Score ââ
+    st.markdown(f"""
+    <div class="content-card" style="text-align: center;">
+        <p class="section-header" style="justify-content: center;">Your Entrepreneurial Readiness</p>
+        <div class="score-ring" style="background: linear-gradient(135deg, {color}, {color}dd);">
+            {overall}
+        </div>
+        <h3 style="color: {color}; margin: 0.5rem 0;">{label}</h3>
+        <p style="color: #6b7280; max-width: 500px; margin: 0 auto; line-height: 1.6;">{label_desc}</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ââ Archetype ââ
+    arch_data = ARCHETYPES[primary]
+    st.markdown(f"""
+    <div class="archetype-badge">
+        <h2>{arch_data['icon']} The {primary}</h2>
+        <p style="font-size: 1.1rem; font-weight: 500; margin-bottom: 0.5rem;">{arch_data['tagline']}</p>
+        <p>{arch_data['desc']}</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if secondary:
+        sec_data = ARCHETYPES[secondary]
+        st.markdown(f"""
+        <div class="content-card" style="text-align: center;">
+            <p style="color: #6b7280;">With strong secondary traits of <strong style="color: #6366f1;">{sec_data['icon']} The {secondary}</strong></p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ââ Dimension Scores ââ
+    st.markdown('<p class="section-header">Your Four Dimensions</p>', unsafe_allow_html=True)
+
+    dim_labels = {
+        "mindset": ("Entrepreneurial Mindset", "#8b5cf6"),
+        "skills": ("Skills & Competencies", "#3b82f6"),
+        "resources": ("Resources & Network", "#22c55e"),
+        "acumen": ("Business Acumen", "#f59e0b"),
+    }
+
+    for dim, (label_text, bar_color) in dim_labels.items():
+        score = dim_scores.get(dim, 0)
+        st.markdown(f"""
+        <div class="dim-bar-container">
+            <div class="dim-bar-label">
+                <span>{label_text}</span>
+                <span style="color: {bar_color}; font-weight: 600;">{score}%</span>
             </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
-    render_consequence(get_round_3_consequence())
-
-    # Dashboard update (cumulative cash and pipeline based on Round 3 score)
-    old_cash = st.session_state.dash_cash
-    old_morale = st.session_state.dash_morale
-    if score >= 4.0:
-        st.session_state.dash_cash = old_cash + 2000  # +$2k if score >= 4
-        st.session_state.dash_credibility = "Strong 🔥"
-        st.session_state.dash_morale = "Inspired 💡"
-    elif score < 2.5:
-        st.session_state.dash_cash = old_cash - 2000  # -$2k if score < 2.5
-        st.session_state.dash_morale = "Deflated 😞"
-        st.session_state.dash_credibility = "Wobbly"
-    else:
-        st.session_state.dash_cash = old_cash  # +$0 otherwise
-        st.session_state.dash_morale = "Uncertain ❓"
-
-    # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Cash: ${old_cash:,} → ${st.session_state.dash_cash:,} · Morale: {old_morale} → {st.session_state.dash_morale}")
-
-    st.markdown("---")
-
-    # Character moment with personality-driven dialogue
-    if score >= 4.0:
-        render_character("Maya", "🎓", "You're shipping, learning, adjusting. That's the cycle. Most founders I mentor are still stuck in planning mode at this stage.")
-    else:
-        render_character("Maya", "🎓", "Alex, I've seen this pattern before — lots of strategic thinking, not enough doing. Ship something imperfect this week. Anything.")
-
-    st.markdown("---")
-    if st.button("Continue to Round 4 ▸", use_container_width=True):
-        go_to(7)
-
-# ── Game 4: Shock Cards ──
-elif page == 7:
-    render_game_badge("Round 4 of 5 — Mindset")
-    st.markdown("### Shock Cards")
-    render_narrative(GAME_NARRATIVES[4])
-
-    for qid in RESIL_QIDS:
-        q = MINDSET_QUESTIONS[qid]
-        render_choice_cards(qid, q["prompt"], q["options"])
-
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("◀ Back"):
-            go_to(5)
-    with c2:
-        if st.button("Continue to Transition ▸", use_container_width=True):
-            missing = [
-                qid
-                for qid in RESIL_QIDS
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error("Respond to all shocks before continuing.")
-            else:
-                go_to(8)
-
-# ── Round 4 Transition ──
-elif page == 8:
-    st.markdown("### Round 4: Consequence")
-
-    # Score display before narrative
-    score = st.session_state.round_4_score
-    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
-    score_pct = int((score / 5.0) * 100)
-    st.markdown(
-        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
-            <div style="font-weight: bold; margin-bottom: 8px;">Round 4 Score: {score:.1f} / 5.0</div>
-            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
-                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
+            <div class="dim-bar-track">
+                <div class="dim-bar-fill" style="width: {score}%; background: linear-gradient(90deg, {bar_color}, {bar_color}bb);"></div>
             </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
+        </div>
+        """, unsafe_allow_html=True)
 
-    render_consequence(get_round_4_consequence())
-
-    # Dashboard update (cumulative cash based on Round 4 score)
-    old_cash = st.session_state.dash_cash
-    old_cred = st.session_state.dash_credibility
-    if score >= 4.0:
-        st.session_state.dash_cash = old_cash + 3000  # +$3k if score >= 4
-        st.session_state.dash_credibility = "Battle-tested ⚡"
-    elif score < 2.5:
-        st.session_state.dash_cash = old_cash - 5000  # -$5k if score < 2.5
-        st.session_state.dash_credibility = "Shaken"
-    else:
-        st.session_state.dash_cash = old_cash - 1000  # -$1k otherwise
-        st.session_state.dash_credibility = "Tested"
-
-    # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Cash: ${old_cash:,} → ${st.session_state.dash_cash:,} · Credibility: {old_cred} → {st.session_state.dash_credibility}")
-
-    st.markdown("---")
-
-    # Character moment with personality-driven dialogue
-    if score >= 4.0:
-        render_character("Sam", "💬", "When that competitor announcement hit, you didn't panic — you called me directly. That's the kind of vendor relationship I want.")
-    else:
-        render_character("Sam", "💬", "Look, I've got three other companies pitching me now. If you can't handle a bump in the road, how will you handle a 200-unit rollout?")
-
-    st.markdown("---")
-    if st.button("Continue to Round 5 ▸", use_container_width=True):
-        go_to(9)
-
-# ── Game 5: Feature Budget ──
-elif page == 9:
-    render_game_badge("Round 5 of 5 — Mindset")
-    st.markdown("### Sprint Planning")
-    render_narrative(GAME_NARRATIVES[5].format(budget=FEATURE_BUDGET))
-
-    cols = st.columns(2)
-    for i, f in enumerate(VALUE_FEATURES):
-        with cols[i % 2]:
-            suffix = f"Cost: {f['cost']} units"
-            render_toggle_card_multi(f["key"], f["name"], suffix=suffix)
-
-    total_cost = sum(
-        f["cost"]
-        for f in VALUE_FEATURES
-        if st.session_state.get(f["key"], False)
-    )
-    remaining = FEATURE_BUDGET - total_cost
-
-    if remaining >= 0:
-        st.markdown(
-            f"**Budget:** {total_cost} / {FEATURE_BUDGET} used &nbsp;·&nbsp; "
-            f"**{remaining} units remaining**"
-        )
-    else:
-        st.error(
-            f"Over budget by {abs(remaining)} units. Deselect something to continue."
-        )
-
-    over_budget = total_cost > FEATURE_BUDGET
-
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("◀ Back"):
-            go_to(7)
-    with c2:
-        if st.button("Continue to Transition ▸", disabled=over_budget, use_container_width=True):
-            go_to(10)
-
-# ── Round 5 Transition ──
-elif page == 10:
-    st.markdown("### Round 5: Consequence")
-
-    # Score display before narrative
-    score = compute_value_creation_score()
-    st.session_state.round_5_score = score
-    score_color = "#238636" if score >= 4.0 else ("#eac645" if score >= 2.5 else "#f85149")
-    score_pct = int((score / 5.0) * 100)
-    st.markdown(
-        f"""<div style="background-color:{score_color}20; border-left: 4px solid {score_color}; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
-            <div style="font-weight: bold; margin-bottom: 8px;">Round 5 Score: {score:.1f} / 5.0</div>
-            <div style="background-color: #30363d; border-radius: 2px; height: 6px; overflow: hidden;">
-                <div style="background-color: {score_color}; height: 100%; width: {score_pct}%;"></div>
-            </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
-    render_consequence(get_round_5_consequence())
-
-    # Dashboard update (final, cumulative cash based on Round 5 score)
-    old_cash = st.session_state.dash_cash
-    if score >= 4.0:
-        st.session_state.dash_cash = old_cash + 5000  # +$5k if score >= 4
-        st.session_state.dash_pipeline = 10
-    elif score < 2.5:
-        st.session_state.dash_cash = old_cash - 2000  # -$2k if score < 2.5
-        st.session_state.dash_pipeline = 5
-    else:
-        st.session_state.dash_cash = old_cash + 2000  # +$2k otherwise
-        st.session_state.dash_pipeline = 8
-
-    # Show metric change
-    st.markdown(f"**📊 Dashboard Update:** Cash: ${old_cash:,} → ${st.session_state.dash_cash:,} · Pipeline: {st.session_state.dash_pipeline} warm leads")
-
-    st.markdown("---")
-
-    # Character moment with personality-driven dialogue
-    if score >= 4.0:
-        render_character("Sam", "💬", "That calibration fix alone saved my team 4 hours this week. Ship more of that.")
-    else:
-        render_character("Sam", "💬", "Honestly? The update didn't change anything for my day-to-day. I need to see real progress next sprint.")
-
-    st.markdown("---")
-    if st.button("Continue to Skills Assessment ▸", use_container_width=True):
-        go_to(11)
-
-# ── Skills Game ──
-elif page == 11:
-    render_game_badge("Skills Assessment")
-    st.markdown("### Startup Skills")
-    render_narrative(GAME_NARRATIVES[6])
-
-    st.markdown("#### Part 1 — Self-Rating")
-    st.caption("Be honest — there's no advantage to inflating these. The scenario rounds will test the reality.")
+    # ââ Strengths & Gaps ââ
     col1, col2 = st.columns(2)
     with col1:
-        st.slider(
-            "Finding and understanding customers",
-            1, 5, st.session_state.get("s_skill_mkt", 3), key="s_skill_mkt",
-        )
-        st.slider(
-            "Keeping operations running smoothly",
-            1, 5, st.session_state.get("s_skill_ops", 3), key="s_skill_ops",
-        )
-        st.slider(
-            "Budgeting, runway, and unit economics",
-            1, 5, st.session_state.get("s_skill_fin", 3), key="s_skill_fin",
-        )
+        strengths_html = "<br>".join("&#8226; " + s for s in arch_data['strengths'])
+        st.markdown(f"""
+        <div class="insight-box">
+            <p style="font-weight: 600; color: #166534; margin-bottom: 0.5rem;">Your Strengths</p>
+            <p>{strengths_html}</p>
+        </div>
+        """, unsafe_allow_html=True)
     with col2:
-        st.slider(
-            "Shaping and building usable products",
-            1, 5, st.session_state.get("s_skill_prod", 3), key="s_skill_prod",
-        )
-        st.slider(
-            "Selling and building relationships",
-            1, 5, st.session_state.get("s_skill_sales", 3), key="s_skill_sales",
-        )
-        st.slider(
-            "Aligning people and priorities",
-            1, 5, st.session_state.get("s_skill_team", 3), key="s_skill_team",
-        )
+        gaps_html = "<br>".join("&#8226; " + g for g in arch_data['gaps'])
+        st.markdown(f"""
+        <div class="coaching-box">
+            <p style="font-weight: 600; color: #92400e; margin-bottom: 0.5rem;">Growth Areas</p>
+            <p>{gaps_html}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("#### Part 2 — Scenario Rounds")
-    st.caption("Now prove it. How would you actually handle these situations?")
-    for skill in SKILL_AREAS:
-        for qid in SKILL_SCENARIO_MAP[skill]:
-            q = SKILL_QUESTIONS[qid]
-            render_choice_cards(qid, q["prompt"], q["options"])
+    # ââ Who You Need Around You ââ
+    complement = arch_data["complement"]
+    comp_data = ARCHETYPES[complement.replace("The ", "")]
+    st.markdown(f"""
+    <div class="complement-box">
+        <p style="font-weight: 600; color: #1e40af; margin-bottom: 0.5rem;">{comp_data['icon']} Who You Need Around You: {complement}</p>
+        <p>{arch_data['complement_why']}</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("◀ Back"):
-            go_to(9)
-    with c2:
-        if st.button("Continue ▸", use_container_width=True):
-            missing = [
-                qid
-                for qid in SKILL_QUESTIONS.keys()
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error(
-                    f"You still have {len(missing)} scenario(s) to complete."
-                )
-            else:
-                # Capture self-ratings before moving on
-                st.session_state.skill_self_ratings = {
-                    "Customer Finding": st.session_state.get("s_skill_mkt", 3),
-                    "Operations": st.session_state.get("s_skill_ops", 3),
-                    "Financial Management": st.session_state.get("s_skill_fin", 3),
-                    "Product Building": st.session_state.get("s_skill_prod", 3),
-                    "Sales & Relationships": st.session_state.get("s_skill_sales", 3),
-                    "Team Leadership": st.session_state.get("s_skill_team", 3),
-                }
-                go_to(12)
+    # ââ Self-Assessment Radar ââ
+    st.markdown('<p class="section-header">Self-Assessment Profile</p>', unsafe_allow_html=True)
 
-# ── Resources ──
-elif page == 12:
-    render_game_badge("Resource Inventory")
-    st.markdown("### Your Resources")
-    render_narrative(GAME_NARRATIVES[7])
+    sa_data = pd.DataFrame([
+        {"Dimension": item["label"], "Score": st.session_state.self_assess.get(item["key"], 5)}
+        for item in SELF_ASSESS_DIMS
+    ])
 
-    st.markdown("**Access to key resources (realistically, in the next 3–6 months):**")
-    st.slider(
-        "Money you could direct toward a venture",
-        1, 5, st.session_state.get("res_fin_level", 3), key="res_fin_level",
-    )
-    st.slider(
-        "Tools, platforms, or infrastructure you already have",
-        1, 5, st.session_state.get("res_tech_level", 3), key="res_tech_level",
-    )
-    st.slider(
-        "People you could involve (co-founders, contractors, advisors)",
-        1, 5, st.session_state.get("res_talent_level", 3), key="res_talent_level",
-    )
-    st.slider(
-        "Connections to customers, partners, mentors, or gatekeepers",
-        1, 5, st.session_state.get("res_network_level", 3), key="res_network_level",
-    )
+    chart = alt.Chart(sa_data).mark_bar(
+        cornerRadiusTopRight=8,
+        cornerRadiusBottomRight=8,
+    ).encode(
+        x=alt.X("Score:Q", scale=alt.Scale(domain=[0, 10]), title="Your Rating"),
+        y=alt.Y("Dimension:N", sort="-x", title=""),
+        color=alt.condition(
+            alt.datum.Score >= 7,
+            alt.value("#22c55e"),
+            alt.condition(alt.datum.Score >= 4, alt.value("#6366f1"), alt.value("#f59e0b"))
+        ),
+    ).properties(height=300).configure_axis(
+        labelFontSize=12, titleFontSize=13
+    ).configure_view(strokeWidth=0)
 
-    st.markdown("---")
-    st.markdown("**Your time pattern:**")
+    st.altair_chart(chart, use_container_width=True)
 
-    def set_time_choice(value: str):
-        st.session_state["res_time_pattern"] = value
+    # ââ Reflection Insights Recap ââ
+    st.markdown('<p class="section-header">What Your Reflections Reveal</p>', unsafe_allow_html=True)
 
-    time_options = [
-        "25+ hours most weeks",
-        "10–25 hours most weeks",
-        "5–10 hours in irregular pockets",
-        "Rarely have focused time",
-    ]
-    current_time = st.session_state.get("res_time_pattern", None)
-    cols = st.columns(2)
-    for i, opt in enumerate(time_options):
-        col = cols[i % 2]
-        with col:
-            selected = current_time == opt
-            label = f"✅ {opt}" if selected else opt
-            st.button(
-                label,
-                key=f"time_opt_{i}",
-                use_container_width=True,
-                on_click=set_time_choice,
-                args=(opt,),
-            )
+    ref_labels = {"motivation": "Motivation", "failure_response": "Failure Response", "vision": "Future Vision"}
 
-    st.markdown("---")
-    st.markdown("**Support for ambitious goals:**")
-    sup_cols = st.columns(2)
-    with sup_cols[0]:
-        st.checkbox(
-            "Someone I can brainstorm with on strategy or decisions.",
-            key="sup_brainstorm",
-        )
-        st.checkbox(
-            "Someone who gives honest feedback without shutting me down.",
-            key="sup_tactical",
-        )
-    with sup_cols[1]:
-        st.checkbox(
-            "Someone emotionally in my corner when things get rough.",
-            key="sup_emotional",
-        )
-        st.checkbox(
-            "Someone willing to make intros or open doors.",
-            key="sup_intros",
-        )
+    for idx, (key, ref_data) in enumerate(REFLECTIONS.items()):
+        text = st.session_state.reflections.get(key, "")
+        matches = reflection_matches[idx]
+        if matches:
+            st.markdown(f"""
+            <div class="content-card">
+                <p style="font-weight: 600; color: #1e1b4b; margin-bottom: 0.5rem;">
+                    {ref_labels[key]}
+                </p>
+            """, unsafe_allow_html=True)
+            for m in matches:
+                st.markdown(f"""
+                <div class="analysis-card">
+                    <p style="color: #6366f1; font-weight: 600; margin-bottom: 0.25rem;">{m['trait']}</p>
+                    <p style="color: #374151; font-size: 0.95rem; line-height: 1.6; margin: 0;">{m['insight']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+        elif text.strip():
+            st.markdown(f"""
+            <div class="content-card">
+                <p style="font-weight: 600; color: #1e1b4b; margin-bottom: 0.5rem;">{ref_labels[key]}</p>
+                <p style="color: #6b7280;">Your response was unique â it didn't match common patterns, which may indicate a distinctive perspective. Consider discussing your entrepreneurial motivations with a mentor to uncover insights that automated analysis might miss.</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    st.markdown("**When you share an ambitious plan, people around you typically:**")
+    # ââ Coaching Recommendations ââ
+    st.markdown('<p class="section-header">Your Next Steps</p>', unsafe_allow_html=True)
+    coaching = generate_coaching(primary, dim_scores, overall)
+    for rec in coaching:
+        if rec:
+            st.markdown(f"""
+            <div class="coaching-box">
+                <p>{rec}</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    def set_reaction_choice(value: str):
-        st.session_state["sup_reaction"] = value
+    # ââ Archetype Breakdown Chart ââ
+    st.markdown('<p class="section-header">Archetype Breakdown</p>', unsafe_allow_html=True)
 
-    react_options = [
-        "Mostly encouraging and try to help",
-        "Neutral or politely interested",
-        "Often skeptical or discouraging",
-    ]
-    current_react = st.session_state.get("sup_reaction", None)
-    cols_r = st.columns(3)
-    for i, opt in enumerate(react_options):
-        col = cols_r[i]
-        with col:
-            selected = current_react == opt
-            label = f"✅ {opt}" if selected else opt
-            st.button(
-                label,
-                key=f"react_opt_{i}",
-                use_container_width=True,
-                on_click=set_reaction_choice,
-                args=(opt,),
-            )
+    arch_df = pd.DataFrame([
+        {"Archetype": f"{ARCHETYPES[a]['icon']} {a}", "Score": round(s, 1)}
+        for a, s in sorted(arch_scores.items(), key=lambda x: x[1], reverse=True)
+    ])
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("◀ Back"):
-            go_to(11)
-    with c2:
-        if st.button("Continue ▸", use_container_width=True):
-            if (
-                st.session_state.get("res_time_pattern") is None
-                or st.session_state.get("sup_reaction") is None
-            ):
-                st.error(
-                    "Select your time pattern and typical reaction before continuing."
-                )
-            else:
-                go_to(13)
+    arch_chart = alt.Chart(arch_df).mark_bar(
+        cornerRadiusTopRight=8,
+        cornerRadiusBottomRight=8,
+    ).encode(
+        x=alt.X("Score:Q", title="Archetype Affinity"),
+        y=alt.Y("Archetype:N", sort="-x", title=""),
+        color=alt.condition(
+            alt.datum.Score == alt.expr.max("Score"),
+            alt.value("#6366f1"),
+            alt.value("#c7d2fe")
+        ),
+    ).properties(height=220).configure_axis(
+        labelFontSize=12, titleFontSize=13
+    ).configure_view(strokeWidth=0)
 
-# ── Acumen ──
-elif page == 13:
-    render_game_badge("Final Round")
-    st.markdown("### Venture-Building Knowledge")
-    render_narrative(GAME_NARRATIVES[8])
+    st.altair_chart(arch_chart, use_container_width=True)
 
-    for qid, q in ACUMEN_QUESTIONS.items():
-        render_choice_cards(qid, q["prompt"], q["options"])
-
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("◀ Back"):
-            go_to(12)
-    with c2:
-        if st.button(
-            "📊  See Your Readiness Profile",
-            use_container_width=True,
-        ):
-            missing = [
-                qid
-                for qid in ACUMEN_QUESTIONS
-                if st.session_state.get(f"{qid}_choice") is None
-            ]
-            if missing:
-                st.error("Answer all questions before viewing your profile.")
-            else:
-                st.session_state.submitted = True
-                go_to(14)
-
-# ── Results ──
-elif page == 14:
-    st.markdown("### Your Readiness Profile")
-
-    if not st.session_state.submitted:
-        st.info(
-            "Complete all rounds and click **See Your Readiness Profile** to view your results."
-        )
-    else:
-        total_score, comp_scores, sub_scores = compute_overall_scores()
-
-        # ── Big score ──
-        st.markdown(
-            f"""<div class="score-big">
-                <div class="number">{total_score}</div>
-                <div class="label">out of 100 · Entrepreneurial Readiness</div>
-            </div>""",
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(f"**{readiness_label(total_score)}**")
-
-        # ── Coaching narrative ──
-        st.markdown("---")
-        st.markdown("#### What This Means For You")
-        coaching = coaching_narrative(total_score, comp_scores, sub_scores)
-        st.markdown(
-            f'<div class="coaching-box">{coaching}</div>',
-            unsafe_allow_html=True,
-        )
-
-        # ── Component bar chart ──
-        st.markdown("---")
-        st.markdown("#### Component Breakdown")
-        df_comp = pd.DataFrame(
-            {
-                "Component": COMPONENTS,
-                "Score": [comp_scores[c] for c in COMPONENTS],
-            }
-        )
-        chart = (
-            alt.Chart(df_comp)
-            .mark_bar(cornerRadiusEnd=6, color="#238636")
-            .encode(
-                x=alt.X("Score:Q", scale=alt.Scale(domain=[0, 5]), title="Score (1–5)"),
-                y=alt.Y("Component:N", sort="-x", title=""),
-                tooltip=["Component", "Score"],
-            )
-            .properties(height=220)
-            .configure_axis(labelColor="#8b949e", titleColor="#8b949e")
-            .configure_view(stroke=None)
-        )
-        st.altair_chart(chart, use_container_width=True)
-
-        # ── Subdimension detail ──
-        st.markdown("---")
-        st.markdown("#### Deep Dive")
-
-        with st.expander("Entrepreneurial Mindset", expanded=False):
-            for sd in MINDSET_SUBDIMS:
-                score = sub_scores["mindset"][sd]
-                bar_pct = int((score / 5) * 100)
-                st.markdown(
-                    f"**{sd}** — {score:.1f}/5 · {MINDSET_DESCRIPTIONS[sd]}"
-                )
-                st.progress(bar_pct / 100)
-
-        with st.expander("Entrepreneurial Skills", expanded=False):
-            for sk in SKILL_AREAS:
-                score = sub_scores["skills"][sk]
-                self_rating = st.session_state.skill_self_ratings.get(sk, 3)
-                st.markdown(
-                    f"**{sk}** — {score:.1f}/5 · {SKILL_DESCRIPTIONS[sk]}"
-                )
-                st.progress(int((score / 5) * 100) / 100)
-
-                # Skill-performance gap feedback
-                gap = score - self_rating
-                if gap > 0.5:
-                    feedback = "You're underselling yourself here — your instincts are stronger than you think."
-                elif gap < -0.5:
-                    feedback = "You rated yourself higher than your scenario performance suggests — consider seeking real-world practice."
-                else:
-                    feedback = "Your self-assessment aligns well with your demonstrated judgment."
-                st.caption(f"_Self-rated: {self_rating}/5. {feedback}_")
-
-        with st.expander("Resource Availability", expanded=False):
-            for rs in RESOURCE_SUBDIMS:
-                score = sub_scores["resources"][rs]
-                st.markdown(
-                    f"**{rs}** — {score:.1f}/5 · {RESOURCE_DESCRIPTIONS[rs]}"
-                )
-                st.progress(int((score / 5) * 100) / 100)
-
-        with st.expander("Business Acumen", expanded=False):
-            for ac in ACUMEN_SUBDIMS:
-                score = sub_scores["acumen"][ac]
-                st.markdown(
-                    f"**{ac}** — {score:.1f}/5 · {ACUMEN_DESCRIPTIONS[ac]}"
-                )
-                st.progress(int((score / 5) * 100) / 100)
-
-        st.markdown("---")
-        if st.button("◀ Back to Business Knowledge"):
-            go_to(13)
+    st.markdown("""
+    <div class="content-card" style="text-align: center; margin-top: 2rem;">
+        <p style="color: #6b7280; font-size: 0.9rem;">
+            This simulation is designed for educational exploration, not definitive assessment.
+            Your entrepreneurial potential is shaped by many factors beyond what any simulation can measure.
+            Use these insights as a starting point for deeper self-reflection and conversation with mentors.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
