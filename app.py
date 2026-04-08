@@ -198,7 +198,7 @@ section[data-testid="stSidebar"] { display: none; }
 
 ARCHETYPES = {
     "Visionary": {
-        "icon": "ð­",
+        "icon": "🔭",
         "tagline": "You see futures others can't imagine",
         "desc": "You're energized by big ideas, new possibilities, and paradigm shifts. You naturally spot trends before they're obvious and love painting a compelling picture of what could be. Your superpower is inspiring others to believe in a vision that doesn't exist yet.",
         "strengths": ["Big-picture thinking", "Trend spotting", "Inspiring storytelling", "Creative ideation"],
@@ -207,7 +207,7 @@ ARCHETYPES = {
         "complement_why": "A Builder grounds your vision into executable plans, handles the operational details you find draining, and turns your big ideas into tangible milestones. Together you dream big AND deliver.",
     },
     "Builder": {
-        "icon": "ð¨",
+        "icon": "🔨",
         "tagline": "You turn ideas into reality, brick by brick",
         "desc": "You thrive on execution — taking something from concept to working product. You're happiest when you're building, shipping, and iterating. You have a natural sense for what's feasible and how to get things done with limited resources.",
         "strengths": ["Execution speed", "Product development", "Resourcefulness", "Iterative improvement"],
@@ -216,7 +216,7 @@ ARCHETYPES = {
         "complement_why": "A Visionary helps you lift your head from the build and see where the market is heading. They bring the storytelling and big-picture strategy that ensures you're building the right thing, not just building things right.",
     },
     "Analyst": {
-        "icon": "ð",
+        "icon": "📊",
         "tagline": "You find truth in the data others overlook",
         "desc": "You're driven by evidence, patterns, and rigorous thinking. You naturally question assumptions and dig into data before making decisions. Your superpower is reducing risk through thorough analysis and spotting flaws before they become costly.",
         "strengths": ["Data-driven decisions", "Risk assessment", "Financial modeling", "Critical thinking"],
@@ -230,7 +230,7 @@ ARCHETYPES = {
         "complement_why": "A Visionary helps you lift your head from the build and see where the market is heading. They bring the storytelling and big-picture strategy that ensures you're building the right thing, not just building things right.",
     },
     "Analyst": {
-        "icon": "ð",
+        "icon": "📊",
         "tagline": "You find truth in the data others overlook",
         "desc": "You're driven by evidence, patterns, and rigorous thinking. You naturally question assumptions and dig into data before making decisions. Your superpower is reducing risk through thorough analysis and spotting flaws before they become costly.",
         "strengths": ["Data-driven decisions", "Risk assessment", "Financial modeling", "Critical thinking"],
@@ -239,7 +239,7 @@ ARCHETYPES = {
         "complement_why": "A Connector brings the relationship intelligence and persuasion skills you need. While you ensure decisions are sound, they open doors, build partnerships, and rally people around the opportunity — turning your analysis into action.",
     },
     "Connector": {
-        "icon": "ð¤",
+        "icon": "🤝",
         "tagline": "You build bridges between people, ideas, and opportunities",
         "desc": "You're a natural relationship builder who sees opportunities in the spaces between people. You intuitively understand what motivates others and can bring diverse groups together around a common goal. Your network IS your net worth.",
         "strengths": ["Relationship building", "Persuasion and sales", "Partnership development", "Team recruitment"],
@@ -248,7 +248,7 @@ ARCHETYPES = {
         "complement_why": "An Analyst brings the rigor and data discipline to complement your people skills. While you open doors and close deals, they ensure the numbers work and the strategy is sound — preventing overcommitment and ensuring sustainable growth.",
     },
     "Resilient Adapter": {
-        "icon": "ð±",
+        "icon": "🌱",
         "tagline": "You bend without breaking and find a way through anything",
         "desc": "You're defined by grit, flexibility, and an uncanny ability to pivot when plans fall apart. You don't just survive setbacks — you learn from them faster than anyone. Your superpower is maintaining momentum when everyone else wants to quit.",
         "strengths": ["Resilience under pressure", "Rapid pivoting", "Learning from failure", "Emotional steadiness"],
@@ -269,7 +269,7 @@ that a competing service launched in a neighboring city last week. The clock is 
 
 SCENES = [
     {
-        "title": "ð¥ Scene 1: The Spark",
+        "title": "🔥 Scene 1: The Spark",
         "narrative": "Your group chat is blowing up. Your friend Maya says <em>\"We need to launch NOW before they expand here.\"</em> Your other friend Jordan says <em>\"We should study what they're doing first and learn from their mistakes.\"</em> You have a free Saturday coming up. What's your move?",
         "options": {
             "Hit the streets — talk to 20 restaurant owners this Saturday and gauge real interest before anything else": {
@@ -295,7 +295,7 @@ SCENES = [
         },
     },
     {
-        "title": "ð° Scene 2: The Reality Check",
+        "title": "💰 Scene 2: The Reality Check",
         "narrative": "It's two weeks later. You've made some progress, but now you're facing a hard truth: to do a proper pilot, you need about $3,000 for packaging, a basic website, and initial food inventory. Between the three of you, you can scrape together $800. How do you handle this?",
         "options": {
             "Bootstrap it — strip the pilot down to the absolute minimum that still tests the core idea with real customers": {
@@ -321,7 +321,7 @@ SCENES = [
         },
     },
     {
-        "title": "ð§ Scene 3: The First Failure",
+        "title": "🔧 Scene 3: The First Failure",
         "narrative": "You launched a small pilot! But the first week is rough. Only 4 out of 30 meal kits sold. Your Instagram campaign got barely any engagement. Maya is frustrated and talking about quitting. Jordan says the whole concept might be flawed. You're sitting at your kitchen table on Sunday night staring at the numbers. What do you do?",
         "options": {
             "Call every single person who DID buy and ask them why — then call people who didn't and ask what would change their mind": {
@@ -347,7 +347,7 @@ SCENES = [
         },
     },
     {
-        "title": "ð¥ Scene 4: The Team Fracture",
+        "title": "👥 Scene 4: The Team Fracture",
         "narrative": "After three months of grinding, things are picking up — you're now selling 50+ kits per week. But tension is rising. Maya has been doing most of the delivery logistics and feels overworked. Jordan has been handling social media but wants to focus on strategy. You've been managing restaurant relationships. Nobody formally agreed on roles, equity, or decision-making authority. A big argument erupts over whether to hire a part-time driver. How do you handle this?",
         "options": {
             "Call a formal meeting — put roles, equity, and decision-making process in writing before making any more operational decisions": {
@@ -373,7 +373,7 @@ SCENES = [
         },
     },
     {
-        "title": "ð Scene 5: The Big Opportunity",
+        "title": "🚀 Scene 5: The Big Opportunity",
         "narrative": "Six months in, FreshLoop is growing steadily. Then a regional grocery chain approaches you: they want to partner exclusively — they'll give you all their unsold food for free, but you can't work with any other grocers in the area. They also want you to use their branding on the meal kits. It would 3x your supply instantly but fundamentally change the business. Your team is split.",
         "options": {
             "Take the deal but negotiate hard — remove the exclusivity clause and the branding requirement, even if it means less supply": {
