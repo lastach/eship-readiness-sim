@@ -305,7 +305,7 @@ def go_to(page_num):
     st.session_state.page = page_num
 
 def render_progress(current_page):
-    pages = ["Welcome", "FreshLoop Scenario", "Self-Assessment", "Email", "Results"]
+    pages = ["Welcome", "ThermaLoop Scenario", "Self-Assessment", "Email", "Results"]
     progress_html = f'<div style="text-align: center; margin-bottom: 2rem; color: #666; font-size: 14px;">Step {current_page + 1} of 5: {pages[current_page]}</div>'
     st.markdown(progress_html, unsafe_allow_html=True)
 
@@ -345,60 +345,60 @@ def page_welcome():
 def page_scenario():
     render_progress(1)
 
-    st.markdown("### The FreshLoop Scenario")
-    st.markdown("You and two friends have been brainstorming FreshLoop, a service that rescues unsold food from local restaurants and grocers, repackages it into affordable meal kits, and delivers them to budget conscious families. A competitor just launched nearby. The clock is ticking.")
+    st.markdown("### The ThermaLoop Scenario")
+    st.markdown("You are Alex, the founder of ThermaLoop, a smart ventilation retrofit kit that cuts building energy costs by up to 30 percent without ripping out existing HVAC systems. You left your job six weeks ago. You have a working prototype, a handful of interested building managers, and a shrinking savings account. Every decision from here shapes whether ThermaLoop becomes a real business or a good idea that never quite made it.")
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
     scenes = [
         {
             "title": "Scene 1: The Spark",
-            "narrative": "Your group chat is blowing up. Your friend Maya says \"We need to launch NOW before they expand here.\" Your other friend Jordan says \"We should study what they are doing first and learn from their mistakes.\" You have a free Saturday coming up. What is your move?",
+            "narrative": "Your prototype works in a lab, but you have never tested it in a real building. A property manager you met at a networking event offers you access to a 40 unit apartment complex for a free pilot. Your former coworker wants to join but only if you can show traction first. You have one free weekend coming up.",
             "options": [
-                "Hit the streets: talk to 20 restaurant owners this Saturday and gauge real interest before anything else",
-                "Draft a one page business model and rough financial projection to see if the numbers even work",
-                "Create a compelling pitch deck and start recruiting more people who could help make this real",
-                "Research the competitor thoroughly: sign up for their service, read their reviews, map their strategy"
+                "Install the prototype in the apartment building this weekend and start collecting real performance data",
+                "Draft a one page business model and rough financial projection to see if the unit economics even work",
+                "Create a compelling pitch deck and start recruiting a technical cofounder who can help scale the hardware",
+                "Research competitors thoroughly: buy their products, read their reviews, map their pricing and distribution"
             ]
         },
         {
             "title": "Scene 2: The Reality Check",
-            "narrative": "You crunch some numbers. To get FreshLoop off the ground, you need about 5,000 dollars for packaging, a delivery vehicle rental, and initial marketing. Your personal savings can cover maybe half. Jordan has some money saved but is hesitant. Maya is all in but broke.",
+            "narrative": "You crunch some numbers. To manufacture your first batch of 50 ThermaLoop kits, you need about 8,000 dollars for components, assembly, and certifications. Your personal savings can cover maybe half. A friend offers to invest but wants 20 percent equity. A local clean energy grant deadline is in two weeks.",
             "options": [
-                "Bootstrap it: start with just bikes and minimal packaging. Prove the concept before spending real money",
-                "Apply to three local startup competitions and grants. Free money and free publicity.",
-                "Build a detailed financial model showing exactly when you break even, then decide how much to invest",
-                "Pre-sell meal kits to 50 families at a discount. Use their payments to fund the first batch."
+                "Bootstrap it: build five kits by hand with off the shelf parts. Prove the concept before spending real money.",
+                "Apply to the clean energy grant and two other startup competitions. Free money and validation.",
+                "Build a detailed financial model showing exactly when you break even, then decide how much to invest.",
+                "Pre-sell kits to 10 building managers at a discount. Use their payments to fund the first production run."
             ]
         },
         {
             "title": "Scene 3: The Team Tension",
-            "narrative": "Two weeks in, tensions are rising. Maya wants to move fast and start delivering immediately, even if the product is rough. Jordan wants to perfect the recipes and branding first. You are caught in the middle and both are looking to you to break the tie.",
+            "narrative": "Your technical cofounder wants to spend three more months perfecting the sensor array before any customer sees it. Your business advisor says you are burning cash and need to start selling now, even if the product is rough. Both are looking to you to make the call.",
             "options": [
-                "Side with Maya: launch a rough version this weekend and improve based on real customer feedback",
-                "Side with Jordan: take two more weeks to get the branding and recipes right before anyone sees it",
-                "Propose a compromise: do a small private beta with 10 families, then polish based on their input",
-                "Call a team meeting to realign on shared vision and roles so this conflict does not keep resurfacing"
+                "Side with the advisor: start selling the current version this month and improve based on real feedback",
+                "Side with the cofounder: take three more months to get the hardware right before anyone sees it",
+                "Propose a compromise: ship the current version to five friendly building managers as a private beta",
+                "Call a meeting to realign on shared vision and define clear roles so this conflict does not keep resurfacing"
             ]
         },
         {
             "title": "Scene 4: The Pivot Signal",
-            "narrative": "Your first 10 beta customers love the food but keep asking the same question: \"Can we choose our own meals instead of getting a surprise box?\" This would require rebuilding your entire ordering system. You are three weeks from your planned public launch.",
+            "narrative": "Your first 10 pilot customers love the energy savings but keep asking the same question: \"Can we get real time data on our phone instead of just monthly reports?\" Building a mobile dashboard would require hiring a developer and delaying your next sales push by a month.",
             "options": [
-                "Delay the launch and build a simple online menu. Customers are telling you exactly what they want.",
-                "Launch as planned with surprise boxes, but add a feedback form. Revisit customization in month two.",
-                "Run the numbers: how many more customers would customization attract vs. the cost of building it?",
+                "Delay the sales push and build a simple mobile dashboard. Customers are telling you exactly what they want.",
+                "Keep selling with monthly reports, but add a feedback form. Revisit the dashboard idea in month two.",
+                "Run the numbers: how many more customers would a dashboard attract vs. the cost of building it?",
                 "Talk to all 10 customers personally. Understand the deeper need before deciding how to respond."
             ]
         },
         {
             "title": "Scene 5: The Opportunity Knock",
-            "narrative": "A local food bank director sees your Instagram page and calls. She wants to partner: her organization would refer families to FreshLoop in exchange for a 20 percent discount. It could mean 200 new customers overnight, but at thinner margins. Your team is already stretched thin.",
+            "narrative": "A regional property management company sees your LinkedIn post and calls. They want to pilot ThermaLoop across 15 buildings in exchange for a 25 percent volume discount. It could mean a massive proof point and recurring revenue, but at thinner margins. You are already stretched thin fulfilling current orders.",
             "options": [
                 "Say yes immediately. This kind of growth opportunity does not come twice. Figure out logistics later.",
-                "Say yes, but negotiate: offer 10 percent discount and a 60 day ramp up period so you can scale operations",
-                "Build a spreadsheet model of the partnership economics before committing to anything",
-                "Invite her to coffee. Explore the partnership but also ask who else she knows in the community."
+                "Say yes, but negotiate: offer 15 percent discount and a 90 day ramp up period so you can scale production.",
+                "Build a spreadsheet model of the partnership economics before committing to anything.",
+                "Invite them to coffee. Explore the partnership but also ask who else they know in the industry."
             ]
         }
     ]
@@ -766,7 +766,7 @@ def page_results():
     ]
 
     slider_data = []
-    f/r i, label in enumerate(slider_labels):
+    for i, label in enumerate(slider_labels):
         slider_data.append({
             "Dimension": label,
             "Score": st.session_state.self_assess[f"slider_{i}"]
