@@ -313,6 +313,14 @@ def generate_coaching(archetype, dim_scores, overall):
 
     return coaching[:3]
 
+def scroll_to_top():
+    st.markdown('<div id="top"></div>', unsafe_allow_html=True)
+    js = '''<script>
+        var top = window.parent.document.querySelector('section.main');
+        if (top) top.scrollTop = 0;
+    </script>'''
+    st.components.v1.html(js, height=0)
+
 def go_to(page_num):
     st.session_state.page = page_num
     st.session_state.scene_step = 0
@@ -334,6 +342,7 @@ def render_back_button(go_to_page):
             st.rerun()
 
 def page_welcome():
+    scroll_to_top()
     render_progress(0)
 
     hero_html = '''
@@ -354,11 +363,6 @@ def page_welcome():
         st.markdown("🤝 **Your Team Complement** which archetype you should recruit to balance your strengths")
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
-    st.markdown("About 10 minutes. There are no right answers, only YOUR answers.")
-    st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
-
-    footer_html = '<div style="text-align: center; color: #888; font-size: 13px; margin-top: 2rem;">Brought to you by LaunchX</div>'
-    st.markdown(footer_html, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
@@ -366,11 +370,20 @@ def page_welcome():
             go_to(1)
             st.rerun()
 
+    st.caption("About 10 minutes. There are no right answers, only YOUR answers.")
+
+    footer_html = '<div style="text-align: center; color: #888; font-size: 13px; margin-top: 2rem;">Brought to you by LaunchX</div>'
+    st.markdown(footer_html, unsafe_allow_html=True)
+
 def page_scenario():
+    scroll_to_top()
     render_progress(1, st.session_state.scene_step)
 
-    st.markdown("### The ThermaLoop Scenario")
-    st.markdown("You are Alex, the founder of ThermaLoop, a smart ventilation retrofit kit that cuts building energy costs by up to 30 percent without ripping out existing HVAC systems. You left your job six weeks ago. You have a working prototype, a handful of interested building managers, and a shrinking savings account. Every decision from here shapes whether ThermaLoop becomes a real business or a good idea that never quite made it.")
+    if st.session_state.scene_step == 0:
+        st.markdown("### The ThermaLoop Scenario")
+        st.markdown("You are Alex, the founder of ThermaLoop, a smart ventilation retrofit kit that cuts building energy costs by up to 30 percent without ripping out existing HVAC systems. You left your job six weeks ago. You have a working prototype, a handful of interested building managers, and a shrinking savings account. Every decision from here shapes whether ThermaLoop becomes a real business or a good idea that never quite made it.")
+    else:
+        st.markdown("### ThermaLoop: Your Story Continues")
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
@@ -518,6 +531,7 @@ def page_scenario():
                 st.rerun()
 
 def page_selfassessment():
+    scroll_to_top()
     render_progress(2)
     render_back_button(1)
 
@@ -561,6 +575,7 @@ def page_selfassessment():
     st.markdown("Your answers to these prompts will reveal deeper patterns in your entrepreneurial mindset. Be honest and thoughtful.")
 
     st.markdown("**1. What draws you to entrepreneurship? What would you build if you knew you could not fail?**")
+    st.caption("Write at least a few sentences for the best insights.")
     reflection_1 = st.text_area(
         "Reflection 1",
         value=st.session_state.reflections.get("motivation", ""),
@@ -579,6 +594,7 @@ def page_selfassessment():
             st.markdown(patterns_html, unsafe_allow_html=True)
 
     st.markdown("**2. Describe a time you faced a significant setback. How did you respond, and what did you learn?**")
+    st.caption("The more detail you share, the more accurate your profile.")
     reflection_2 = st.text_area(
         "Reflection 2",
         value=st.session_state.reflections.get("failure", ""),
@@ -597,6 +613,7 @@ def page_selfassessment():
             st.markdown(patterns_html, unsafe_allow_html=True)
 
     st.markdown("**3. Imagine your life five years from now. What does your ideal professional life look like?**")
+    st.caption("Dream big. There are no wrong answers here.")
     reflection_3 = st.text_area(
         "Reflection 3",
         value=st.session_state.reflections.get("vision", ""),
@@ -621,6 +638,7 @@ def page_selfassessment():
             st.rerun()
 
 def page_email():
+    scroll_to_top()
     render_progress(3)
     render_back_button(2)
 
@@ -694,6 +712,7 @@ def page_email():
     st.markdown(footer_html, unsafe_allow_html=True)
 
 def page_results():
+    scroll_to_top()
     render_progress(4)
 
     if not st.session_state.results:
@@ -709,8 +728,15 @@ def page_results():
     label = results["label"]
     color = results["color"]
 
+    user_name = st.session_state.name.strip()
+    if user_name:
+        greeting = f"{user_name}, your"
+    else:
+        greeting = "Your"
+
     score_ring_html = f'''
     <div style="text-align: center; margin: 2rem 0;">
+        <div style="font-size: 1.3rem; color: #555; margin-bottom: 1rem;">{greeting} Readiness Score</div>
         <div style="width: 200px; height: 200px; margin: 0 auto; border-radius: 50%; background: linear-gradient(135deg, {color}33 0%, {color}11 100%); border: 8px solid {color}; display: flex; align-items: center; justify-content: center; flex-direction: column;">
             <div style="font-size: 3rem; font-weight: bold; color: {color};">{int(overall)}</div>
             <div style="font-size: 1.2rem; color: #333;">{label}</div>
@@ -797,53 +823,51 @@ def page_results():
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
-    st.markdown("### Your Self Assessment Profile")
+    with st.expander("Your Self Assessment Profile", expanded=False):
+        slider_labels = [
+            "Ambiguity",
+            "Action Bias",
+            "Financial",
+            "Network",
+            "Creative",
+            "Resilience",
+            "Leadership",
+            "Market"
+        ]
 
-    slider_labels = [
-        "Ambiguity",
-        "Action Bias",
-        "Financial",
-        "Network",
-        "Creative",
-        "Resilience",
-        "Leadership",
-        "Market"
-    ]
+        slider_data = []
+        for i, label_s in enumerate(slider_labels):
+            slider_data.append({
+                "Dimension": label_s,
+                "Score": st.session_state.self_assess[f"slider_{i}"]
+            })
 
-    slider_data = []
-    for i, label in enumerate(slider_labels):
-        slider_data.append({
-            "Dimension": label,
-            "Score": st.session_state.self_assess[f"slider_{i}"]
-        })
+        df_sliders = pd.DataFrame(slider_data)
 
-    df_sliders = pd.DataFrame(slider_data)
+        chart = alt.Chart(df_sliders).mark_bar(color="#6366f1").encode(
+            y=alt.Y("Dimension:N", sort="-x"),
+            x=alt.X("Score:Q", scale=alt.Scale(domain=[0, 10])),
+            tooltip=["Dimension", "Score"]
+        ).properties(height=250, width=400)
 
-    chart = alt.Chart(df_sliders).mark_barh(color="#6366f1").encode(
-        y=alt.Y("Dimension:N", sort="-x"),
-        x=alt.X("Score:Q", scale=alt.Scale(domain=[0, 10])),
-        tooltip=["Dimension", "Score"]
-    ).properties(height=250, width=400)
+        st.altair_chart(chart, use_container_width=True)
 
-    st.altair_chart(chart, use_container_width=True)
-
-    st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
-
-    st.markdown("### What Your Reflections Reveal")
-
-    if results["reflection_matches"]:
-        seen_traits = set()
-        for match in results["reflection_matches"]:
-            trait = match["trait"]
-            if trait not in seen_traits:
-                insight = match["insight"]
-                analysis_html = f'''
-                <div style="background: #f5f3ff; border-left: 4px solid #6366f1; padding: 1rem; border-radius: 6px; margin: 0.5rem 0;">
-                    <strong>{trait}:</strong> {insight}
-                </div>
-                '''
-                st.markdown(analysis_html, unsafe_allow_html=True)
-                seen_traits.add(trait)
+    with st.expander("What Your Reflections Reveal", expanded=False):
+        if results["reflection_matches"]:
+            seen_traits = set()
+            for match in results["reflection_matches"]:
+                trait = match["trait"]
+                if trait not in seen_traits:
+                    insight = match["insight"]
+                    analysis_html = f'''
+                    <div style="background: #f5f3ff; border-left: 4px solid #6366f1; padding: 1rem; border-radius: 6px; margin: 0.5rem 0;">
+                        <strong>{trait}:</strong> {insight}
+                    </div>
+                    '''
+                    st.markdown(analysis_html, unsafe_allow_html=True)
+                    seen_traits.add(trait)
+        else:
+            st.markdown("Write more in your reflections to unlock deeper pattern analysis.")
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
@@ -859,22 +883,21 @@ def page_results():
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
-    st.markdown("### Archetype Breakdown")
+    with st.expander("Archetype Breakdown", expanded=False):
+        arch_scores_list = []
+        for arch, score in results["arch_scores"].items():
+            arch_scores_list.append({"Archetype": arch, "Affinity": max(0, score)})
 
-    arch_scores_list = []
-    for arch, score in results["arch_scores"].items():
-        arch_scores_list.append({"Archetype": arch, "Affinity": max(0, score)})
+        df_archs = pd.DataFrame(arch_scores_list).sort_values("Affinity", ascending=True)
 
-    df_archs = pd.DataFrame(arch_scores_list).sort_values("Affinity", ascending=True)
+        colors = ["#6366f1", "#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6"]
+        chart = alt.Chart(df_archs).mark_bar().encode(
+            y=alt.Y("Archetype:N", sort="-x"),
+            x="Affinity:Q",
+            color=alt.Color("Archetype:N", scale=alt.Scale(domain=list(ARCHETYPES.keys()), range=colors), legend=None)
+        ).properties(height=250)
 
-    colors = ["#6366f1", "#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6"]
-    chart = alt.Chart(df_archs).mark_barh().encode(
-        y=alt.Y("Archetype:N", sort="-x"),
-        x="Affinity:Q",
-        color=alt.Color("Archetype:N", scale=alt.Scale(domain=list(ARCHETYPES.keys()), range=colors), legend=None)
-    ).properties(height=250)
-
-    st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, use_container_width=True)
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
@@ -884,7 +907,7 @@ def page_results():
     <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 2rem; border-radius: 12px; text-align: center;">
         <h3 style="margin-top: 0;">Explore LaunchX Programs</h3>
         <p style="margin: 1rem 0; font-size: 1.05rem;">Your simulation reveals your strengths and growth areas. LaunchX programs are designed to help aspiring founders like you build the specific skills you need to launch successfully.</p>
-        <a href="#" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: white; color: #6366f1; text-decoration: none; border-radius: 6px; font-weight: bold;">Learn More About LaunchX Programs</a>
+        <a href="https://launchx.com/programs" target="_blank" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: white; color: #6366f1; text-decoration: none; border-radius: 6px; font-weight: bold;">Learn More About LaunchX Programs</a>
     </div>
     '''
     st.markdown(cta_card, unsafe_allow_html=True)
@@ -892,10 +915,15 @@ def page_results():
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
     st.markdown("### Challenge a Friend")
-    challenge_html = '''
+    share_url = "https://eship-readiness-sim.streamlit.app"
+    challenge_html = f'''
     <div style="background: #f0fdf4; border: 2px solid #22c55e; padding: 1.5rem; border-radius: 8px; text-align: center;">
         <p style="margin-top: 0; color: #333;">Found the simulation valuable? Challenge a friend to discover their founder archetype too.</p>
-        <p style="color: #666; font-size: 0.95rem; margin-bottom: 0;">The more founders who understand their strengths, the stronger our entrepreneurial community becomes.</p>
+        <p style="color: #666; font-size: 0.95rem;">The more founders who understand their strengths, the stronger our entrepreneurial community becomes.</p>
+        <div style="margin-top: 1rem;">
+            <input type="text" value="{share_url}" readonly style="width: 70%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; text-align: center; font-size: 0.9rem; color: #333; background: white;" onclick="this.select();" />
+        </div>
+        <p style="color: #999; font-size: 0.8rem; margin-bottom: 0; margin-top: 0.5rem;">Click the link above to select it, then copy and share!</p>
     </div>
     '''
     st.markdown(challenge_html, unsafe_allow_html=True)
