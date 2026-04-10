@@ -23,7 +23,7 @@ if "scene_step" not in st.session_state:
 if "scene_choices" not in st.session_state:
     st.session_state.scene_choices = {}
 if "self_assess" not in st.session_state:
-    st.session_state.self_assess = {f"slider_{i}": 5 for i in range(8)}
+    st.session_state.self_assess = {f"slider_{i}": 5 for i in range(6)}
 if "reflections" not in st.session_state:
     st.session_state.reflections = {"motivation": "", "failure": "", "vision": ""}
 if "email" not in st.session_state:
@@ -69,15 +69,6 @@ ARCHETYPES = {
         "gaps": ["Solo execution", "Financial analysis", "Saying no"],
         "complement": "Builder",
         "complement_why": "You need someone who turns your relationships into tangible products and delivered results."
-    },
-    "Innovator": {
-        "icon": "💡",
-        "tagline": "Creates what others cannot imagine",
-        "description": "Creative problem solver who invents novel solutions and sees possibilities where others see obstacles.",
-        "strengths": ["Creative thinking", "Novel problem solving", "Challenging assumptions"],
-        "gaps": ["Following through on details", "Working within constraints", "Patience with process"],
-        "complement": "Analyst",
-        "complement_why": "You need someone who grounds your creative ideas in data and helps you build repeatable processes."
     }
 }
 
@@ -135,14 +126,14 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
         ("scene_0", 0): "Builder",
         ("scene_0", 1): "Analyst",
         ("scene_0", 2): "Connector",
-        ("scene_0", 3): "Analyst",
-        ("scene_1", 0): "Innovator",
+        ("scene_0", 3): "Visionary",
+        ("scene_1", 0): "Visionary",
         ("scene_1", 1): "Connector",
         ("scene_1", 2): "Analyst",
         ("scene_1", 3): "Builder",
         ("scene_2", 0): "Builder",
         ("scene_2", 1): "Analyst",
-        ("scene_2", 2): "Innovator",
+        ("scene_2", 2): "Visionary",
         ("scene_2", 3): "Connector",
         ("scene_3", 0): "Visionary",
         ("scene_3", 1): "Builder",
@@ -151,7 +142,7 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
         ("scene_4", 0): "Visionary",
         ("scene_4", 1): "Builder",
         ("scene_4", 2): "Analyst",
-        ("scene_4", 3): "Innovator",
+        ("scene_4", 3): "Connector",
     }
 
     for scene, choice_idx in scene_choices.items():
@@ -166,24 +157,24 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
             "Autonomy Seeker": "Builder",
             "Financial Motivator": "Analyst",
             "Creator Mindset": "Builder",
-            "Problem Solver": "Connector",
+            "Problem Solver": "Builder",
             "Leadership Drive": "Connector",
-            "Growth Oriented": "Innovator",
+            "Growth Oriented": "Visionary",
             "Passion Driven": "Visionary",
             "Tech Oriented": "Builder",
             "Community Focused": "Connector",
             "Persistence": "Builder",
-            "Adaptability": "Innovator",
+            "Adaptability": "Visionary",
             "Support Seeking": "Connector",
             "Strategic Recovery": "Analyst",
-            "Emotional Awareness": "Innovator",
+            "Emotional Awareness": "Connector",
             "Accountability": "Analyst",
             "Rapid Response": "Builder",
             "Organization Builder": "Connector",
             "Thought Leadership": "Visionary",
             "Portfolio Thinker": "Analyst",
             "Holistic Vision": "Visionary",
-            "Innovation Focus": "Innovator"
+            "Innovation Focus": "Visionary"
         }
         if trait in trait_map:
             scores[trait_map[trait]] += 8
@@ -194,9 +185,7 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
         2: "Analyst",
         3: "Connector",
         4: "Builder",
-        5: "Innovator",
-        6: "Connector",
-        7: "Analyst"
+        5: "Connector"
     }
 
     for i, value in enumerate(self_assess.values()):
@@ -226,21 +215,21 @@ def compute_dimension_scores(scene_choices, self_assess):
         ("scene_0", 0): "skills",
         ("scene_0", 1): "acumen",
         ("scene_0", 2): "resources",
-        ("scene_0", 3): "acumen",
+        ("scene_0", 3): "mindset",
         ("scene_1", 0): "mindset",
         ("scene_1", 1): "resources",
         ("scene_1", 2): "acumen",
         ("scene_1", 3): "skills",
-        ("scene_2", 0): "mindset",
-        ("scene_2", 1): "skills",
-        ("scene_2", 2): "mindset",
+        ("scene_2", 0): "skills",
+        ("scene_2", 1): "mindset",
+        ("scene_2", 2): "acumen",
         ("scene_2", 3): "resources",
         ("scene_3", 0): "mindset",
         ("scene_3", 1): "skills",
         ("scene_3", 2): "acumen",
         ("scene_3", 3): "resources",
         ("scene_4", 0): "mindset",
-        ("scene_4", 1): "acumen",
+        ("scene_4", 1): "skills",
         ("scene_4", 2): "acumen",
         ("scene_4", 3): "resources",
     }
@@ -250,11 +239,12 @@ def compute_dimension_scores(scene_choices, self_assess):
         if key in scene_dim_map:
             dim_scores[scene_dim_map[key]] += 8
 
-    # Sliders: each contributes (value / 10) * 15 points to relevant dimension
-    slider_dim_map = ["mindset", "mindset", "acumen", "resources", "skills", "mindset", "skills", "resources"]
+    # Sliders: each contributes (value / 10) * 18 points to relevant dimension
+    slider_dim_map = ["mindset", "skills", "acumen", "resources", "mindset", "skills"]
     for i, value in enumerate(self_assess.values()):
-        dim = slider_dim_map[i]
-        dim_scores[dim] += (value / 10.0) * 15
+        if i < len(slider_dim_map):
+            dim = slider_dim_map[i]
+            dim_scores[dim] += (value / 10.0) * 18
 
     # Cap at 100
     for dim in dim_scores:
@@ -362,7 +352,7 @@ def page_welcome():
     st.markdown("### What You'll Discover")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("🎯 **Your Founder Archetype** which of five founder types you naturally embody")
+        st.markdown("🎯 **Your Founder Archetype** which of four founder types you naturally embody")
         st.markdown("📈 **Readiness Score** your startup readiness across four critical dimensions")
     with col2:
         st.markdown("💡 **Personalized Analysis** deep insights based on your choices and reflections")
@@ -560,10 +550,8 @@ def page_selfassessment():
         ("Bias Toward Action", "I think before I act", "I act and adjust"),
         ("Financial Literacy", "Numbers intimidate me", "I think in spreadsheets"),
         ("Network Strength", "I know few entrepreneurs", "My network is deep"),
-        ("Creative Problem Solving", "I follow proven methods", "I invent new approaches"),
         ("Resilience Under Pressure", "Stress slows me down", "Pressure fuels me"),
-        ("Leadership Confidence", "I prefer to follow", "I naturally lead"),
-        ("Market Awareness", "I focus on my idea", "I obsess over customers")
+        ("Leadership Confidence", "I prefer to follow", "I naturally lead")
     ]
 
     for i, (label, low_label, high_label) in enumerate(sliders):
@@ -856,10 +844,8 @@ def page_results():
             "Action Bias",
             "Financial",
             "Network",
-            "Creative",
             "Resilience",
-            "Leadership",
-            "Market"
+            "Leadership"
         ]
 
         slider_data = []
@@ -917,7 +903,7 @@ def page_results():
 
         df_archs = pd.DataFrame(arch_scores_list).sort_values("Affinity", ascending=True)
 
-        colors = ["#6366f1", "#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6"]
+        colors = ["#6366f1", "#3b82f6", "#22c55e", "#f59e0b"]
         chart = alt.Chart(df_archs).mark_bar().encode(
             y=alt.Y("Archetype:N", sort="-x"),
             x="Affinity:Q",
@@ -963,7 +949,7 @@ def page_results():
             st.session_state.page = 0
             st.session_state.scene_step = 0
             st.session_state.scene_choices = {}
-            st.session_state.self_assess = {f"slider_{i}": 5 for i in range(8)}
+            st.session_state.self_assess = {f"slider_{i}": 5 for i in range(6)}
             st.session_state.reflections = {"motivation": "", "failure": "", "vision": ""}
             st.session_state.email = ""
             st.session_state.name = ""
