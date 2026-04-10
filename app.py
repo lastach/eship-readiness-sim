@@ -70,14 +70,14 @@ ARCHETYPES = {
         "complement": "Builder",
         "complement_why": "You need someone who turns your relationships into tangible products and delivered results."
     },
-    "Resilient Adapter": {
-        "icon": "🔥",
-        "tagline": "Bends without breaking",
-        "description": "Flexible thinker who learns from everything and pivots gracefully when needed.",
-        "strengths": ["Adaptability", "Learning from failure", "Creative pivoting"],
-        "gaps": ["Committing to one direction", "Building systems", "Scaling"],
+    "Innovator": {
+        "icon": "💡",
+        "tagline": "Creates what others cannot imagine",
+        "description": "Creative problem solver who invents novel solutions and sees possibilities where others see obstacles.",
+        "strengths": ["Creative thinking", "Novel problem solving", "Challenging assumptions"],
+        "gaps": ["Following through on details", "Working within constraints", "Patience with process"],
         "complement": "Analyst",
-        "complement_why": "You need someone who brings structure to your flexibility and helps you build repeatable processes."
+        "complement_why": "You need someone who grounds your creative ideas in data and helps you build repeatable processes."
     }
 }
 
@@ -136,13 +136,13 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
         ("scene_0", 1): "Analyst",
         ("scene_0", 2): "Connector",
         ("scene_0", 3): "Analyst",
-        ("scene_1", 0): "Resilient Adapter",
+        ("scene_1", 0): "Innovator",
         ("scene_1", 1): "Connector",
         ("scene_1", 2): "Analyst",
         ("scene_1", 3): "Builder",
         ("scene_2", 0): "Builder",
         ("scene_2", 1): "Analyst",
-        ("scene_2", 2): "Resilient Adapter",
+        ("scene_2", 2): "Innovator",
         ("scene_2", 3): "Connector",
         ("scene_3", 0): "Visionary",
         ("scene_3", 1): "Builder",
@@ -151,7 +151,7 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
         ("scene_4", 0): "Visionary",
         ("scene_4", 1): "Builder",
         ("scene_4", 2): "Analyst",
-        ("scene_4", 3): "Resilient Adapter",
+        ("scene_4", 3): "Innovator",
     }
 
     for scene, choice_idx in scene_choices.items():
@@ -168,22 +168,22 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
             "Creator Mindset": "Builder",
             "Problem Solver": "Connector",
             "Leadership Drive": "Connector",
-            "Growth Oriented": "Resilient Adapter",
+            "Growth Oriented": "Innovator",
             "Passion Driven": "Visionary",
             "Tech Oriented": "Builder",
             "Community Focused": "Connector",
             "Persistence": "Builder",
-            "Adaptability": "Resilient Adapter",
+            "Adaptability": "Innovator",
             "Support Seeking": "Connector",
             "Strategic Recovery": "Analyst",
-            "Emotional Awareness": "Resilient Adapter",
+            "Emotional Awareness": "Innovator",
             "Accountability": "Analyst",
             "Rapid Response": "Builder",
             "Organization Builder": "Connector",
             "Thought Leadership": "Visionary",
             "Portfolio Thinker": "Analyst",
             "Holistic Vision": "Visionary",
-            "Innovation Focus": "Visionary"
+            "Innovation Focus": "Innovator"
         }
         if trait in trait_map:
             scores[trait_map[trait]] += 8
@@ -194,7 +194,7 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
         2: "Analyst",
         3: "Connector",
         4: "Builder",
-        5: "Resilient Adapter",
+        5: "Innovator",
         6: "Connector",
         7: "Analyst"
     }
@@ -216,8 +216,12 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
 
 def compute_dimension_scores(scene_choices, self_assess):
     dim_scores = {"mindset": 0, "skills": 0, "resources": 0, "acumen": 0}
-    dim_counts = {"mindset": 0, "skills": 0, "resources": 0, "acumen": 0}
 
+    # Base score: everyone starts with some readiness
+    for dim in dim_scores:
+        dim_scores[dim] = 25
+
+    # Scene choices: each adds 8 points to relevant dimension
     scene_dim_map = {
         ("scene_0", 0): "skills",
         ("scene_0", 1): "acumen",
@@ -244,31 +248,17 @@ def compute_dimension_scores(scene_choices, self_assess):
     for scene, choice_idx in scene_choices.items():
         key = (scene, choice_idx)
         if key in scene_dim_map:
-            dim = scene_dim_map[key]
-            dim_scores[dim] += 12
-            dim_counts[dim] += 1
+            dim_scores[scene_dim_map[key]] += 8
 
-    slider_dim_map = [
-        "mindset",
-        "mindset",
-        "acumen",
-        "resources",
-        "skills",
-        "mindset",
-        "skills",
-        "resources"
-    ]
-
+    # Sliders: each contributes (value / 10) * 15 points to relevant dimension
+    slider_dim_map = ["mindset", "mindset", "acumen", "resources", "skills", "mindset", "skills", "resources"]
     for i, value in enumerate(self_assess.values()):
         dim = slider_dim_map[i]
-        dim_scores[dim] += value * 1.5
-        dim_counts[dim] += 1
+        dim_scores[dim] += (value / 10.0) * 15
 
+    # Cap at 100
     for dim in dim_scores:
-        if dim_counts[dim] > 0:
-            dim_scores[dim] = min(100, dim_scores[dim] / dim_counts[dim] * 1.2)
-        else:
-            dim_scores[dim] = 50
+        dim_scores[dim] = min(100, dim_scores[dim])
 
     return dim_scores
 
@@ -287,29 +277,45 @@ def readiness_label(score):
     else:
         return ("Early Explorer", "#8b5cf6", "You are at the beginning of your entrepreneurial journey. Every step counts.")
 
-def generate_coaching(archetype, dim_scores, overall):
+def generate_coaching(primary_arch, dim_scores, overall):
     coaching = []
+    arch_data = ARCHETYPES[primary_arch]
+
+    # Get primary strengths from archetype
+    primary_strengths = set(arch_data["strengths"])
 
     if dim_scores["mindset"] < 50:
-        coaching.append("Work on your comfort with ambiguity: take on projects with unclear outcomes to build your tolerance for uncertainty.")
-    elif len(coaching) == 0:
-        coaching.append("Leverage your mindset strength: mentor others who struggle with ambiguity and help them build resilience.")
+        if "Future thinking" not in primary_strengths:
+            coaching.append("Build comfort with ambiguity: take on projects with unclear outcomes to strengthen your confidence in uncertain situations.")
+        else:
+            coaching.append("Leverage your visionary mindset: help your team think bigger and focus on long-term possibilities.")
+    elif dim_scores["mindset"] >= 70:
+        coaching.append("You have strong mindset. Now focus on translating vision into action by building execution discipline.")
 
     if dim_scores["skills"] < 50:
-        coaching.append("Build execution skills: find a mentor who ships fast and spend time learning their craft through observation and collaboration.")
-    elif len(coaching) == 1:
-        coaching.append("Channel your execution skills: lead a project or initiative where your speed of action creates real value.")
+        if "Speed of execution" not in primary_strengths:
+            coaching.append("Build execution speed: find a mentor who ships fast and learn their approach through hands-on collaboration.")
+        else:
+            coaching.append("Channel your execution skills: lead a project where your speed creates measurable value for customers.")
+    elif dim_scores["skills"] >= 70:
+        coaching.append("Your execution skills are strong. Focus on building strategic thinking to direct all that speed toward the right goals.")
 
     if dim_scores["resources"] < 50:
-        coaching.append("Expand your network intentionally: attend founder meetups, invest in your personal brand, and build genuine relationships with other entrepreneurs.")
-    elif len(coaching) == 2:
-        coaching.append("Strengthen partnerships: your network is a core asset. Deepen relationships and think about how to create mutual value.")
+        if "Networking" not in primary_strengths:
+            coaching.append("Expand your network intentionally: attend founder meetups, build genuine relationships with other entrepreneurs, and invest in your personal brand.")
+        else:
+            coaching.append("You are naturally connected. Use your network strategically to open doors and find early customers.")
+    elif dim_scores["resources"] >= 70:
+        coaching.append("Your network is a core asset. Deepen relationships and create mutual value through meaningful introductions and support.")
 
     if len(coaching) < 3:
         if dim_scores["acumen"] < 50:
-            coaching.append("Develop financial literacy: learn the basics of unit economics, runway, and fundraising through courses or mentorship.")
-        else:
-            coaching.append("Use your financial mindset to stress test your idea: build a simple model and validate your assumptions before you commit resources.")
+            if "Financial modeling" not in primary_strengths:
+                coaching.append("Develop financial literacy: learn unit economics, runway calculations, and simple financial modeling through courses or mentorship.")
+            else:
+                coaching.append("Use your analytical mind to stress test your business model with real data before committing resources.")
+        elif dim_scores["acumen"] >= 70:
+            coaching.append("Your financial acumen is solid. Build on it by helping your team understand unit economics and sustainable growth.")
 
     return coaching[:3]
 
@@ -326,11 +332,11 @@ def go_to(page_num):
     st.session_state.scene_step = 0
 
 def render_progress(current_page, scene_step=None):
-    pages = ["Welcome", "Scenarios", "Self-Assessment", "Unlock Results", "Your Results"]
+    pages = ["Welcome", "Scenarios", "About You", "Reflections", "Unlock Results", "Your Results"]
     if scene_step is not None and current_page == 1:
-        progress_text = f"Decision {scene_step + 1} of 5 - {pages[current_page]}"
+        progress_text = f"Decision {scene_step + 1} of 5 in {pages[current_page]}"
     else:
-        progress_text = f"Step {current_page + 1} of 5: {pages[current_page]}"
+        progress_text = f"Step {current_page + 1} of 6: {pages[current_page]}"
     progress_html = f'<div style="text-align: center; margin-bottom: 2rem; color: #666; font-size: 14px;">{progress_text}</div>'
     st.markdown(progress_html, unsafe_allow_html=True)
 
@@ -381,7 +387,7 @@ def page_scenario():
 
     if st.session_state.scene_step == 0:
         st.markdown("### The ThermaLoop Scenario")
-        st.markdown("You are Alex, the founder of ThermaLoop, a smart ventilation retrofit kit that cuts building energy costs by up to 30 percent without ripping out existing HVAC systems. You left your job six weeks ago. You have a working prototype, a handful of interested building managers, and a shrinking savings account. Every decision from here shapes whether ThermaLoop becomes a real business or a good idea that never quite made it.")
+        st.markdown("You came up with the idea for ThermaLoop during a summer program at a local property management company. You have been developing a working prototype with help from your school's maker space. Your school's entrepreneurship teacher is your mentor, and a few local building managers are curious about what you have built. Every decision from here shapes whether ThermaLoop becomes a real venture or stays a class project.")
     else:
         st.markdown("### ThermaLoop: Your Story Continues")
 
@@ -390,17 +396,17 @@ def page_scenario():
     scenes = [
         {
             "title": "Scene 1: The Spark",
-            "narrative": "Your prototype works in a lab, but you have never tested it in a real building. A property manager you met at a networking event offers you access to a 40 unit apartment complex for a free pilot. Your former coworker wants to join but only if you can show traction first. You have one free weekend coming up.",
+            "narrative": "Your prototype works in a lab, but you have never tested it in a real building. A property manager you met at a networking event offers you access to a 40 unit apartment complex for a free pilot. A classmate who is great with hardware wants to join but only if you can show traction first. You have one free weekend coming up.",
             "options": [
                 "Install the prototype in the apartment building this weekend and start collecting real performance data",
                 "Draft a one page business model and rough financial projection to see if the unit economics even work",
-                "Create a compelling pitch deck and start recruiting a technical cofounder who can help scale the hardware",
+                "Create a compelling pitch deck and start recruiting a technical partner who can help scale the hardware",
                 "Research competitors thoroughly: buy their products, read their reviews, map their pricing and distribution"
             ]
         },
         {
             "title": "Scene 2: The Reality Check",
-            "narrative": "You crunch some numbers. To manufacture your first batch of 50 ThermaLoop kits, you need about 8,000 dollars for components, assembly, and certifications. Your personal savings can cover maybe half. A friend offers to invest but wants 20 percent equity. A local clean energy grant deadline is in two weeks.",
+            "narrative": "You crunch some numbers. To manufacture your first batch of 50 ThermaLoop kits, you need about 2,000 dollars for components, assembly, and certifications. Your savings from your summer job and a pitch competition prize can cover maybe half. A family member offers to help fund it but wants 20 percent equity. A local clean energy grant deadline is in two weeks.",
             "options": [
                 "Bootstrap it: build five kits by hand with off the shelf parts. Prove the concept before spending real money.",
                 "Apply to the clean energy grant and two other startup competitions. Free money and validation.",
@@ -410,27 +416,27 @@ def page_scenario():
         },
         {
             "title": "Scene 3: The Team Tension",
-            "narrative": "Your technical cofounder wants to spend three more months perfecting the sensor array before any customer sees it. Your business advisor says you are burning cash and need to start selling now, even if the product is rough. Both are looking to you to make the call.",
+            "narrative": "Your technical partner wants to spend three more months perfecting the sensor array before any customer sees it. Your mentor says you are burning cash and need to start selling now, even if the product is rough. Both are looking to you to make the call.",
             "options": [
-                "Side with the advisor: start selling the current version this month and improve based on real feedback",
-                "Side with the cofounder: take three more months to get the hardware right before anyone sees it",
+                "Side with your mentor: start selling the current version this month and improve based on real feedback",
+                "Side with your partner: take three more months to get the hardware right before anyone sees it",
                 "Propose a compromise: ship the current version to five friendly building managers as a private beta",
                 "Call a meeting to realign on shared vision and define clear roles so this conflict does not keep resurfacing"
             ]
         },
         {
             "title": "Scene 4: The Pivot Signal",
-            "narrative": "Your first 10 pilot customers love the energy savings but keep asking the same question: \"Can we get real time data on our phone instead of just monthly reports?\" Building a mobile dashboard would require hiring a developer and delaying your next sales push by a month.",
+            "narrative": "Your first 10 pilot customers love the energy savings but keep asking the same question: \"Can we get real time data on our phone instead of just monthly reports?\" Finding a developer or learning to build it yourself would require dedicating time and delaying your next sales push by a month.",
             "options": [
-                "Delay the sales push and build a simple mobile dashboard. Customers are telling you exactly what they want.",
+                "Delay the sales push and find or build a simple mobile dashboard. Customers are telling you exactly what they want.",
                 "Keep selling with monthly reports, but add a feedback form. Revisit the dashboard idea in month two.",
-                "Run the numbers: how many more customers would a dashboard attract vs. the cost of building it?",
+                "Run the numbers: how many more customers would a dashboard attract versus the cost of building it?",
                 "Talk to all 10 customers personally. Understand the deeper need before deciding how to respond."
             ]
         },
         {
             "title": "Scene 5: The Opportunity Knock",
-            "narrative": "A regional property management company sees your LinkedIn post and calls. They want to pilot ThermaLoop across 15 buildings in exchange for a 25 percent volume discount. It could mean a massive proof point and recurring revenue, but at thinner margins. You are already stretched thin fulfilling current orders.",
+            "narrative": "A regional property management company sees your presentation at a local startup showcase and calls. They want to pilot ThermaLoop across 15 buildings in exchange for a 25 percent volume discount. It could mean a massive proof point and recurring revenue, but at thinner margins. You are already stretched thin fulfilling current orders.",
             "options": [
                 "Say yes immediately. This kind of growth opportunity does not come twice. Figure out logistics later.",
                 "Say yes, but negotiate: offer 15 percent discount and a 90 day ramp up period so you can scale production.",
@@ -458,59 +464,61 @@ def page_scenario():
         range(len(scene["options"])),
         format_func=lambda i: scene["options"][i],
         key=scene_key,
+        index=None,
         label_visibility="collapsed"
     )
 
-    st.session_state.scene_choices[scene_key] = selected_idx
+    if selected_idx is not None:
+        st.session_state.scene_choices[scene_key] = selected_idx
 
-    insight_text = ""
-    if st.session_state.scene_step == 0:
-        insights = [
-            "Nice. You lead with action and customer engagement. This real world focus will keep you grounded.",
-            "Interesting. You validate the core business model before jumping in. This financial discipline reduces risk.",
-            "Nice. You see team and momentum as critical early. Building early buy in is a strength.",
-            "You learn from others before committing resources. This research mindset is valuable."
-        ]
-        insight_text = insights[selected_idx]
-    elif st.session_state.scene_step == 1:
-        insights = [
-            "Nice. You embrace constraints and learn to do more with less. This resourcefulness is a founder superpower.",
-            "You actively seek external validation and funding. Smart founders pursue all channels.",
-            "Nice. You stress test your idea before investing heavily. This rigor will serve you well.",
-            "Interesting. You find creative ways to fund growth. Pre-selling is a powerful signal of demand."
-        ]
-        insight_text = insights[selected_idx]
-    elif st.session_state.scene_step == 2:
-        insights = [
-            "Nice. You trust your instincts and learn fast. Speed to market can be an advantage.",
-            "You believe in getting the fundamentals right. Quality and brand matter to you.",
-            "Interesting. You find middle paths that preserve team harmony while still moving forward. This balance is rare.",
-            "Nice. You recognize that vision and roles must align. Strong founders invest in team alignment."
-        ]
-        insight_text = insights[selected_idx]
-    elif st.session_state.scene_step == 3:
-        insights = [
-            "Nice. You listen to your customers and follow where the market leads. This customer obsession will scale you.",
-            "You balance customer feedback with execution momentum. Shipping matters.",
-            "Interesting. You make data informed decisions. Running the numbers prevents costly mistakes.",
-            "Nice. You deepen customer relationships to understand root needs. This empathy is a strength."
-        ]
-        insight_text = insights[selected_idx]
-    elif st.session_state.scene_step == 4:
-        insights = [
-            "Nice. You see transformational opportunities and act decisively. Growth mindset will propel you.",
-            "Interesting. You negotiate thoughtfully to win win outcomes. This is how strong partnerships are built.",
-            "You let data guide scaling decisions. Financial discipline will keep your venture healthy.",
-            "Nice. You leverage your network to compound growth. Relationships are your leverage."
-        ]
-        insight_text = insights[selected_idx]
+        insight_text = ""
+        if st.session_state.scene_step == 0:
+            insights = [
+                "Nice. You lead with action and customer engagement. This real world focus will keep you grounded.",
+                "Interesting. You validate the core business model before jumping in. This financial discipline reduces risk.",
+                "Nice. You see team and momentum as critical early. Building early buy in is a strength.",
+                "You learn from others before committing resources. This research mindset is valuable."
+            ]
+            insight_text = insights[selected_idx]
+        elif st.session_state.scene_step == 1:
+            insights = [
+                "Nice. You embrace constraints and learn to do more with less. This resourcefulness is a founder superpower.",
+                "You actively seek external validation and funding. Smart founders pursue all channels.",
+                "Nice. You stress test your idea before investing heavily. This rigor will serve you well.",
+                "Interesting. You find creative ways to fund growth. Pre-selling is a powerful signal of demand."
+            ]
+            insight_text = insights[selected_idx]
+        elif st.session_state.scene_step == 2:
+            insights = [
+                "Nice. You trust your instincts and learn fast. Speed to market can be an advantage.",
+                "You believe in getting the fundamentals right. Quality and brand matter to you.",
+                "Interesting. You find middle paths that preserve team harmony while still moving forward. This balance is rare.",
+                "Nice. You recognize that vision and roles must align. Strong founders invest in team alignment."
+            ]
+            insight_text = insights[selected_idx]
+        elif st.session_state.scene_step == 3:
+            insights = [
+                "Nice. You listen to your customers and follow where the market leads. This customer obsession will scale you.",
+                "You balance customer feedback with execution momentum. Shipping matters.",
+                "Interesting. You make data informed decisions. Running the numbers prevents costly mistakes.",
+                "Nice. You deepen customer relationships to understand root needs. This empathy is a strength."
+            ]
+            insight_text = insights[selected_idx]
+        elif st.session_state.scene_step == 4:
+            insights = [
+                "Nice. You see transformational opportunities and act decisively. Growth mindset will propel you.",
+                "Interesting. You negotiate thoughtfully to win win outcomes. This is how strong partnerships are built.",
+                "You let data guide scaling decisions. Financial discipline will keep your venture healthy.",
+                "Nice. You leverage your network to compound growth. Relationships are your leverage."
+            ]
+            insight_text = insights[selected_idx]
 
-    insight_html = f'''
-    <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
-        <strong>What This Reveals:</strong> {insight_text}
-    </div>
-    '''
-    st.markdown(insight_html, unsafe_allow_html=True)
+        insight_html = f'''
+        <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+            <strong>What This Reveals:</strong> {insight_text}
+        </div>
+        '''
+        st.markdown(insight_html, unsafe_allow_html=True)
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
@@ -521,22 +529,29 @@ def page_scenario():
                 st.session_state.scene_step -= 1
                 st.rerun()
     with col3:
-        if st.session_state.scene_step < 4:
-            if st.button("Next", key="scenario_next", use_container_width=True):
-                st.session_state.scene_step += 1
-                st.rerun()
+        if selected_idx is None:
+            if st.session_state.scene_step < 4:
+                st.button("Next", key="scenario_next", use_container_width=True, disabled=True)
+            else:
+                st.button("Next: About You", key="scenario_continue", use_container_width=True, disabled=True)
+            st.caption("Choose one to continue")
         else:
-            if st.button("Next: Rate Yourself", key="scenario_continue", use_container_width=True):
-                go_to(2)
-                st.rerun()
+            if st.session_state.scene_step < 4:
+                if st.button("Next", key="scenario_next", use_container_width=True):
+                    st.session_state.scene_step += 1
+                    st.rerun()
+            else:
+                if st.button("Next: About You", key="scenario_continue", use_container_width=True):
+                    go_to(2)
+                    st.rerun()
 
 def page_selfassessment():
     scroll_to_top()
     render_progress(2)
     render_back_button(1)
 
-    st.markdown("### Self Assessment: Rate Yourself")
-    st.markdown("Answer honestly. These ratings help us understand your instinctive tendencies and reveal your natural strengths.")
+    st.markdown("### About You: Where Do You Naturally Fall?")
+    st.markdown("There are no right answers here. Just slide to wherever feels most true for you.")
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
@@ -571,8 +586,21 @@ def page_selfassessment():
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("Next: Reflections", key="assess_continue", use_container_width=True):
+            go_to(3)
+            st.rerun()
+
+def page_reflections():
+    scroll_to_top()
+    render_progress(3)
+    render_back_button(2)
+
     st.markdown("### Reflections: Your Story")
     st.markdown("Your answers to these prompts will reveal deeper patterns in your entrepreneurial mindset. Be honest and thoughtful.")
+
+    st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
     st.markdown("**1. What draws you to entrepreneurship? What would you build if you knew you could not fail?**")
     st.caption("Write at least a few sentences for the best insights.")
@@ -631,16 +659,18 @@ def page_selfassessment():
             patterns_html += '</div>'
             st.markdown(patterns_html, unsafe_allow_html=True)
 
+    st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
+
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        if st.button("See My Results", key="assess_continue", use_container_width=True):
-            go_to(3)
+        if st.button("Next: Unlock Results", key="reflections_continue", use_container_width=True):
+            go_to(4)
             st.rerun()
 
 def page_email():
     scroll_to_top()
-    render_progress(3)
-    render_back_button(2)
+    render_progress(4)
+    render_back_button(3)
 
     st.markdown("### Your Founder Profile is Ready")
 
@@ -652,7 +682,7 @@ def page_email():
     '''
     st.markdown(teaser_html, unsafe_allow_html=True)
 
-    st.markdown("Enter your email to unlock your complete results:")
+    st.markdown("Enter your email to unlock your complete results (optional, but great for staying updated on LaunchX):")
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
@@ -661,7 +691,7 @@ def page_email():
         name = st.text_input("Name (optional)", value=st.session_state.name, key="email_name")
         st.session_state.name = name
     with col2:
-        email = st.text_input("Email address", value=st.session_state.email, key="email_input")
+        email = st.text_input("Email (optional)", value=st.session_state.email, key="email_input")
         st.session_state.email = email
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
@@ -669,43 +699,40 @@ def page_email():
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
         if st.button("Show My Results", key="email_unlock", use_container_width=True):
-            if "@" in email and len(email) > 5:
-                all_matches = []
-                all_matches.extend(analyze_text(st.session_state.reflections["motivation"], ANALYSIS_MAPS["motivation"]))
-                all_matches.extend(analyze_text(st.session_state.reflections["failure"], ANALYSIS_MAPS["failure"]))
-                all_matches.extend(analyze_text(st.session_state.reflections["vision"], ANALYSIS_MAPS["vision"]))
+            all_matches = []
+            all_matches.extend(analyze_text(st.session_state.reflections["motivation"], ANALYSIS_MAPS["motivation"]))
+            all_matches.extend(analyze_text(st.session_state.reflections["failure"], ANALYSIS_MAPS["failure"]))
+            all_matches.extend(analyze_text(st.session_state.reflections["vision"], ANALYSIS_MAPS["vision"]))
 
-                primary_arch, secondary_arch, arch_scores = compute_archetype(
-                    st.session_state.scene_choices,
-                    all_matches,
-                    st.session_state.self_assess
-                )
+            primary_arch, secondary_arch, arch_scores = compute_archetype(
+                st.session_state.scene_choices,
+                all_matches,
+                st.session_state.self_assess
+            )
 
-                dim_scores = compute_dimension_scores(
-                    st.session_state.scene_choices,
-                    st.session_state.self_assess
-                )
+            dim_scores = compute_dimension_scores(
+                st.session_state.scene_choices,
+                st.session_state.self_assess
+            )
 
-                overall = overall_readiness(dim_scores)
-                label, color, description = readiness_label(overall)
+            overall = overall_readiness(dim_scores)
+            label, color, description = readiness_label(overall)
 
-                st.session_state.results = {
-                    "primary_arch": primary_arch,
-                    "secondary_arch": secondary_arch,
-                    "arch_scores": arch_scores,
-                    "dim_scores": dim_scores,
-                    "overall": overall,
-                    "label": label,
-                    "color": color,
-                    "label_desc": description,
-                    "reflection_matches": all_matches,
-                    "coaching": generate_coaching(primary_arch, dim_scores, overall)
-                }
+            st.session_state.results = {
+                "primary_arch": primary_arch,
+                "secondary_arch": secondary_arch,
+                "arch_scores": arch_scores,
+                "dim_scores": dim_scores,
+                "overall": overall,
+                "label": label,
+                "color": color,
+                "label_desc": description,
+                "reflection_matches": all_matches,
+                "coaching": generate_coaching(primary_arch, dim_scores, overall)
+            }
 
-                go_to(4)
-                st.rerun()
-            else:
-                st.error("Please enter a valid email address.")
+            go_to(5)
+            st.rerun()
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
     footer_html = '<div style="text-align: center; color: #888; font-size: 12px;">Brought to you by LaunchX. We respect your privacy.</div>'
@@ -713,7 +740,7 @@ def page_email():
 
 def page_results():
     scroll_to_top()
-    render_progress(4)
+    render_progress(5)
 
     if not st.session_state.results:
         st.error("Results not available. Please restart.")
@@ -772,14 +799,14 @@ def page_results():
     dim_labels = ["Mindset (30%)", "Skills (25%)", "Resources (20%)", "Acumen (25%)"]
     dim_colors = ["#8b5cf6", "#3b82f6", "#22c55e", "#f59e0b"]
 
-    for dim, label, color_dim in zip(dim_order, dim_labels, dim_colors):
+    for dim, label_dim, color_dim in zip(dim_order, dim_labels, dim_colors):
         score = dim_scores[dim]
         percent = int(score)
 
         bar_html = f'''
         <div style="margin: 1.5rem 0;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                <span style="font-weight: bold; color: #333;">{label}</span>
+                <span style="font-weight: bold; color: #333;">{label_dim}</span>
                 <span style="color: {color_dim}; font-weight: bold;">{percent}/100</span>
             </div>
             <div style="width: 100%; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden;">
@@ -960,6 +987,8 @@ elif st.session_state.page == 1:
 elif st.session_state.page == 2:
     page_selfassessment()
 elif st.session_state.page == 3:
-    page_email()
+    page_reflections()
 elif st.session_state.page == 4:
+    page_email()
+elif st.session_state.page == 5:
     page_results()
