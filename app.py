@@ -4,7 +4,7 @@ import altair as alt
 import re
 from collections import defaultdict
 
-st.set_page_config(page_title="LaunchX Entrepreneurial Readiness", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Entrepreneurial Readiness Simulation", layout="wide", initial_sidebar_state="collapsed")
 
 # Hide Streamlit's default menu, footer, and header
 hide_streamlit_style = """
@@ -415,7 +415,7 @@ def render_progress(current_page, scene_step=None):
     if scene_step is not None and current_page == 1:
         progress_text = f"Decision {scene_step + 1} of 5 in {pages[current_page]}"
     else:
-        progress_text = f"Step {current_page + 1} of 6: {pages[current_page]}"
+        progress_text = f"Step {current_page + 1} of 5: {pages[current_page]}"
     progress_html = f'<div style="text-align: center; margin-bottom: 2rem; color: #666; font-size: 14px;">{progress_text}</div>'
     st.markdown(progress_html, unsafe_allow_html=True)
 
@@ -459,9 +459,9 @@ def page_welcome():
             go_to(1)
             st.rerun()
 
-    st.caption("About 10 minutes. There are no right answers, only YOUR answers.")
+    st.caption("About 15-20 minutes. There are no right answers, only YOUR answers.")
 
-    footer_html = '<div style="text-align: center; color: #888; font-size: 13px; margin-top: 2rem;">Brought to you by LaunchX</div>'
+    footer_html = '<div style="text-align: center; color: #888; font-size: 13px; margin-top: 2rem;">Entrepreneurial Readiness Simulation</div>'
     st.markdown(footer_html, unsafe_allow_html=True)
 
 # =============================================================================
@@ -780,7 +780,7 @@ def page_email():
     '''
     st.markdown(teaser_html, unsafe_allow_html=True)
 
-    st.markdown("Enter your email to unlock your complete results (optional, but great for staying updated on LaunchX):")
+    st.markdown("Enter your email to unlock your complete results (optional):")
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
@@ -833,7 +833,7 @@ def page_email():
             st.rerun()
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
-    footer_html = '<div style="text-align: center; color: #888; font-size: 12px;">Brought to you by LaunchX. We respect your privacy.</div>'
+    footer_html = '<div style="text-align: center; color: #888; font-size: 12px;">We respect your privacy.</div>'
     st.markdown(footer_html, unsafe_allow_html=True)
 
 # =============================================================================
@@ -1033,17 +1033,6 @@ def page_results():
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
-    st.markdown("### Ready to Take the Next Step?")
-
-    cta_card = '''
-    <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 2rem; border-radius: 12px; text-align: center;">
-        <h3 style="margin-top: 0;">Explore LaunchX Programs</h3>
-        <p style="margin: 1rem 0; font-size: 1.05rem;">Your simulation reveals your strengths and growth areas. LaunchX programs are designed to help aspiring founders like you build the specific skills you need to launch successfully.</p>
-        <a href="https://launchx.com/programs" target="_blank" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: white; color: #6366f1; text-decoration: none; border-radius: 6px; font-weight: bold;">Learn More About LaunchX Programs</a>
-    </div>
-    '''
-    st.markdown(cta_card, unsafe_allow_html=True)
-
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
     st.markdown("### Challenge a Friend")
@@ -1082,7 +1071,7 @@ def page_results():
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
-    footer_html = '<div style="text-align: center; color: #888; font-size: 13px; margin-top: 2rem;">Brought to you by LaunchX</div>'
+    footer_html = '<div style="text-align: center; color: #888; font-size: 13px; margin-top: 2rem;">Entrepreneurial Readiness Simulation</div>'
     st.markdown(footer_html, unsafe_allow_html=True)
 
 # =============================================================================
