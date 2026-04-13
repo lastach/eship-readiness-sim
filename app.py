@@ -18,16 +18,18 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 if "page" not in st.session_state:
     st.session_state.page = 0
-if "scene_step" not in st.session_state:
-    st.session_state.scene_step = 0
-if "scene_choices" not in st.session_state:
-    st.session_state.scene_choices = {}
+if "exercise_step" not in st.session_state:
+    st.session_state.exercise_step = 0
+if "time_budget" not in st.session_state:
+    st.session_state.time_budget = {"build": 8, "sell": 8, "operate": 6, "market": 6, "team": 6, "strategy": 6}
+if "money_budget" not in st.session_state:
+    st.session_state.money_budget = {"product": 20, "sales": 15, "ops": 15, "marketing": 15, "hires": 20, "reserve": 15}
+if "energy_audit" not in st.session_state:
+    st.session_state.energy_audit = {}
 if "self_assess" not in st.session_state:
     st.session_state.self_assess = {f"slider_{i}": 5 for i in range(6)}
 if "reflections" not in st.session_state:
     st.session_state.reflections = {"motivation": "", "failure": "", "vision": ""}
-if "email" not in st.session_state:
-    st.session_state.email = ""
 if "name" not in st.session_state:
     st.session_state.name = ""
 if "results" not in st.session_state:
@@ -170,37 +172,56 @@ def analyze_text(text, analysis_map):
 # SCORING: Founder Type
 # =============================================================================
 
-def compute_archetype(scene_choices, reflection_matches, self_assess):
+def compute_archetype(time_budget, money_budget, energy_audit, reflection_matches, self_assess):
     scores = {arch: 0 for arch in ARCHETYPES.keys()}
 
-    # Scene choices: each maps to a founder type
-    scene_archetype_map = {
-        ("scene_0", 0): "Builder",
-        ("scene_0", 1): "Operations",
-        ("scene_0", 2): "Business Development",
-        ("scene_0", 3): "Marketing",
-        ("scene_1", 0): "Builder",
-        ("scene_1", 1): "Marketing",
-        ("scene_1", 2): "Operations",
-        ("scene_1", 3): "Business Development",
-        ("scene_2", 0): "Business Development",
-        ("scene_2", 1): "Builder",
-        ("scene_2", 2): "Operations",
-        ("scene_2", 3): "Marketing",
-        ("scene_3", 0): "Builder",
-        ("scene_3", 1): "Operations",
-        ("scene_3", 2): "Marketing",
-        ("scene_3", 3): "Business Development",
-        ("scene_4", 0): "Business Development",
-        ("scene_4", 1): "Operations",
-        ("scene_4", 2): "Builder",
-        ("scene_4", 3): "Marketing",
+    # ---- Time budget signals (hours out of 40) ----
+    # Each hour allocated counts toward the linked archetype
+    time_arch_map = {
+        "build": "Builder",
+        "sell": "Business Development",
+        "operate": "Operations",
+        "market": "Marketing",
+        "team": "Operations",
+        "strategy": "Builder",  # strategic thinking leans slightly Builder/visionary
     }
+    for category, hours in time_budget.items():
+        arch = time_arch_map.get(category)
+        if arch:
+            # Each hour = 1.5 points toward archetype
+            scores[arch] += hours * 1.5
 
-    for scene, choice_idx in scene_choices.items():
-        key = (scene, choice_idx)
-        if key in scene_archetype_map:
-            scores[scene_archetype_map[key]] += 15
+    # ---- Money budget signals ($K out of $100K) ----
+    money_arch_map = {
+        "product": "Builder",
+        "sales": "Business Development",
+        "ops": "Operations",
+        "marketing": "Marketing",
+        "hires": "Operations",
+        "reserve": "Operations",  # reserving cash reflects operational discipline
+    }
+    for category, dollars in money_budget.items():
+        arch = money_arch_map.get(category)
+        if arch:
+            # Each $1K = 0.6 points
+            scores[arch] += dollars * 0.6
+
+    # ---- Energy audit signals ----
+    # Each task tagged with a primary archetype; rating value: Drain = -5, Neutral = 0, Energize = +10
+    energy_task_archetype = {
+        "code": "Builder",
+        "cold_email": "Business Development",
+        "financial_model": "Operations",
+        "linkedin_post": "Marketing",
+        "standup": "Operations",
+        "investor_pitch": "Business Development",
+        "competitive_research": "Marketing",
+        "onboarding_process": "Operations",
+    }
+    rating_values = {"drain": -5, "neutral": 0, "energize": 10}
+    for task, arch in energy_task_archetype.items():
+        rating = energy_audit.get(task, "neutral")
+        scores[arch] += rating_values.get(rating, 0)
 
     # Reflection trait mapping to founder types
     trait_map = {
@@ -274,41 +295,56 @@ def compute_archetype(scene_choices, reflection_matches, self_assess):
 # SCORING: EntreComp Readiness Dimensions
 # =============================================================================
 
-def compute_dimension_scores(scene_choices, self_assess):
+def compute_dimension_scores(time_budget, money_budget, energy_audit, self_assess):
     dim_scores = {"ideas": 0, "resources": 0, "action": 0}
 
     # Base score: everyone starts with some readiness
     for dim in dim_scores:
         dim_scores[dim] = 25
 
-    # Scene choices: each maps to a readiness dimension
-    scene_dim_map = {
-        ("scene_0", 0): "action",
-        ("scene_0", 1): "resources",
-        ("scene_0", 2): "resources",
-        ("scene_0", 3): "ideas",
-        ("scene_1", 0): "action",
-        ("scene_1", 1): "ideas",
-        ("scene_1", 2): "resources",
-        ("scene_1", 3): "action",
-        ("scene_2", 0): "action",
-        ("scene_2", 1): "ideas",
-        ("scene_2", 2): "action",
-        ("scene_2", 3): "resources",
-        ("scene_3", 0): "action",
-        ("scene_3", 1): "action",
-        ("scene_3", 2): "resources",
-        ("scene_3", 3): "ideas",
-        ("scene_4", 0): "action",
-        ("scene_4", 1): "resources",
-        ("scene_4", 2): "ideas",
-        ("scene_4", 3): "resources",
+    # ---- Time budget signals: each category maps to EntreComp dimension ----
+    time_dim_map = {
+        "build": "action",
+        "sell": "resources",
+        "operate": "resources",
+        "market": "ideas",
+        "team": "resources",
+        "strategy": "ideas",
     }
+    for category, hours in time_budget.items():
+        dim = time_dim_map.get(category)
+        if dim:
+            dim_scores[dim] += hours * 0.8
 
-    for scene, choice_idx in scene_choices.items():
-        key = (scene, choice_idx)
-        if key in scene_dim_map:
-            dim_scores[scene_dim_map[key]] += 10
+    # ---- Money budget signals ----
+    money_dim_map = {
+        "product": "action",
+        "sales": "resources",
+        "ops": "resources",
+        "marketing": "ideas",
+        "hires": "resources",
+        "reserve": "resources",
+    }
+    for category, dollars in money_budget.items():
+        dim = money_dim_map.get(category)
+        if dim:
+            dim_scores[dim] += dollars * 0.3
+
+    # ---- Energy audit: energizing tasks add to relevant dimension ----
+    energy_task_dim = {
+        "code": "action",
+        "cold_email": "resources",
+        "financial_model": "resources",
+        "linkedin_post": "ideas",
+        "standup": "resources",
+        "investor_pitch": "resources",
+        "competitive_research": "ideas",
+        "onboarding_process": "action",
+    }
+    rating_values = {"drain": -2, "neutral": 1, "energize": 4}
+    for task, dim in energy_task_dim.items():
+        rating = energy_audit.get(task, "neutral")
+        dim_scores[dim] += rating_values.get(rating, 0)
 
     # Sliders: mapped to EntreComp areas
     # 0: Opportunity Spotting -> ideas
@@ -408,14 +444,16 @@ def scroll_to_top():
 
 def go_to(page_num):
     st.session_state.page = page_num
-    st.session_state.scene_step = 0
+    st.session_state.exercise_step = 0
 
-def render_progress(current_page, scene_step=None):
-    pages = ["Welcome", "Scenarios", "About You", "Reflections", "Unlock Results", "Your Results"]
-    if scene_step is not None and current_page == 1:
-        progress_text = f"Decision {scene_step + 1} of 5 in {pages[current_page]}"
+def render_progress(current_page, exercise_step=None):
+    pages = ["Welcome", "Founder Exercises", "About You", "Reflections", "Your Results"]
+    exercise_labels = ["Time Budget", "Money Budget", "Energy Audit"]
+    if exercise_step is not None and current_page == 1:
+        progress_text = f"Exercise {exercise_step + 1} of 3: {exercise_labels[exercise_step]}"
     else:
-        progress_text = f"Step {current_page + 1} of 5: {pages[current_page]}"
+        step_idx = current_page if current_page < 4 else 4
+        progress_text = f"Step {step_idx + 1} of 5: {pages[min(current_page, 4)]}"
     progress_html = f'<div style="text-align: center; margin-bottom: 2rem; color: #666; font-size: 14px;">{progress_text}</div>'
     st.markdown(progress_html, unsafe_allow_html=True)
 
@@ -448,7 +486,7 @@ def page_welcome():
         st.markdown("🔨 **Your Founder Type** which of four founding team roles you naturally fill: Builder, Business Development, Operations, or Marketing")
         st.markdown("📈 **Readiness Score** your startup readiness across the three EntreComp dimensions used by researchers worldwide")
     with col2:
-        st.markdown("💡 **Personalized Analysis** deep insights based on your choices and reflections")
+        st.markdown("💡 **Personalized Analysis** deep insights based on how you'd allocate time, money, and energy as a founder")
         st.markdown("🤝 **Your Team Complement** which founder type you should recruit to balance your strengths")
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
@@ -459,172 +497,228 @@ def page_welcome():
             go_to(1)
             st.rerun()
 
-    st.caption("About 15-20 minutes. There are no right answers, only YOUR answers.")
+    st.caption("About 12-15 minutes. Three founder exercises (time, money, energy), a short self-assessment, and three reflections.")
 
     footer_html = '<div style="text-align: center; color: #888; font-size: 13px; margin-top: 2rem;">Entrepreneurial Readiness Simulation</div>'
     st.markdown(footer_html, unsafe_allow_html=True)
 
 # =============================================================================
-# PAGE: Scenarios
+# PAGE: Founder Exercises (replaces multiple-choice scenarios with
+# allocation-based mechanics that reveal how you'd actually spend time,
+# money, and energy as a founder)
 # =============================================================================
+
+TIME_CATEGORIES = [
+    ("build", "🔨 Building the product", "Writing code, soldering hardware, shipping features"),
+    ("sell", "🤝 Customer & sales work", "Cold outreach, demos, closing deals, discovery calls"),
+    ("operate", "⚙️ Operations & finance", "Bookkeeping, metrics dashboards, systems, processes"),
+    ("market", "📣 Marketing & story", "Content, brand, social posts, PR, positioning"),
+    ("team", "👥 Team & hiring", "Recruiting, 1:1s, standups, culture"),
+    ("strategy", "🔭 Strategy & research", "Competitive research, thinking time, opportunity scouting"),
+]
+
+MONEY_CATEGORIES = [
+    ("product", "🔨 Product R&D", "Prototyping, tools, components, contractors"),
+    ("sales", "🤝 Sales & BD", "Sales rep, travel, CRM, partner events"),
+    ("ops", "⚙️ Operations & finance tools", "Accounting, legal, compliance, dashboards"),
+    ("marketing", "📣 Marketing & PR", "Content, ads, brand design, launch events"),
+    ("hires", "👥 Key hires", "First full-time hire, stipends, onboarding"),
+    ("reserve", "💰 Cash reserve", "Runway buffer — unallocated for surprises"),
+]
+
+ENERGY_TASKS = [
+    ("code", "Writing code or building a prototype"),
+    ("cold_email", "Cold-emailing a potential customer"),
+    ("financial_model", "Building a financial model in a spreadsheet"),
+    ("linkedin_post", "Writing a LinkedIn post to market your company"),
+    ("standup", "Running a team standup and setting weekly priorities"),
+    ("investor_pitch", "Pitching investors in a conference room"),
+    ("competitive_research", "Researching competitors and mapping the market"),
+    ("onboarding_process", "Designing an onboarding process for a new hire"),
+]
+
 
 def page_scenario():
     scroll_to_top()
-    render_progress(1, st.session_state.scene_step)
+    render_progress(1, st.session_state.exercise_step)
 
-    if st.session_state.scene_step == 0:
-        st.markdown("### The ThermaLoop Scenario")
-        st.markdown("You came up with the idea for ThermaLoop during a summer program at a local property management company. You have been developing a working prototype with help from your school's maker space. Your school's entrepreneurship teacher is your mentor, and a few local building managers are curious about what you have built. Every decision from here shapes whether ThermaLoop becomes a real venture or stays a class project.")
-    else:
-        st.markdown("### ThermaLoop: Your Story Continues")
+    if st.session_state.exercise_step == 0:
+        st.markdown("### The ThermaLoop Launch Pad")
+        st.markdown(
+            "You're getting ThermaLoop — a smart ventilation retrofit kit — off the ground. "
+            "Instead of picking from a list of answers, you'll show us how you'd actually spend "
+            "your time, your money, and your energy as a founder. Your allocations and ratings "
+            "will reveal your founder type and readiness profile."
+        )
+        st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
+        st.markdown("#### Exercise 1 of 3: Your First Week (40 hours)")
+        st.markdown(
+            "You have **40 hours** for your first full week working on ThermaLoop. "
+            "Allocate them across the six categories below — exactly 40 hours total. "
+            "Use the +/- buttons or type directly."
+        )
 
-    st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
+        # Render number inputs for each category
+        cols = st.columns(2)
+        for i, (key, label, helptext) in enumerate(TIME_CATEGORIES):
+            with cols[i % 2]:
+                st.markdown(f"**{label}**")
+                st.caption(helptext)
+                current = st.session_state.time_budget.get(key, 0)
+                val = st.number_input(
+                    label,
+                    min_value=0,
+                    max_value=40,
+                    value=int(current),
+                    step=1,
+                    key=f"time_{key}",
+                    label_visibility="collapsed",
+                )
+                st.session_state.time_budget[key] = val
 
-    scenes = [
-        {
-            "title": "Scene 1: The Spark",
-            "narrative": "Your prototype works in a lab, but you have never tested it in a real building. A property manager you met at a networking event offers you access to a 40 unit apartment complex for a free pilot. A classmate who is great with hardware wants to join but only if you can show traction first. You have one free weekend coming up.",
-            "options": [
-                "Install the prototype in the apartment building this weekend and start collecting real performance data",
-                "Draft a one page business model and rough financial projection to see if the unit economics even work",
-                "Reach out to five building managers this week to gauge interest and line up potential early customers",
-                "Research the market thoroughly: study competitors, read customer reviews, and map the landscape before committing"
-            ]
-        },
-        {
-            "title": "Scene 2: The Reality Check",
-            "narrative": "You crunch some numbers. To manufacture your first batch of 50 ThermaLoop kits, you need about 2,000 dollars for components, assembly, and certifications. Your savings from your summer job and a pitch competition prize can cover maybe half. A family member offers to help fund it but wants 20 percent equity. A local clean energy grant deadline is in two weeks.",
-            "options": [
-                "Bootstrap it: build five kits by hand with off the shelf parts. Prove the concept before spending real money.",
-                "Create a compelling story around your mission and launch a crowdfunding campaign to build buzz and raise funds simultaneously.",
-                "Build a detailed financial model showing exactly when you break even, then decide how much to invest.",
-                "Pre sell kits to 10 building managers at a discount. Use their payments to fund the first production run."
-            ]
-        },
-        {
-            "title": "Scene 3: The Team Tension",
-            "narrative": "Your technical partner wants to spend three more months perfecting the sensor array before any customer sees it. Your mentor says you are burning cash and need to start selling now, even if the product is rough. Both are looking to you to make the call.",
-            "options": [
-                "Side with your mentor: start selling the current version this month and improve based on real customer feedback",
-                "Side with your partner: take three more months to get the hardware right before anyone sees it",
-                "Propose a structured compromise: ship a private beta to five friendly customers with clear expectations, and set specific milestones for the full launch",
-                "Write a clear brand and positioning document first. Make sure when you do launch, the story matches the product quality."
-            ]
-        },
-        {
-            "title": "Scene 4: The Pivot Signal",
-            "narrative": "Your first 10 pilot customers love the energy savings but keep asking the same question: \"Can we get real time data on our phone instead of just monthly reports?\" Finding a developer or learning to build it yourself would require dedicating time and delaying your next sales push by a month.",
-            "options": [
-                "Delay the sales push and find or build a simple mobile dashboard. Customers are telling you exactly what they want.",
-                "Keep selling with monthly reports, but create a feedback process to track and prioritize feature requests systematically.",
-                "Create a \"coming soon\" landing page for the mobile dashboard to test demand before investing in building it.",
-                "Talk to all 10 customers personally. Understand the deeper need and explore partnership opportunities while you are at it."
-            ]
-        },
-        {
-            "title": "Scene 5: The Opportunity Knock",
-            "narrative": "A regional property management company sees your presentation at a local startup showcase and calls. They want to pilot ThermaLoop across 15 buildings in exchange for a 25 percent volume discount. It could mean a massive proof point and recurring revenue, but at thinner margins. You are already stretched thin fulfilling current orders.",
-            "options": [
-                "Say yes, but negotiate: offer 15 percent discount and a 90 day ramp up period so you can scale production.",
-                "Build a spreadsheet model of the partnership economics before committing to anything.",
-                "Say yes, and use this as the centerpiece of a press release and case study to attract even more customers.",
-                "Invite them to coffee. Explore the partnership but also ask who else they know in the industry."
-            ]
-        }
-    ]
+        total = sum(st.session_state.time_budget.values())
+        remaining = 40 - total
 
-    scene = scenes[st.session_state.scene_step]
-    scene_key = f"scene_{st.session_state.scene_step}"
-
-    st.markdown(f"### {scene['title']}")
-    st.markdown(scene["narrative"])
-
-    scenario_card = f'''
-    <div style="background: #fefce8; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
-        <strong>Your Decision:</strong>
-    </div>
-    '''
-    st.markdown(scenario_card, unsafe_allow_html=True)
-
-    selected_idx = st.radio(
-        "Choose one:",
-        range(len(scene["options"])),
-        format_func=lambda i: scene["options"][i],
-        key=scene_key,
-        index=None,
-        label_visibility="collapsed"
-    )
-
-    if selected_idx is not None:
-        st.session_state.scene_choices[scene_key] = selected_idx
-
-        # Insight feedback per scene
-        insights_by_scene = [
-            [
-                "Nice. You lead with action and hands on testing. Real world data is the fastest way to learn.",
-                "Interesting. You validate the core business model before jumping in. This financial discipline reduces risk.",
-                "Nice. You prioritize relationships and customer validation. Understanding demand before building is smart.",
-                "You learn from the landscape before committing resources. This research mindset is valuable."
-            ],
-            [
-                "Nice. You embrace constraints and learn to do more with less. This resourcefulness is a founder superpower.",
-                "Interesting. You think about brand and community from the start. Building an audience while fundraising is powerful.",
-                "Nice. You stress test your idea before investing heavily. This rigor will serve you well.",
-                "You find creative ways to fund growth through customers. Pre selling is a powerful signal of real demand."
-            ],
-            [
-                "Nice. You trust customer feedback over perfection. Speed to market can be a real advantage.",
-                "You believe in getting the fundamentals right. Quality and craft matter to you.",
-                "Interesting. You find structured middle paths that preserve team harmony while still moving forward. This balance is rare.",
-                "Nice. You think about positioning and story before launch. When the product arrives, the narrative will be ready."
-            ],
-            [
-                "Nice. You listen to your customers and follow where the market leads. This responsiveness will scale you.",
-                "You balance customer feedback with operational discipline. Building systems to manage input prevents chaos.",
-                "Interesting. You test demand before committing resources. This marketing instinct prevents costly mistakes.",
-                "Nice. You deepen customer relationships to understand root needs and explore growth opportunities simultaneously."
-            ],
-            [
-                "Interesting. You negotiate thoughtfully to protect margins while capturing growth. This is how strong partnerships are built.",
-                "You let data guide scaling decisions. Financial discipline will keep your venture healthy.",
-                "Nice. You see every deal as a marketing opportunity. Turning partnerships into stories that attract more business is a real skill.",
-                "You leverage relationships to compound growth. Networking your way through opportunities is your superpower."
-            ]
-        ]
-
-        insight_text = insights_by_scene[st.session_state.scene_step][selected_idx]
-
-        insight_html = f'''
-        <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
-            <strong>What This Reveals:</strong> {insight_text}
-        </div>
-        '''
-        st.markdown(insight_html, unsafe_allow_html=True)
-
-    st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col1:
-        if st.session_state.scene_step > 0:
-            if st.button("Back", key="scenario_back", use_container_width=True):
-                st.session_state.scene_step -= 1
-                st.rerun()
-    with col3:
-        if selected_idx is None:
-            if st.session_state.scene_step < 4:
-                st.button("Next", key="scenario_next", use_container_width=True, disabled=True)
-            else:
-                st.button("Next: About You", key="scenario_continue", use_container_width=True, disabled=True)
-            st.caption("Choose one to continue")
+        if total == 40:
+            st.success(f"✅ Perfect — all 40 hours allocated.")
+        elif total < 40:
+            st.warning(f"⚠️ You have **{remaining} hours** left to allocate ({total}/40 used).")
         else:
-            if st.session_state.scene_step < 4:
-                if st.button("Next", key="scenario_next", use_container_width=True):
-                    st.session_state.scene_step += 1
+            st.error(f"❌ You've allocated **{total} hours** — that's {total - 40} over budget. Trim somewhere.")
+
+        # Live preview of where their time is going
+        st.markdown("##### Your Time Mix")
+        if total > 0:
+            chart_data = pd.DataFrame([
+                {"Category": label.split(" ", 1)[1] if " " in label else label, "Hours": st.session_state.time_budget.get(key, 0)}
+                for key, label, _ in TIME_CATEGORIES
+            ])
+            chart = alt.Chart(chart_data).mark_bar(color="#6366f1").encode(
+                y=alt.Y("Category:N", sort="-x"),
+                x=alt.X("Hours:Q", scale=alt.Scale(domain=[0, 40])),
+                tooltip=["Category", "Hours"],
+            ).properties(height=220)
+            st.altair_chart(chart, use_container_width=True)
+
+        st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("Back", key="ex1_back", use_container_width=True):
+                go_to(0)
+                st.rerun()
+        with col3:
+            if total == 40:
+                if st.button("Next: Money Budget", key="ex1_next", use_container_width=True):
+                    st.session_state.exercise_step = 1
                     st.rerun()
             else:
-                if st.button("Next: About You", key="scenario_continue", use_container_width=True):
-                    go_to(2)
+                st.button("Next: Money Budget", key="ex1_next_disabled", use_container_width=True, disabled=True)
+                st.caption("Allocate exactly 40 hours to continue.")
+
+    elif st.session_state.exercise_step == 1:
+        st.markdown("### Exercise 2 of 3: Your $100K Budget")
+        st.markdown(
+            "A grant, angel, or family round just gave ThermaLoop **$100,000** in seed capital. "
+            "Allocate it across six buckets in $1K increments. Total must equal $100K."
+        )
+
+        cols = st.columns(2)
+        for i, (key, label, helptext) in enumerate(MONEY_CATEGORIES):
+            with cols[i % 2]:
+                st.markdown(f"**{label}**")
+                st.caption(helptext)
+                current = st.session_state.money_budget.get(key, 0)
+                val = st.number_input(
+                    f"{key}_amount",
+                    min_value=0,
+                    max_value=100,
+                    value=int(current),
+                    step=1,
+                    key=f"money_{key}",
+                    label_visibility="collapsed",
+                    help="In thousands of dollars",
+                )
+                st.session_state.money_budget[key] = val
+                st.caption(f"${val}K")
+
+        total_money = sum(st.session_state.money_budget.values())
+        remaining_money = 100 - total_money
+        if total_money == 100:
+            st.success(f"✅ Perfect — all $100K allocated.")
+        elif total_money < 100:
+            st.warning(f"⚠️ You have **${remaining_money}K** left to allocate (${total_money}K/$100K used).")
+        else:
+            st.error(f"❌ You've allocated **${total_money}K** — that's ${total_money - 100}K over budget. Trim somewhere.")
+
+        st.markdown("##### Your Capital Allocation")
+        if total_money > 0:
+            chart_data = pd.DataFrame([
+                {"Category": label.split(" ", 1)[1] if " " in label else label, "Amount ($K)": st.session_state.money_budget.get(key, 0)}
+                for key, label, _ in MONEY_CATEGORIES
+            ])
+            chart = alt.Chart(chart_data).mark_bar(color="#22c55e").encode(
+                y=alt.Y("Category:N", sort="-x"),
+                x=alt.X("Amount ($K):Q", scale=alt.Scale(domain=[0, 100])),
+                tooltip=["Category", "Amount ($K)"],
+            ).properties(height=220)
+            st.altair_chart(chart, use_container_width=True)
+
+        st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("Back", key="ex2_back", use_container_width=True):
+                st.session_state.exercise_step = 0
+                st.rerun()
+        with col3:
+            if total_money == 100:
+                if st.button("Next: Energy Audit", key="ex2_next", use_container_width=True):
+                    st.session_state.exercise_step = 2
                     st.rerun()
+            else:
+                st.button("Next: Energy Audit", key="ex2_next_disabled", use_container_width=True, disabled=True)
+                st.caption("Allocate exactly $100K to continue.")
+
+    else:  # exercise_step == 2
+        st.markdown("### Exercise 3 of 3: Energy Audit")
+        st.markdown(
+            "For each founder task, mark whether it **drains** you, is **neutral**, or **energizes** you. "
+            "Be honest — this is about what genuinely pulls you forward, not what you think you should pick."
+        )
+
+        for key, task in ENERGY_TASKS:
+            current = st.session_state.energy_audit.get(key, "neutral")
+            st.markdown(f"**{task}**")
+            idx_map = {"drain": 0, "neutral": 1, "energize": 2}
+            labels = ["😴 Drains me", "😐 Neutral", "⚡ Energizes me"]
+            selected_label = st.radio(
+                task,
+                labels,
+                index=idx_map.get(current, 1),
+                key=f"energy_{key}",
+                horizontal=True,
+                label_visibility="collapsed",
+            )
+            value_map = {labels[0]: "drain", labels[1]: "neutral", labels[2]: "energize"}
+            st.session_state.energy_audit[key] = value_map[selected_label]
+            st.markdown('<div style="height: 1px; background: #f3f4f6; margin: 0.75rem 0;"></div>', unsafe_allow_html=True)
+
+        # Count energizers
+        energizer_count = sum(1 for v in st.session_state.energy_audit.values() if v == "energize")
+        drain_count = sum(1 for v in st.session_state.energy_audit.values() if v == "drain")
+        st.info(f"You marked **{energizer_count}** task(s) as energizing and **{drain_count}** as draining.")
+
+        st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("Back", key="ex3_back", use_container_width=True):
+                st.session_state.exercise_step = 1
+                st.rerun()
+        with col3:
+            if st.button("Next: About You", key="ex3_next", use_container_width=True):
+                go_to(2)
+                st.rerun()
+    return
+
 
 # =============================================================================
 # PAGE: Self Assessment (sliders mapped to EntreComp)
@@ -762,10 +856,10 @@ def page_reflections():
             st.rerun()
 
 # =============================================================================
-# PAGE: Email Capture
+# PAGE: Reveal Results (no email capture — optional first name only)
 # =============================================================================
 
-def page_email():
+def page_reveal():
     scroll_to_top()
     render_progress(4)
     render_back_button(3)
@@ -774,43 +868,42 @@ def page_email():
 
     teaser_html = '''
     <div style="background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.1) 100%); border: 2px dashed #6366f1; padding: 2rem; border-radius: 12px; text-align: center; margin-bottom: 2rem;">
-        <p style="font-size: 1.1rem; color: #666; margin: 0;">Your founder type is ready to be revealed...</p>
-        <p style="color: #999; font-size: 0.95rem; margin: 0.5rem 0 0 0;">Plus personalized readiness scores and coaching recommendations designed just for you.</p>
+        <p style="font-size: 1.1rem; color: #666; margin: 0;">Your founder type is ready to be revealed.</p>
+        <p style="color: #999; font-size: 0.95rem; margin: 0.5rem 0 0 0;">Personalized readiness scores and coaching recommendations, based on how you actually allocated your time, money, and energy.</p>
     </div>
     '''
     st.markdown(teaser_html, unsafe_allow_html=True)
 
-    st.markdown("Enter your email to unlock your complete results (optional):")
+    st.markdown("Optionally tell us your first name so we can personalize your report:")
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        name = st.text_input("Name (optional)", value=st.session_state.name, key="email_name")
-        st.session_state.name = name
-    with col2:
-        email = st.text_input("Email (optional)", value=st.session_state.email, key="email_input")
-        st.session_state.email = email
+    name = st.text_input("First name (optional)", value=st.session_state.name, key="reveal_name")
+    st.session_state.name = name
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        if st.button("Show My Results", key="email_unlock", use_container_width=True):
+        if st.button("Show My Results", key="reveal_show", use_container_width=True):
             all_matches = []
             all_matches.extend(analyze_text(st.session_state.reflections["motivation"], ANALYSIS_MAPS["motivation"]))
             all_matches.extend(analyze_text(st.session_state.reflections["failure"], ANALYSIS_MAPS["failure"]))
             all_matches.extend(analyze_text(st.session_state.reflections["vision"], ANALYSIS_MAPS["vision"]))
 
             primary_arch, secondary_arch, arch_scores = compute_archetype(
-                st.session_state.scene_choices,
+                st.session_state.time_budget,
+                st.session_state.money_budget,
+                st.session_state.energy_audit,
                 all_matches,
-                st.session_state.self_assess
+                st.session_state.self_assess,
             )
 
             dim_scores = compute_dimension_scores(
-                st.session_state.scene_choices,
-                st.session_state.self_assess
+                st.session_state.time_budget,
+                st.session_state.money_budget,
+                st.session_state.energy_audit,
+                st.session_state.self_assess,
             )
 
             overall = overall_readiness(dim_scores)
@@ -826,14 +919,14 @@ def page_email():
                 "color": color,
                 "label_desc": description,
                 "reflection_matches": all_matches,
-                "coaching": generate_coaching(primary_arch, dim_scores, overall)
+                "coaching": generate_coaching(primary_arch, dim_scores, overall),
             }
 
             go_to(5)
             st.rerun()
 
     st.markdown('<div style="height: 1px; background: #e5e7eb; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
-    footer_html = '<div style="text-align: center; color: #888; font-size: 12px;">We respect your privacy.</div>'
+    footer_html = '<div style="text-align: center; color: #888; font-size: 12px;">No email required. Your answers stay on your device.</div>'
     st.markdown(footer_html, unsafe_allow_html=True)
 
 # =============================================================================
@@ -1055,11 +1148,12 @@ def page_results():
     with col1:
         if st.button("Start Over", key="results_restart", use_container_width=True):
             st.session_state.page = 0
-            st.session_state.scene_step = 0
-            st.session_state.scene_choices = {}
+            st.session_state.exercise_step = 0
+            st.session_state.time_budget = {"build": 8, "sell": 8, "operate": 6, "market": 6, "team": 6, "strategy": 6}
+            st.session_state.money_budget = {"product": 20, "sales": 15, "ops": 15, "marketing": 15, "hires": 20, "reserve": 15}
+            st.session_state.energy_audit = {}
             st.session_state.self_assess = {f"slider_{i}": 5 for i in range(6)}
             st.session_state.reflections = {"motivation": "", "failure": "", "vision": ""}
-            st.session_state.email = ""
             st.session_state.name = ""
             st.session_state.results = None
             st.rerun()
@@ -1087,6 +1181,6 @@ elif st.session_state.page == 2:
 elif st.session_state.page == 3:
     page_reflections()
 elif st.session_state.page == 4:
-    page_email()
+    page_reveal()
 elif st.session_state.page == 5:
     page_results()
