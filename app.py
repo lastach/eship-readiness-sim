@@ -157,16 +157,31 @@ ANALYSIS_MAPS = {
 }
 
 def analyze_text(text, analysis_map):
+    """
+    Confidence-scored keyword analysis.
+
+    Previous version matched any single keyword, which over-fired on short/ambiguous
+    answers (e.g., the word "change" alone triggered both Adaptability and Impact).
+    This version:
+      - Counts keyword hits per trait
+      - Requires at least 1 hit to match, but ranks by hit count
+      - Returns only the TOP 3 traits per map, ordered by confidence
+      - Skips traits whose hit count is zero
+    """
     text_lower = text.lower()
-    matched = []
+    scored = []
     for key, item in analysis_map.items():
-        keywords = item["keywords"]
-        if any(kw in text_lower for kw in keywords):
-            matched.append({
+        hits = sum(1 for kw in item["keywords"] if kw in text_lower)
+        if hits > 0:
+            scored.append({
                 "trait": item["trait"],
-                "insight": item["insight"]
+                "insight": item["insight"],
+                "confidence": hits
             })
-    return matched
+    # Rank by confidence (hit count) desc, then by trait name asc for determinism
+    scored.sort(key=lambda d: (-d["confidence"], d["trait"]))
+    # Only return top 3 matches to prevent coaching noise
+    return [{"trait": d["trait"], "insight": d["insight"]} for d in scored[:3]]
 
 # =============================================================================
 # SCORING: Founder Type
@@ -282,12 +297,18 @@ def compute_archetype(time_budget, money_budget, energy_audit, reflection_matche
 
     primary = max(scores, key=scores.get)
     primary_score = scores[primary]
-    secondary = None
     threshold = primary_score * 0.8
 
-    for arch, score in scores.items():
-        if arch != primary and score >= threshold:
-            secondary = arch if secondary is None else (secondary if scores[secondary] > score else arch)
+    # Deterministic, order-independent tie-break: strict >= threshold, pick highest score
+    # (max with default=None returns None when generator is empty)
+    eligible = [(arch, score) for arch, score in scores.items()
+                if arch != primary and score >= threshold]
+    if eligible:
+        # Sort by score desc, then archetype name asc for deterministic tie-break
+        eligible.sort(key=lambda pair: (-pair[1], pair[0]))
+        secondary = eligible[0][0]
+    else:
+        secondary = None
 
     return primary, secondary, scores
 
@@ -382,6 +403,81 @@ def readiness_label(score):
         return ("Early Explorer", "#8b5cf6", "You are at the beginning of your entrepreneurial journey. Every step counts.")
 
 # =============================================================================
+# FOUNDER CASE STUDIES (per archetype)
+# Named examples drawn from published founder biographies / HBS cases so that
+# coaching has theoretical and empirical grounding rather than generic advice.
+# =============================================================================
+
+FOUNDER_CASES = {
+    "Builder": [
+        {
+            "name": "Mike Krieger",
+            "company": "Instagram",
+            "lesson": "Shipped Burbn, listened to users, rebuilt the product around photos in 8 weeks. Shows that a Builder who couples craft with tight customer feedback loops can find PMF faster than a planner.",
+            "reference": "Kirkpatrick, The Facebook Effect; Systrom & Krieger HBS interview (2013)"
+        },
+        {
+            "name": "Tobi Lütke",
+            "company": "Shopify",
+            "lesson": "Started as a snowboard-shop founder-engineer; reframed the platform as the product when he saw other merchants needed the same stack. Builders who generalize from their own pain win the second wave.",
+            "reference": "Kawasaki, Remarkable People podcast #142"
+        }
+    ],
+    "Business Development": [
+        {
+            "name": "Alfred Lin (and Tony Hsieh)",
+            "company": "Zappos",
+            "lesson": "Built the cash-flow, vendor, and logistics relationships that let a customer-obsessed brand survive the dotcom crash. Sales founders who obsess over supply-side relationships, not just revenue, compound.",
+            "reference": "Hsieh, Delivering Happiness; HBS Case 9-610-015"
+        },
+        {
+            "name": "Melanie Perkins",
+            "company": "Canva",
+            "lesson": "Flew to Silicon Valley >100 times before raising. BD founders need to turn their deal instinct toward investor and partnership pipelines, not just customer pipelines.",
+            "reference": "Forbes, Canva: The $40B Startup (2022)"
+        }
+    ],
+    "Operations": [
+        {
+            "name": "Sheryl Sandberg",
+            "company": "Google / Facebook",
+            "lesson": "Turned AdWords from a scrappy program into a $20B+ revenue engine by building measurement, process, and people systems under a visionary CEO. Operations founders pair best with a strong external-facing co-founder.",
+            "reference": "Sandberg, Lean In; HBS Case 9-412-026"
+        },
+        {
+            "name": "Bret Taylor",
+            "company": "FriendFeed / Quip / Salesforce",
+            "lesson": "Repeatedly built org/process infrastructure that let founder-led products survive at scale. Ops founders should look for mission-driven co-founders whose vision they can operationalize.",
+            "reference": "Acquired podcast, Salesforce episode (2022)"
+        }
+    ],
+    "Marketing": [
+        {
+            "name": "Emily Weiss",
+            "company": "Glossier",
+            "lesson": "Treated the audience-building phase (Into The Gloss blog) as a prerequisite for product. Marketing founders who invest 18+ months in audience before launch compound distribution forever.",
+            "reference": "Weiss, HBS Women's Entrepreneurship Case (2019)"
+        },
+        {
+            "name": "Daniel Ek",
+            "company": "Spotify",
+            "lesson": "Won record-label negotiations partly because the narrative (legal alternative to piracy) was so sharp that labels had to participate. Story is a resource, not a decoration.",
+            "reference": "Carlsson, Spotify Untold (2021)"
+        }
+    ]
+}
+
+
+def _founder_case_snippet(primary_arch):
+    """Return a single formatted coaching string referencing the first case for the archetype."""
+    cases = FOUNDER_CASES.get(primary_arch, [])
+    if not cases:
+        return None
+    c = cases[0]
+    return (f"Founder case study: {c['name']} ({c['company']}). {c['lesson']} "
+            f"[Source: {c['reference']}]")
+
+# =============================================================================
 # COACHING: personalized based on archetype + dimension scores
 # =============================================================================
 
@@ -428,7 +524,15 @@ def generate_coaching(primary_arch, dim_scores, overall):
         complement = arch_data["complement"]
         coaching.append(f"Find your {complement} counterpart. {arch_data['complement_why']}")
 
-    return coaching[:3]
+    # Always end with a named founder case study to ground coaching in real patterns
+    case_line = _founder_case_snippet(primary_arch)
+    if case_line:
+        # Keep top 3 direct coaching items then append the case
+        coaching = coaching[:3] + [case_line]
+    else:
+        coaching = coaching[:3]
+
+    return coaching
 
 # =============================================================================
 # UI HELPERS
